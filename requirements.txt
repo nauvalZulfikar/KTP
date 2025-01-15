@@ -1,0 +1,9 @@
+pandas
+datetime
+matplotlib.pyplot
+matplotlib.dates
+math
+collections
+streamlit
+plotly.express
+streamlit_autorefresh
