@@ -414,7 +414,7 @@ def similarity(dfm):
         aggfunc='max',
         fill_value=0
     )
-    df_pivot
+    return df_pivot
 
 similarity_df = similarity(dfm)
 
