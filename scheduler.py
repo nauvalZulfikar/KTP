@@ -411,7 +411,7 @@ def similarity(dfm):
     dfm['Binary'] = 1  # Add a binary column
     df_pivot = dfm[dfm['Machine Number']!='OutSrc'].pivot_table(
         index='Operation',
-        columns=['Product Name', 'Machine Number'],
+        columns=['Product Name', 'Machine Number','Components],
         values='Binary',
         aggfunc='max',
         fill_value=0
