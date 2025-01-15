@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from scheduler import dfm, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
+from scheduler import dfm, similarity_df, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
 
 def product_catalogue():
     df_list = ['Order Processing Date','Promised Delivery Date','Start Time','End Time']
