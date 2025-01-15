@@ -15,7 +15,6 @@ df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
 df['Start Time'] = pd.NaT  # Initialize as empty datetime
 df['End Time'] = pd.NaT  # Initialize as empty datetime
-df['mac_comp'] = df['Machine Number'] + ' - ' + df['Components']
 
 # Sort the data by Promised Delivery Date, Product Name, and Component order
 df = df.sort_values(by=['Promised Delivery Date',
@@ -380,6 +379,7 @@ def schedule_production_with_days(data):
 dfm = df.copy()
 dfm = schedule_production_with_days(dfm)
 dfm = adjust_end_time_and_start_time(dfm)  # Adjust Start and End Times
+dfm['mac_comp'] = dfm['Machine Number'] + ' - ' + dfm['Components']
 
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
