@@ -25,7 +25,3 @@ def results():
         st.subheader("Late Products")
         late_products_df = late_products(dfm)
         st.write(late_products_df)
-
-# Ensure the function gets called when the app runs
-if __name__ == "__main__":
-    results()
