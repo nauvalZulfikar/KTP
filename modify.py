@@ -8,14 +8,12 @@ def modify():
         "Time Converter"
         ])
     with tabs[0]:
-        # st.subheader("In House")
+        st.subheader("In House")
         
     with tabs[1]:
-        # st.subheader("Out Source")
+        st.subheader("Out Source")
         
     with tabs[2]:
-        # st.subheader("Time Converter")
-        
         # Radio button for conversion options
         conversion_type = st.radio(
             "Choose a conversion type:",
