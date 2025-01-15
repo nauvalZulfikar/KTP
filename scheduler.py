@@ -9,8 +9,6 @@ import math
 from collections import defaultdict
 
 df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
-similarity_df = pd.read_excel('Product Details_v1.xlsx', sheet_name='Similarity')
-# similarity_df = pd.read_excel('Product Details_v1.xlsx', sheet_name='Similarity')
 
 # Convert columns to appropriate types
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
@@ -417,6 +415,8 @@ def similarity(dfm):
         fill_value=0
     )
     df_pivot
+
+similarity_df = similarity(dfm)
 
 def calculate_machine_utilization(dfm):
     # Define working hours (8 hours per day in minutes)
