@@ -38,7 +38,7 @@ def visualisation(df,st):
 
     # Layout for buttons with reduced spacing
     with st.container():
-        col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.05, 1, 0.05, 1, 0.05, 1])
+        col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 1, 1, 1, 1, 1, 1])
     
         with col1:
             if st.button("Start"):
