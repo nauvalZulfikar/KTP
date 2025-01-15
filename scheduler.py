@@ -543,3 +543,5 @@ def late_products(dfm):
     late = dfm.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
     late['late'] = ['late' if late['End Time'][i] > late['Promised Delivery Date'][i] else 'on time' for i in range(len(late))]
     late_df = late.groupby('late')['late'].count()
+
+    return late_df
