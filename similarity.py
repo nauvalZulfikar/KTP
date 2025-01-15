@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-from scheduler import similarity_df
 
 def similarity():
     # Editable DataFrame
