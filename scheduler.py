@@ -379,7 +379,6 @@ def schedule_production_with_days(data):
 dfm = df.copy()
 dfm = schedule_production_with_days(dfm)
 dfm = adjust_end_time_and_start_time(dfm)  # Adjust Start and End Times
-dfm['mac_comp'] = dfm['Machine Number'] + ' - ' + dfm['Components']
 
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
@@ -406,9 +405,9 @@ def calculate_business_hours_split(start_time, end_time):
     return total_hours
 
 # SIMILARITY
-def similarity(dfm):
-    dfm['Binary'] = 1  # Add a binary column
-    df_pivot = dfm[dfm['Machine Number']!='OutSrc'].pivot_table(
+def similarity(df):
+    df['Binary'] = 1  # Add a binary column
+    df_pivot = df[df['Machine Number']!='OutSrc'].pivot_table(
         index='Operation',
         columns=['Product Name', 'Machine Number','Components'],
         values='Binary',
@@ -419,7 +418,7 @@ def similarity(dfm):
 
 similarity_df = similarity(dfm)
 
-def calculate_machine_utilization(dfm):
+def calculate_machine_utilization(df):
     # Define working hours (8 hours per day in minutes)
     WORK_HOURS_PER_DAY = 8 * 60
 
@@ -539,6 +538,8 @@ product_waiting_df = calculate_waiting_time(
     group_by_column='Product Name',
     date_columns=('Order Processing Date', 'Start Time')
 )
+
+dfm['mac_comp'] = dfm['Machine Number'] + ' - ' + dfm['Components']
 
 def late_products(dfm):
     late = dfm.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
