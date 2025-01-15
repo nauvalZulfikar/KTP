@@ -404,20 +404,6 @@ def calculate_business_hours_split(start_time, end_time):
     # Return the total business hours as a timedelta object
     return total_hours
 
-# SIMILARITY
-def similarity(df):
-    df['Binary'] = 1  # Add a binary column
-    df_pivot = df[df['Machine Number']!='OutSrc'].pivot_table(
-        index='Operation',
-        columns=['Product Name', 'Machine Number','Components'],
-        values='Binary',
-        aggfunc='max',
-        fill_value=0
-    )
-    return df_pivot
-
-similarity_df = similarity(dfm)
-
 def calculate_machine_utilization(df):
     # Define working hours (8 hours per day in minutes)
     WORK_HOURS_PER_DAY = 8 * 60
