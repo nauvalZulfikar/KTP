@@ -36,18 +36,34 @@ def visualisation(df,st):
     if "total_rows" not in st.session_state:
         st.session_state.total_rows = len(dfm)  # Total rows in the DataFrame
 
+    # Layout for buttons in a single row
+    col1, col2, col3, col4 = st.columns(4)
+    
     # Start Button Above the Static Chart
-    if st.button("Start"):
-        # Reset the progress DataFrame and counters for animation
-        st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
-        st.session_state.rows_added = 0
-        st.session_state.auto_refresh = True
-    elif st.button("Pause"):
-        pass
-    elif st.button("Reschedule"):
-        pass
-    elif st.button("Reset"):
-        pass
+    with col1:
+        if st.button("Start"):
+            # Reset the progress DataFrame and counters for animation
+            st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+            st.session_state.rows_added = 0
+            st.session_state.auto_refresh = True
+    with col2:
+        if st.button("Pause"):
+            # Pause the auto-refresh
+            st.session_state.auto_refresh = False
+            st.info("Animation paused.")
+    with col3:
+        if st.button("Reschedule"):
+            # Reschedule logic - reset the progress to start fresh
+            st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+            st.session_state.rows_added = 0
+            st.info("Rescheduling initiated. Click 'Start' to animate again.")
+    with col4:
+        if st.button("Reset"):
+            # Reset all session state variables
+            st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+            st.session_state.rows_added = 0
+            st.session_state.auto_refresh = False
+            st.success("Progress reset successfully.")
 
     # Dropdown (Selectbox) for visualization options
     visualization_options = [
