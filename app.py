@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from scheduler import dfm  # Import the processed `dfm` from the backend
 from visualisation import visualisation  # Import Gantt chart visualization
-from similarity import similarity
 from results import results
 from modify import modify
 from product_list_change import product_list_change
