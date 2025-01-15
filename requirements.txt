@@ -1,9 +1,8 @@
 pandas
 datetime
-matplotlib.pyplot
-matplotlib.dates
+matplotlib
 math
 collections
 streamlit
-plotly.express
-streamlit_autorefresh
+plotly
+streamlit-autorefresh
