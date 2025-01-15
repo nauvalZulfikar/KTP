@@ -25,7 +25,7 @@ tabs = st.tabs([
     "Product List Change", 
     "Product Catalogue", 
     "Similarity Catalogue", 
-    "Results",
+    # "Results",
     ])
 
 # Tab Content
@@ -44,5 +44,5 @@ with tabs[3]:
 with tabs[4]:
     similarity()
 
-with tabs[5]:
-    results()
+# with tabs[5]:
+#     results()
