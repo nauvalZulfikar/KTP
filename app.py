@@ -20,12 +20,12 @@ st.title("Machine Production Scheduler")
 
 # Add Tabs Below
 tabs = st.tabs([
-    "Visualisation", 
+    "Visualisation",  
+    "Modify",
     "Product List Change", 
     "Product Catalogue", 
     "Similarity Catalogue", 
-    "Results", 
-    "Modify", 
+    "Results",
     ])
 
 # Tab Content
