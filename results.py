@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from scheduler import calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
+from scheduler import dfm, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
 
 def results():
     # Add Tabs Below
@@ -12,7 +12,7 @@ def results():
         ])
 
     with tabs[0]:
-        st.write(calculate_machine_utilization)
+        st.write(calculate_machine_utilization(dfm))
     
     with tabs[1]:
         st.write(component_waiting_df)
@@ -21,5 +21,5 @@ def results():
         st.write(product_waiting_df)
     
     with tabs[3]:
-        st.write(late_products)
+        st.write(late_products(dfm))
     
