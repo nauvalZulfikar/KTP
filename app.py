@@ -31,18 +31,18 @@ tabs = st.tabs([
 # Tab Content
 with tabs[0]:  # Visualisation Tab
     visualisation(dfm,st)
-
+    
 with tabs[1]:
-    product_list_change()
+    modify()
 
 with tabs[2]:
-    product_catalogue()
+    product_list_change()
 
 with tabs[3]:
-    similarity()
+    product_catalogue()
 
 with tabs[4]:
-    results()
+    similarity()
 
 with tabs[5]:
-    modify()
+    results()
