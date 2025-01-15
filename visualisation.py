@@ -42,6 +42,12 @@ def visualisation(df,st):
         st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
         st.session_state.rows_added = 0
         st.session_state.auto_refresh = True
+    elif st.button("Pause"):
+        pass
+    elif st.button("Reschedule"):
+        pass
+    elif st.button("Reset"):
+        pass
 
     # Dropdown (Selectbox) for visualization options
     visualization_options = [
