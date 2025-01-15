@@ -13,7 +13,7 @@ def product_catalogue():
     st.write(dfpc.sort_values(by=['Start Time','End Time']))
     
     # Editable DataFrame
-    st.subheader("Edit the DataFrame Below")
+    st.subheader("Similarity Catalogue")
     edited_df = st.data_editor(similarity_df, num_rows="dynamic", use_container_width=True)
 
     # Update the source DataFrame in session state
