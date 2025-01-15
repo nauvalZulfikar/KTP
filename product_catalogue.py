@@ -10,4 +10,4 @@ def product_catalogue():
     for i in dfm_list:
         dfpc[i] = dfpc[i].dt.strftime('%Y-%m-%d %H:%M')
         
-    st.write(dfm.sort_values(by=['Start Time','End Time']))
+    st.write(dfpc.sort_values(by=['Start Time','End Time']))
