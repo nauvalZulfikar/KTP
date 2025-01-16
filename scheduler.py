@@ -15,6 +15,7 @@ df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
 df['Start Time'] = pd.NaT  # Initialize as empty datetime
 df['End Time'] = pd.NaT  # Initialize as empty datetime
+df['Status'] = 'InProgress'
 
 # Sort the data by Promised Delivery Date, Product Name, and Component order
 df = df.sort_values(by=['Promised Delivery Date',
