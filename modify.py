@@ -15,7 +15,7 @@ def modify():
     with tabs[1]: # Outsource
         products = dfm['Product Name'].unique()
         product_name = [
-            dfm['Product Name'].unique()
+            products
         ]
         selected_product = st.selectbox(
             'select product name: ',
