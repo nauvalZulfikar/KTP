@@ -221,7 +221,7 @@ def visualisation(dfm,st):
 
     if selected_visualization == "Product Components Status":
         # Progressive animation
-        if st.session_state.auto_refresh_status and st.session_state.rows_added_status < st.session_state.total_rows_status:
+        if st.session_state.auto_refresh and st.session_state.rows_added_status < st.session_state.total_rows_status:
             st_autorefresh(interval=1000, limit=None, key="autorefresh_status")  # Refresh every second
             # Add the next row to the progress DataFrame
             st.session_state.dfm_progress_status = pd.concat(
@@ -232,7 +232,7 @@ def visualisation(dfm,st):
     
         # Stop animation when all rows are added
         if st.session_state.rows_added_status >= st.session_state.total_rows_status:
-            st.session_state.auto_refresh_status = False
+            st.session_state.auto_refresh = False
             st.success("Animation complete! Reload the page to reset.")
     
         # Create a scatter plot for progressive animation or static visualization
