@@ -1,7 +1,23 @@
 import streamlit as st
 from scheduler import dfm
+import pandas as pd
+from openpyxl import load_workbook
 
+# File path
+file_path = "Product Details_v1.xlsx"
+
+# Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
+
+def save_to_excel(df, sheet_name):
+    """Save the updated dataframe back to the Excel file."""
+    try:
+        book = load_workbook(file_path)
+        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+            writer.book = book
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+    except Exception as e:
+        st.error(f"Error saving data to Excel: {e}")
 
 def modify():
     # Add Tabs Below
@@ -60,6 +76,9 @@ def modify():
                 (df_in['Components'] == in_selected_components),
                 in_selected_fields
             ] = in_edit_input
+
+            # Save changes back to Excel
+            save_to_excel(dfn, sheet_name="prodet")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -111,6 +130,9 @@ def modify():
                 (df_out['Components'] == out_selected_components),
                 out_selected_fields
             ] = out_edit_input
+
+            # Save changes back to Excel
+            save_to_excel(dfn, sheet_name="prodet")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
@@ -146,4 +168,3 @@ def modify():
         elif conversion_type == "Minutes to Days":
             result = input_value / (24 * 60)
             st.write(f"{input_value} minutes is equivalent to {result:.6f} days.")
-
