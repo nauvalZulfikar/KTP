@@ -5,8 +5,13 @@ import pandas as pd
 file_path = "Product Details_v1.xlsx"
 
 def write_excel(df, file_path, sheet_name):
+    """Writes the updated DataFrame to Excel and updates dfm in memory."""
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
         df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    # Update the global dfm
+    global dfm
+    dfm.update(df)  # Reflect changes in dfm
 
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
@@ -17,14 +22,14 @@ def modify():
         "In House", 
         "Out Source", 
         "Time Converter"
-        ])
+    ])
 
     int_col = ['UniqueID', 'Sr. No', 'Quantity Required', 'Run Time (min/1000)', 'Cycle Time (seconds)', 'Setup time (seconds)']
     str_col = ['Product Name', 'Components', 'Operation', 'Process Type', 'Machine Number']
     date_col = ['Order Processing Date', 'Promised Delivery Date']
 
     with tabs[0]:  # In House
-        df_in = dfn[dfn['Process Type'] == 'In House']
+        df_in = dfm[dfm['Process Type'] == 'In House']
         in_products = df_in['Product Name'].unique()
         in_selected_product = st.selectbox(
             'Select product name:',
@@ -63,14 +68,14 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
-            df_in.loc[
-                (df_in['Product Name'] == in_selected_product) &
-                (df_in['Components'] == in_selected_components),
+            dfm.loc[
+                (dfm['Product Name'] == in_selected_product) &
+                (dfm['Components'] == in_selected_components),
                 in_selected_fields
             ] = in_edit_input
 
             # Save changes back to Excel
-            write_excel(df_in, file_path, sheet_name="prodet")
+            write_excel(dfm, file_path, sheet_name="prodet")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -79,7 +84,7 @@ def modify():
         st.success('Data has been successfully changed!')
 
     with tabs[1]:  # Outsource
-        df_out = dfn[dfn['Process Type'] == 'Outsource']
+        df_out = dfm[dfm['Process Type'] == 'Outsource']
         out_products = df_out['Product Name'].unique()
         out_selected_product = st.selectbox(
             'Select product name:',
@@ -118,14 +123,14 @@ def modify():
             )
             
         if st.button('Confirm', key="out_confirm"):
-            df_out.loc[
-                (df_out['Product Name'] == out_selected_product) &
-                (df_out['Components'] == out_selected_components),
+            dfm.loc[
+                (dfm['Product Name'] == out_selected_product) &
+                (dfm['Components'] == out_selected_components),
                 out_selected_fields
             ] = out_edit_input
 
             # Save changes back to Excel
-            write_excel(df_out, file_path, sheet_name="prodet")
+            write_excel(dfm, file_path, sheet_name="prodet")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
