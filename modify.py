@@ -1,7 +1,7 @@
 import streamlit as st
 from scheduler import dfm
 
-dfn = dfm.drop(columns=['wait_time','legend']).copy()
+dfn = dfm.drop(columns=['wait_time','legend','Status']).copy()
 
 def modify():
     # Add Tabs Below
@@ -33,10 +33,24 @@ def modify():
             field
         )
 
-        edit_input = st.text_input(
-            'Enter new value: '
-        )
 
+        int_col = ['UniqueID','Sr. No','Quantity Required','Run Time (min/1000)','Cycle Time (seconds)','Setup time (seconds)']
+        str_col = ['Product Name','Components','Operation','Process Type','Machine Number']
+        date_col = ['Order Processing Date','Promised Delivery Date']
+
+        if selected_fields in int_cold:
+            edit_input = st.number_input(
+                'Enter new value: '
+            )
+        elif selected_fields in str_cold:
+            edit_input = st.text_input(
+                'Enter new value: '
+            )
+        else:
+            edit_input = st.date_input(
+                'Enter new value: '
+            )
+            
         if st.button('Confirm'):
             dfn.loc[
              (dfn['Product Name']==selected_product)&
