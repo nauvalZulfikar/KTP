@@ -220,25 +220,25 @@ def visualisation(dfm,st):
         st.plotly_chart(product_chart, use_container_width=True)
 
     if selected_visualization == "Product Components Status":
-        # Ensure df_viz has the required data
-        # df_viz = dfm[['Product Name', 'Components', 'Machine Number','Status']].copy()
-        
-        products = dfm['Product Name'].unique()
-        components = dfm['Components'].unique()
-        
-        # Map status to colors
-        status_color_map = {
-            "InProgress_Outsource": "orange",
-            "InProgress_In House": "brown",
-            "Completed_In House": "cyan",
-            "Completed_Outsource": "blue",
-            "Late": "red"
-        }
-        
-        # Create a scatter plot
+        # Progressive animation
+        if st.session_state.auto_refresh_status and st.session_state.rows_added_status < st.session_state.total_rows_status:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh_status")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress_status = pd.concat(
+                [st.session_state.dfm_progress_status, dfm.iloc[st.session_state.rows_added_status:st.session_state.rows_added_status + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_added_status += 1  # Increment the counter
+    
+        # Stop animation when all rows are added
+        if st.session_state.rows_added_status >= st.session_state.total_rows_status:
+            st.session_state.auto_refresh_status = False
+            st.success("Animation complete! Reload the page to reset.")
+    
+        # Create a scatter plot for progressive animation or static visualization
         fig = go.Figure()
-        
-        for _, entry in dfm.iterrows():  # Iterate over rows using .iterrows()
+    
+        for _, entry in st.session_state.dfm_progress_status.iterrows():  # Iterate over rows using .iterrows()
             fig.add_trace(go.Scatter(
                 x=[entry['Product Name']],
                 y=[entry['Components']],
@@ -252,7 +252,7 @@ def visualisation(dfm,st):
                 textposition='middle center',  # Place text in the middle of the square
                 showlegend=False  # Suppress duplicate legends
             ))
-        
+    
         # Add legend manually
         for status, color in status_color_map.items():
             fig.add_trace(go.Scatter(
@@ -260,15 +260,14 @@ def visualisation(dfm,st):
                 marker=dict(size=15, color=color, symbol='square'),
                 name=status
             ))
-        
+    
         # Update layout
         fig.update_layout(
-            # title='Status of Each Product Component',
-            xaxis=dict(title='Product Name', tickvals=products, ticktext=products),
-            yaxis=dict(title='Components', tickvals=components, ticktext=components),
+            xaxis=dict(title='Product Name', tickvals=dfm['Product Name'].unique()),
+            yaxis=dict(title='Components', tickvals=dfm['Components'].unique()),
             legend_title='Status and Process Type',
             template='plotly_white'
         )
-        
+    
         # Display the Plotly chart
         st.plotly_chart(fig, use_container_width=True)
