@@ -525,7 +525,7 @@ product_waiting_df = calculate_waiting_time(
     date_columns=('Order Processing Date', 'Start Time')
 )
 
-dfm['legend'] = dfm['Components'].copy()
+dfm['legend'] = dfm['Components']
 for i in range(len(dfm)):
   if dfm['Machine Number'][i] == 'OutSrc':
     dfm['legend'][i] = 'OutSrc'
