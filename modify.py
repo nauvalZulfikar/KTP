@@ -16,6 +16,7 @@ def save_to_excel(df, sheet_name):
     except Exception as e:
         st.error(f"Error saving data to Excel: {e}")
 
+file_path = "Product Details_v1.xlsx"
 
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
