@@ -263,16 +263,12 @@ def visualisation(dfm,st):
         
         # Update layout
         fig.update_layout(
-            title='Status of Each Product Component',
+            # title='Status of Each Product Component',
             xaxis=dict(title='Product Name', tickvals=products, ticktext=products),
             yaxis=dict(title='Components', tickvals=components, ticktext=components),
             legend_title='Status and Process Type',
             template='plotly_white'
         )
-        
-        # Streamlit app
-        st.title("Product Component Status Visualization")
-        st.write("This scatter plot visualizes the status of each product component.")
         
         # Display the Plotly chart
         st.plotly_chart(fig, use_container_width=True)
