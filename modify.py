@@ -5,19 +5,10 @@ from openpyxl import load_workbook
 
 file_path = "Product Details_v1.xlsx"
 
-def save_to_excel(df, sheet_name):
-    try:
-        # Load the workbook
-        book = load_workbook(file_path)
-
-        # Open the workbook with ExcelWriter
-        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-            writer.sheets = {ws.title: ws for ws in book.worksheets}  # Map existing sheets
-            df.to_excel(writer, sheet_name=sheet_name, index=False)  # Write to the sheet
-    except Exception as e:
-        st.error(f"Error saving data to Excel: {e}")
-
-
+def write_excel(df, file_path, sheet_name):
+    print(df)
+    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
+        df.to_excel(writer, sheet_name=sheet_name, index=False)
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
 
@@ -90,7 +81,7 @@ def modify():
             ] = in_edit_input
 
             # Save changes back to Excel
-            save_to_excel(dfn, sheet_name="prodet")
+            write_excel(dfn, sheet_name="prodet")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -144,7 +135,7 @@ def modify():
             ] = out_edit_input
 
             # Save changes back to Excel
-            save_to_excel(dfn, sheet_name="prodet")
+            write_excel(dfn, sheet_name="prodet")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
