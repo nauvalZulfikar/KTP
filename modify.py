@@ -76,6 +76,7 @@ def modify():
             (df_in['Product Name'] == in_selected_product) &
             (df_in['Components'] == in_selected_components)
         ])
+        st.success('Data successfully changed!')
 
     with tabs[1]:  # Outsource
         df_out = dfn[dfn['Process Type'] == 'Outsource']
@@ -130,6 +131,7 @@ def modify():
             (df_out['Product Name'] == out_selected_product) &
             (df_out['Components'] == out_selected_components)
         ])
+        st.success('Data successfully changed!')
         
     with tabs[2]:  # Time Converter
         # Radio button for conversion options
