@@ -33,16 +33,15 @@ def modify():
             field
         )
 
-
         int_col = ['UniqueID','Sr. No','Quantity Required','Run Time (min/1000)','Cycle Time (seconds)','Setup time (seconds)']
         str_col = ['Product Name','Components','Operation','Process Type','Machine Number']
         date_col = ['Order Processing Date','Promised Delivery Date']
 
-        if selected_fields in int_cold:
+        if selected_fields in int_col:
             edit_input = st.number_input(
                 'Enter new value: '
             )
-        elif selected_fields in str_cold:
+        elif selected_fields in str_col:
             edit_input = st.text_input(
                 'Enter new value: '
             )
