@@ -355,10 +355,10 @@ def visualisation(dfm,st):
         df_visual['color'] = df_visual['Status'].map(status_colors)
 
         # Create scatter plot
-        fig = go.Figure()
+        pcs = go.Figure()
 
         for _, row in df_visual.iterrows():
-            fig.add_trace(go.Scatter(
+            pcs.add_trace(go.Scatter(
                 x=[row['Product Name']],
                 y=[row['Components']],
                 mode='markers+text',
@@ -368,15 +368,15 @@ def visualisation(dfm,st):
                 name=row['Status']
             ))
 
-        fig.update_layout(
-            title="Status of Each Product Component (Progressive)",
+        pcs.update_layout(
+            # title="Status of Each Product Component (Progressive)",
             xaxis=dict(title="Product Name"),
             yaxis=dict(title="Components"),
             legend_title="Status and Process Type",
             template="plotly_white"
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(pcs, use_container_width=True)
 
         # Stop animation when all rows are added
         if st.session_state.rows_to_display >= len(dfm):
