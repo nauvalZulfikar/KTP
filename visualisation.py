@@ -88,7 +88,7 @@ def visualisation(df,st):
                 x_start="Start Time",
                 x_end="End Time",
                 y="Product Name",
-                color="mac_comp",  # Use Components for color differentiation
+                color="legend",  # Use Components for color differentiation
                 # labels={"Components": "Component", "Machine Number": "Machine"}
             )
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
@@ -121,7 +121,7 @@ def visualisation(df,st):
                 x_start="Start Time",
                 x_end="End Time",
                 y="Product Name",
-                color="Components",  # Use Components for color differentiation
+                color="legend",  # Use Components for color differentiation
                 labels={"Components": "Component", "Machine Number": "Machine"}
             )
             fig_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
