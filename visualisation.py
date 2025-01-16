@@ -224,18 +224,18 @@ def visualisation(dfm,st):
         if "rows_added" not in st.session_state:
             st.session_state.rows_added = 0
         if "dfm_progress" not in st.session_state:
-            st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Empty DataFrame for animation
+            st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)  # Empty DataFrame for animation
         if "total_rows" not in st.session_state:
-            st.session_state.total_rows = len(df)  # Total number of rows in the DataFrame
+            st.session_state.total_rows = len(dfm)  # Total number of rows in the DataFrame
     
         # Start animation button
         if st.button("Start Animation"):
             st.session_state.auto_refresh = True  # Trigger animation
             st.session_state.rows_added = 0  # Reset row counter
-            st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Reset progress DataFrame
+            st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)  # Reset progress DataFrame
     
         # Clean up the Status column
-        df['Status'] = df['Status'].apply(lambda x: str(x).strip() if x is not None else '')
+        dfm['Status'] = dfm['Status'].apply(lambda x: str(x).strip() if x is not None else '')
     
         # Define colors and custom legends for statuses
         status_colors = {
@@ -261,7 +261,7 @@ def visualisation(dfm,st):
             st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
             # Add the next row to the progress DataFrame
             st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, df.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
                 ignore_index=True
             )
             st.session_state.rows_added += 1  # Increment the counter
@@ -335,8 +335,8 @@ def visualisation(dfm,st):
             title='Animated Status of Each Product Component',
             xaxis_title='Product',
             yaxis_title='Component',
-            xaxis=dict(tickmode='array', tickvals=df['Product Name'].unique()),
-            yaxis=dict(tickmode='array', tickvals=df['Components'].unique()),
+            xaxis=dict(tickmode='array', tickvals=dfm['Product Name'].unique()),
+            yaxis=dict(tickmode='array', tickvals=dfm['Components'].unique()),
             legend_title_text='Status and Process Type'
         )
     
