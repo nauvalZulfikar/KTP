@@ -1,15 +1,14 @@
 import streamlit as st
 from scheduler import dfm
 import pandas as pd
-from openpyxl import load_workbook
 
 file_path = "Product Details_v1.xlsx"
 
 def write_excel(df, file_path, sheet_name):
-    print(df)
+    """Write a DataFrame to an Excel file."""
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
         df.to_excel(writer, sheet_name=sheet_name, index=False)
-        
+
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
 
@@ -72,7 +71,7 @@ def modify():
             ] = in_edit_input
 
             # Save changes back to Excel
-            write_excel(dfn, file_path, sheet_name="prodet")
+            write_excel(df_in, file_path, sheet_name="InHouse")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -126,7 +125,7 @@ def modify():
             ] = out_edit_input
 
             # Save changes back to Excel
-            write_excel(dfn, file_path sheet_name="prodet")
+            write_excel(df_out, file_path, sheet_name="Outsource")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
