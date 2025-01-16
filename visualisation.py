@@ -84,7 +84,7 @@ def visualisation(dfm,st):
         visualization_options
     )
 
-    st.write(st.session_state.dfm_progress)
+    st.dataframe(st.session_state.dfm_progress)
 
 # =========================================================================================
     
