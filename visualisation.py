@@ -330,12 +330,12 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-        df.loc[df['Process Type'] == 'Outsource', 'status'] = 'InProgress_Outsource'
-        df.loc[df['Process Type'] == 'In House', 'status'] = 'InProgress_In House'
+        st.session_state.df_progress.loc[st.session_state.df_progress['Process Type'] == 'Outsource', 'status'] = 'InProgress_Outsource'
+        st.session_state.df_progress.loc[st.session_state.df_progress['Process Type'] == 'In House', 'status'] = 'InProgress_In House'
     
-        # Initialize session state for control
-        if 'df_progress' not in st.session_state:
-            st.session_state.df_progress = df.copy()
+        # # Initialize session state for control
+        # if 'df_progress' not in st.session_state:
+        #     st.session_state.df_progress = df.copy()
     
         if "rows_to_display" not in st.session_state:
             st.session_state.rows_to_display = 0
@@ -343,9 +343,9 @@ def visualisation(dfm,st):
         if "is_running" not in st.session_state:
             st.session_state.is_running = False
     
-        # Start/Stop button
-        if st.button("Start" if not st.session_state.is_running else "Stop"):
-            st.session_state.is_running = not st.session_state.is_running
+        # # Start/Stop button
+        # if st.button("Start" if not st.session_state.is_running else "Stop"):
+        #     st.session_state.is_running = not st.session_state.is_running
     
         # Ensure rows_to_display is within bounds
         if st.session_state.rows_to_display < len(st.session_state.df_progress):
