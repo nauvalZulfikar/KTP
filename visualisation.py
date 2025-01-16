@@ -218,128 +218,127 @@ def visualisation(dfm,st):
         st.plotly_chart(product_chart, use_container_width=True)
 
     if selected_visualization == "Product Components Status":
-    # Initialize session state variables for animation if not already set
-    if "auto_refresh" not in st.session_state:
-        st.session_state.auto_refresh = False
-    if "rows_added" not in st.session_state:
-        st.session_state.rows_added = 0
-    if "dfm_progress" not in st.session_state:
-        st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Empty DataFrame for animation
-    if "total_rows" not in st.session_state:
-        st.session_state.total_rows = len(df)  # Total number of rows in the DataFrame
-
-    # Start animation button
-    if st.button("Start Animation"):
-        st.session_state.auto_refresh = True  # Trigger animation
-        st.session_state.rows_added = 0  # Reset row counter
-        st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Reset progress DataFrame
-
-    # Clean up the Status column
-    df['Status'] = df['Status'].apply(lambda x: str(x).strip() if x is not None else '')
-
-    # Define colors and custom legends for statuses
-    status_colors = {
-        "InProgress_Outsource": "orange",
-        "InProgress_In House": "yellow",
-        "Completed_In House": "green",
-        "Completed_Outsource": "blue",
-        "Late": "red"  # Use a common color for both Late statuses
-    }
-
-    custom_legend_names = {
-        "InProgress_Outsource": "Component Out for Outsource",
-        "Completed_Outsource": "Component Back From Outsource and Completed",
-        "InProgress_In House": "Component InProgress Inhouse",
-        "Completed_In House": "Component Completed Inhouse",
-        "Late": "Component Late"  # Use the same legend entry for both Late statuses
-    }
-
-    fig = go.Figure()
-
-    # Progressive animation logic
-    if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-        st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
-        # Add the next row to the progress DataFrame
-        st.session_state.dfm_progress = pd.concat(
-            [st.session_state.dfm_progress, df.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
-            ignore_index=True
-        )
-        st.session_state.rows_added += 1  # Increment the counter
-
-    # Stop animation when all rows are added
-    if st.session_state.rows_added >= st.session_state.total_rows:
-        st.session_state.auto_refresh = False
-        st.success("Animation complete! Reload the page to reset.")
-
-    # Display the visualization
-    for product in st.session_state.dfm_progress['Product Name'].unique():
-        product_data = st.session_state.dfm_progress[st.session_state.dfm_progress['Product Name'] == product]
-        for component in product_data['Components'].unique():
-            component_data = product_data[product_data['Components'] == component]
-            status = component_data['Status'].values[0]
-            process_type = component_data['Process Type'].values[0]
-            machine_number = component_data['Machine Number'].values[0]
-            delay_days = component_data['Delay Days'].fillna(0).values[0]
-            delay_hours = component_data['Delay Hours'].fillna(0).values[0]
-            start_time = pd.to_datetime(component_data['Start Time'].values[0], errors='coerce')
-            end_time = pd.to_datetime(component_data['End Time'].values[0], errors='coerce')
-
-            key = f"{status}_{process_type}" if status != "Late" else "Late"
-            color = status_colors.get(key, "grey")
-
-            hover_text = (
-                f"Product Name: {product}<br>"
-                f"Component: {component}<br>"
-                f"Machine Number: {machine_number}<br>"
-                f"Delay Days: {delay_days}<br>"
-                f"Delay Hours: {delay_hours}<br>"
-                f"Start Time: {start_time.strftime('%d-%b %H:%M') if pd.notnull(start_time) else 'N/A'}<br>"
-                f"End Time: {end_time.strftime('%d-%b %H:%M') if pd.notnull(end_time) else 'N/A'}"
+        # Initialize session state variables for animation if not already set
+        if "auto_refresh" not in st.session_state:
+            st.session_state.auto_refresh = False
+        if "rows_added" not in st.session_state:
+            st.session_state.rows_added = 0
+        if "dfm_progress" not in st.session_state:
+            st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Empty DataFrame for animation
+        if "total_rows" not in st.session_state:
+            st.session_state.total_rows = len(df)  # Total number of rows in the DataFrame
+    
+        # Start animation button
+        if st.button("Start Animation"):
+            st.session_state.auto_refresh = True  # Trigger animation
+            st.session_state.rows_added = 0  # Reset row counter
+            st.session_state.dfm_progress = pd.DataFrame(columns=df.columns)  # Reset progress DataFrame
+    
+        # Clean up the Status column
+        df['Status'] = df['Status'].apply(lambda x: str(x).strip() if x is not None else '')
+    
+        # Define colors and custom legends for statuses
+        status_colors = {
+            "InProgress_Outsource": "orange",
+            "InProgress_In House": "yellow",
+            "Completed_In House": "green",
+            "Completed_Outsource": "blue",
+            "Late": "red"  # Use a common color for both Late statuses
+        }
+    
+        custom_legend_names = {
+            "InProgress_Outsource": "Component Out for Outsource",
+            "Completed_Outsource": "Component Back From Outsource and Completed",
+            "InProgress_In House": "Component InProgress Inhouse",
+            "Completed_In House": "Component Completed Inhouse",
+            "Late": "Component Late"  # Use the same legend entry for both Late statuses
+        }
+    
+        fig = go.Figure()
+    
+        # Progressive animation logic
+        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress = pd.concat(
+                [st.session_state.dfm_progress, df.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                ignore_index=True
             )
-
+            st.session_state.rows_added += 1  # Increment the counter
+    
+        # Stop animation when all rows are added
+        if st.session_state.rows_added >= st.session_state.total_rows:
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
+    
+        # Display the visualization
+        for product in st.session_state.dfm_progress['Product Name'].unique():
+            product_data = st.session_state.dfm_progress[st.session_state.dfm_progress['Product Name'] == product]
+            for component in product_data['Components'].unique():
+                component_data = product_data[product_data['Components'] == component]
+                status = component_data['Status'].values[0]
+                process_type = component_data['Process Type'].values[0]
+                machine_number = component_data['Machine Number'].values[0]
+                delay_days = component_data['Delay Days'].fillna(0).values[0]
+                delay_hours = component_data['Delay Hours'].fillna(0).values[0]
+                start_time = pd.to_datetime(component_data['Start Time'].values[0], errors='coerce')
+                end_time = pd.to_datetime(component_data['End Time'].values[0], errors='coerce')
+    
+                key = f"{status}_{process_type}" if status != "Late" else "Late"
+                color = status_colors.get(key, "grey")
+    
+                hover_text = (
+                    f"Product Name: {product}<br>"
+                    f"Component: {component}<br>"
+                    f"Machine Number: {machine_number}<br>"
+                    f"Delay Days: {delay_days}<br>"
+                    f"Delay Hours: {delay_hours}<br>"
+                    f"Start Time: {start_time.strftime('%d-%b %H:%M') if pd.notnull(start_time) else 'N/A'}<br>"
+                    f"End Time: {end_time.strftime('%d-%b %H:%M') if pd.notnull(end_time) else 'N/A'}"
+                )
+    
+                fig.add_trace(go.Scatter(
+                    x=[product],
+                    y=[component],
+                    mode='markers+text',
+                    marker=dict(
+                        color=color,
+                        size=30,
+                        symbol='square'
+                    ),
+                    text=[machine_number],
+                    textposition='middle center',
+                    name='',
+                    legendgroup=key,
+                    showlegend=False,
+                    hovertemplate=hover_text
+                ))
+    
+        # Add custom legend entries
+        for status_key, color in status_colors.items():
+            legend_name = custom_legend_names.get(status_key, status_key.replace("_", " and "))
             fig.add_trace(go.Scatter(
-                x=[product],
-                y=[component],
-                mode='markers+text',
+                x=[None], y=[None],
+                mode='markers',
                 marker=dict(
                     color=color,
-                    size=30,
+                    size=10,
                     symbol='square'
                 ),
-                text=[machine_number],
-                textposition='middle center',
-                name='',
-                legendgroup=key,
-                showlegend=False,
-                hovertemplate=hover_text
+                legendgroup=status_key,
+                showlegend=True,
+                name=legend_name
             ))
-
-    # Add custom legend entries
-    for status_key, color in status_colors.items():
-        legend_name = custom_legend_names.get(status_key, status_key.replace("_", " and "))
-        fig.add_trace(go.Scatter(
-            x=[None], y=[None],
-            mode='markers',
-            marker=dict(
-                color=color,
-                size=10,
-                symbol='square'
-            ),
-            legendgroup=status_key,
-            showlegend=True,
-            name=legend_name
-        ))
-
-    # Update layout
-    fig.update_layout(
-        title='Animated Status of Each Product Component',
-        xaxis_title='Product',
-        yaxis_title='Component',
-        xaxis=dict(tickmode='array', tickvals=df['Product Name'].unique()),
-        yaxis=dict(tickmode='array', tickvals=df['Components'].unique()),
-        legend_title_text='Status and Process Type'
-    )
-
-    # Display the animated chart
-    st.plotly_chart(fig, use_container_width=True)
-
+    
+        # Update layout
+        fig.update_layout(
+            title='Animated Status of Each Product Component',
+            xaxis_title='Product',
+            yaxis_title='Component',
+            xaxis=dict(tickmode='array', tickvals=df['Product Name'].unique()),
+            yaxis=dict(tickmode='array', tickvals=df['Components'].unique()),
+            legend_title_text='Status and Process Type'
+        )
+    
+        # Display the animated chart
+        st.plotly_chart(fig, use_container_width=True)
