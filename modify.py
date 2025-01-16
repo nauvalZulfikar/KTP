@@ -13,7 +13,7 @@ file_path = "KTP/Product Details_v1.xlsx"
 
 
 # Load the dataframe
-dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
+dfn = dfm.drop(columns=['wait_time', 'legend', 'Status','Daily Utilization']).copy()
 
 def modify():
     # Add Tabs Below
@@ -67,7 +67,7 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
-                dfin.loc[
+                df_in.loc[
                 (dfm['Product Name'] == in_selected_product) &
                 (dfm['Components'] == in_selected_components),
                 in_selected_fields
