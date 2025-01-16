@@ -8,7 +8,7 @@ def product_catalogue():
     dfpc = dfm.copy()
     
     for i in df_list:
-        dfpc[i] = dfpc[i].dt.strftime('%Y-%m-%d %H:%M')
+        dfpc[i] = dfpc[i]#.dt.strftime('%Y-%m-%d %H:%M')
         
     st.write(dfpc.sort_values(by=['Start Time','End Time']))
 
