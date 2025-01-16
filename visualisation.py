@@ -352,7 +352,7 @@ def visualisation(dfm,st):
 
         # Prepare the visualization data
         df_visual = dfm.iloc[:st.session_state.rows_to_display].copy()
-        df_visual['color'] = df_visual['status'].map(status_colors)
+        df_visual['color'] = df_visual['Status'].map(status_colors)
 
         # Create scatter plot
         fig = go.Figure()
@@ -365,7 +365,7 @@ def visualisation(dfm,st):
                 marker=dict(size=20, color=row['color'], symbol='square'),
                 text=row['Machine Number'],
                 textposition='top center',
-                name=row['status']
+                name=row['Status']
             ))
 
         fig.update_layout(
