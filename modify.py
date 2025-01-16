@@ -81,7 +81,7 @@ def modify():
             ] = in_edit_input
 
             # Save changes back to Excel
-            write_excel(dfn, sheet_name="prodet")
+            write_excel(dfn, file_path, sheet_name="prodet")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -135,7 +135,7 @@ def modify():
             ] = out_edit_input
 
             # Save changes back to Excel
-            write_excel(dfn, sheet_name="prodet")
+            write_excel(dfn, file_path sheet_name="prodet")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
