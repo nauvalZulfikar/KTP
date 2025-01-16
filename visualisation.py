@@ -82,6 +82,8 @@ def visualisation(dfm,st):
         visualization_options
     )
 
+# =========================================================================================
+    
     if selected_visualization == "Gantt Chart":
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
@@ -134,6 +136,8 @@ def visualisation(dfm,st):
             )
             st.plotly_chart(fig_animated, use_container_width=True)
 
+# =========================================================================================
+
     elif selected_visualization == "Gantt Chart (Unscheduled)":
         # Step 1: Calculate durations
         data = dfm.copy()  # Ensure the original DataFrame is not modified
@@ -167,6 +171,8 @@ def visualisation(dfm,st):
         # st.title("Horizontal Bar Chart Visualization")
         st.plotly_chart(fig, use_container_width=True)
 
+# =========================================================================================
+    
     elif selected_visualization == "Machine Utilisation":
         # Calculate machine utilization
         average_utilization = calculate_machine_utilization(dfm)
@@ -199,27 +205,81 @@ def visualisation(dfm,st):
         # st.title("Machine Utilization Visualization")
         st.plotly_chart(fig, use_container_width=True)
 
+# =========================================================================================
+    
     elif selected_visualization == "Product Waiting Time":
+        # Map session state variables to new variables for this context
+        product_waiting_progress = st.session_state.dfm_progress
+        auto_refresh_waiting = st.session_state.auto_refresh
+        rows_added_waiting = st.session_state.rows_added
+        total_rows_waiting = st.session_state.total_rows
+    
+        # Progressive animation
+        if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh_product_waiting")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress = pd.concat(
+                [product_waiting_progress,
+                 component_waiting_df.iloc[rows_added_waiting:rows_added_waiting + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_added += 1  # Increment the counter
+    
+        # Stop animation when all rows are added
+        if rows_added_waiting >= total_rows_waiting:
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
+    
+        # Create bar chart
         component_chart = create_bar_chart(
-            component_waiting_df, 
-            x_col="Components", 
-            y_col="Average Days", 
+            product_waiting_progress,
+            x_col="Components",
+            y_col="Average Days",
         )
-
-        # st.subheader("Average Waiting Time by Component")
+    
+        # Display the bar chart
         st.plotly_chart(component_chart, use_container_width=True)
 
-    elif selected_visualization == "Component Waiting Time":
-        product_chart = create_bar_chart(
-            product_waiting_df, 
-            x_col="Product Name", 
-            y_col="Average Days", 
-        )
 
-        # st.subheader("Average Waiting Time by Product")
+# =========================================================================================
+    
+    elif selected_visualization == "Component Waiting Time":
+        # Map session state variables to new variables for this context
+        component_waiting_progress = st.session_state.dfm_progress
+        auto_refresh_waiting = st.session_state.auto_refresh
+        rows_added_waiting = st.session_state.rows_added
+        total_rows_waiting = st.session_state.total_rows
+    
+        # Progressive animation
+        if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh_waiting")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress = pd.concat(
+                [component_waiting_progress,
+                 product_waiting_df.iloc[rows_added_waiting:rows_added_waiting + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_added += 1  # Increment the counter
+    
+        # Stop animation when all rows are added
+        if rows_added_waiting >= total_rows_waiting:
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
+    
+        # Create bar chart
+        product_chart = create_bar_chart(
+            component_waiting_progress,
+            x_col="Product Name",
+            y_col="Average Days",
+        )
+    
+        # Display the bar chart
         st.plotly_chart(product_chart, use_container_width=True)
 
-    if selected_visualization == "Product Components Status":
+
+# =========================================================================================
+    
+    elif selected_visualization == "Product Components Status":
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
             st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
