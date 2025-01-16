@@ -23,7 +23,7 @@ def modify():
             in_products  # Pass the array directly without wrapping it in a list
         )
 
-        in_components = df_in[df_in['Product Name']==selected_product]['Components'].unique()
+        in_components = df_in[df_in['Product Name']==in_selected_product]['Components'].unique()
         in_selected_components = st.selectbox(
             'select components: ',
             in_components
@@ -69,7 +69,7 @@ def modify():
             out_products  # Pass the array directly without wrapping it in a list
         )
 
-        out_components = df_out[df_out['Product Name']==selected_product]['Components'].unique()
+        out_components = df_out[df_out['Product Name']==out_selected_product]['Components'].unique()
         out_selected_components = st.selectbox(
             'select components: ',
             components
@@ -78,7 +78,7 @@ def modify():
         out_field = df_out.columns
         out_selected_fields = st.selectbox(
             'select fields: ',
-            field
+            out_field
         )
         
         if out_selected_fields in int_col:
