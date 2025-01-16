@@ -229,7 +229,7 @@ def visualisation(dfm,st):
         # Map status to colors
         status_color_map = {
             "InProgress_Outsource": "orange",
-            "InProgress_In House": "yellow",
+            "InProgress_In House": "brown",
             "Completed_In House": "cyan",
             "Completed_Outsource": "blue",
             "Late": "red"
