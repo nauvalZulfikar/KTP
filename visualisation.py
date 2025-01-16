@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
-from scheduler import dfm, adjust_to_working_hours_and_days, calculate_machine_utilization, product_waiting_df, component_waiting_df
+from scheduler import df, dfm, adjust_to_working_hours_and_days, calculate_machine_utilization, product_waiting_df, component_waiting_df
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -31,6 +31,8 @@ def visualisation(dfm,st):
     # Initialize session state for progressive visualization
     if "dfm_progress" not in st.session_state:
         st.session_state.dfm_progress = dfm.copy()  # Initially show the full DataFrame
+    if "df_progress" not in st.session_state:
+        st.session_state.df_progress = df.copy()  # Initially show the full DataFrame
     if "auto_refresh" not in st.session_state:
         st.session_state.auto_refresh = False  # Auto-refresh toggle
     if "rows_added" not in st.session_state:
@@ -81,6 +83,8 @@ def visualisation(dfm,st):
         "Choose a visualization:",
         visualization_options
     )
+
+    st.write(st.session_state.dfm_progress)
 
 # =========================================================================================
     
