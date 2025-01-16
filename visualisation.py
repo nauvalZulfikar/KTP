@@ -84,8 +84,6 @@ def visualisation(dfm,st):
         visualization_options
     )
 
-    st.dataframe(st.session_state.dfm_progress)
-
 # =========================================================================================
     
     if selected_visualization == "Gantt Chart":
@@ -143,37 +141,46 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Gantt Chart (Unscheduled)":
+        
         # Step 1: Calculate durations
         data = dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
-
+        
         # Step 2: Adjust durations for working hours and days
         data['Adjusted End Time'] = data.apply(
             lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
             axis=1
-        )
+        
+        if not st.session_state.auto_refresh:  # Show the static chart if not animating
+        #     fig_static = px.timeline(
+        #         st.session_state.dfm_progress,
+        #         x_start="Start Time",
+        #         x_end="End Time",
+        #         y="Product Name",
+        #         color="legend",  # Use Components for color differentiation
+        #         # labels={"Components": "Component", "Machine Number": "Machine"}
+        #     )
+        # )
+            # Step 3: Create a horizontal bar chart
+            fig_static = px.bar(
+                data,
+                x="Duration",  # Horizontal axis
+                y="Product Name",  # Vertical axis
+                color="Components",  # Color by components
+                orientation="h",  # Horizontal bars
+                labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+                # title="Horizontal Bar Chart of Task Durations"
+            )
 
-        # Step 3: Create a horizontal bar chart
-        fig = px.bar(
-            data,
-            x="Duration",  # Horizontal axis
-            y="Product Name",  # Vertical axis
-            color="Components",  # Color by components
-            orientation="h",  # Horizontal bars
-            labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-            # title="Horizontal Bar Chart of Task Durations"
-        )
+            fig_static.update_layout(
+                xaxis_title="Task Duration (minutes)",
+                yaxis_title="Products",
+                legend_title="Components",
+                template="plotly_white"
+            )
 
-        fig.update_layout(
-            xaxis_title="Task Duration (minutes)",
-            yaxis_title="Products",
-            legend_title="Components",
-            template="plotly_white"
-        )
-
-        # Step 4: Integrate into Streamlit
-        # st.title("Horizontal Bar Chart Visualization")
-        st.plotly_chart(fig, use_container_width=True)
+            # Step 4: Integrate into Streamlit
+            st.plotly_chart(fig_static, use_container_width=True)
 
 # =========================================================================================
     
