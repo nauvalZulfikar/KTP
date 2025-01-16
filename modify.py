@@ -2,7 +2,7 @@ import streamlit as st
 from scheduler import dfm
 import pandas as pd
 
-file_path = "Product Details_v1.xlsx"
+file_path = "KTP/Product Details_v1.xlsx"
 
 def write_excel(df, file_path, sheet_name):
     print(df)
