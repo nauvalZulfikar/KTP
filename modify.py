@@ -1,4 +1,5 @@
 import streamlit as st
+from scheduler import dfm
 
 def modify():
     # Add Tabs Below
@@ -9,9 +10,30 @@ def modify():
         ])
     with tabs[0]:
         st.subheader("In House")
-        
-    with tabs[1]:
-        st.subheader("Out Source")
+
+    
+    with tabs[1]: # Outsource
+        products = dfm['Product Name'].unique()
+        product_name = [
+            dfm['Product Name'].unique()
+        ]
+        selected_product = st.selectbox(
+            'select product name: ',
+            selected_product
+        )
+
+        # product_name = [
+        #     'C1',
+        #     'C2',
+        #     'C3',
+        #     'C4',
+        #     'C5',
+        #     'C6'
+        # ]
+        # selected_product = st.selectbox(
+        #     'select components: ',
+        #     selected_product
+        # )
         
     with tabs[2]:
         # Radio button for conversion options
