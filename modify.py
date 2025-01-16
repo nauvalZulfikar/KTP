@@ -3,20 +3,20 @@ from scheduler import dfm
 import pandas as pd
 from openpyxl import load_workbook
 
+file_path = "Product Details_v1.xlsx"
+
 def save_to_excel(df, sheet_name):
     try:
-        # Load the existing workbook
+        # Load the workbook
         book = load_workbook(file_path)
 
         # Open the workbook with ExcelWriter
         with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-            writer.book = book  # Associate the writer with the loaded workbook
-            writer.sheets = {ws.title: ws for ws in book.worksheets}  # Load existing sheets
+            writer.sheets = {ws.title: ws for ws in book.worksheets}  # Map existing sheets
             df.to_excel(writer, sheet_name=sheet_name, index=False)  # Write to the sheet
     except Exception as e:
         st.error(f"Error saving data to Excel: {e}")
 
-file_path = "Product Details_v1.xlsx"
 
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
