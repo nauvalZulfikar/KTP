@@ -330,9 +330,9 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-        # Progressive visualization for Product Components Status
-        if "rows_to_display" not in st.session_state:
-            st.session_state.rows_to_display = 0
+        # # Progressive visualization for Product Components Status
+        # if "rows_to_display" not in st.session_state:
+        #     st.session_state.rows_to_display = 0
 
         # Assign colors based on status
         status_colors = {
