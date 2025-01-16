@@ -19,7 +19,7 @@ def modify():
         ]
         selected_product = st.selectbox(
             'select product name: ',
-            selected_product
+            product_name
         )
 
         # product_name = [
