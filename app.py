@@ -10,7 +10,7 @@ from product_catalogue import product_catalogue
 # Set page configuration
 st.set_page_config(
     page_title="Machine Production Scheduler",
-    page_icon="✨",
+    page_icon="🦾",
     layout="wide"
 )
 
