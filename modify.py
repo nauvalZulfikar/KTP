@@ -4,12 +4,12 @@ import pandas as pd
 
 file_path = "KTP/Product Details_v1.xlsx"
 
-def write_excel(df, file_path, sheet_name):
-    print(df)
-    with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
-        df.to_excel(writer, sheet_name=sheet_name, index=False)
+# def write_excel(df, file_path, sheet_name):
+#     print(df)
+#     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
+#         df.to_excel(writer, sheet_name=sheet_name, index=False)
         
-file_path='/content/Product Details_v2.xlsx'
+# file_path='/content/Product Details_v2.xlsx'
 
 
 # Load the dataframe
@@ -73,8 +73,8 @@ def modify():
                 in_selected_fields
             ] = in_edit_input
 
-            # Save changes back to Excel
-            write_excel(dfm, file_path, sheet_name="prodet")
+            # # Save changes back to Excel
+            # write_excel(dfm, file_path, sheet_name="prodet")
         
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
@@ -128,8 +128,8 @@ def modify():
                 out_selected_fields
             ] = out_edit_input
 
-            # Save changes back to Excel
-            write_excel(dfm, file_path, sheet_name="prodet")
+            # # Save changes back to Excel
+            # write_excel(dfm, file_path, sheet_name="prodet")
         
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
