@@ -74,8 +74,8 @@ def visualisation(dfm,st):
         "Gantt Chart",
         "Gantt Chart (Unscheduled)",
         "Machine Utilisation",
-        "Product Waiting Time",
-        "Component Waiting Time",
+        # "Product Waiting Time",
+        # "Component Waiting Time",
         "Product Components Status"
     ]
 
