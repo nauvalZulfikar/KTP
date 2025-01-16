@@ -149,7 +149,7 @@ def visualisation(dfm,st):
         # Step 2: Adjust durations for working hours and days
         data['Adjusted End Time'] = data.apply(
             lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
-            axis=1
+            axis=1)
         
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
         #     fig_static = px.timeline(
