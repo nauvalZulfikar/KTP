@@ -4,18 +4,9 @@ import pandas as pd
 
 file_path = "KTP/Product Details_v1.xlsx"
 
-# def write_excel(df, file_path, sheet_name):
-#     print(df)
-#     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
-#         df.to_excel(writer, sheet_name=sheet_name, index=False)
-        
-# file_path='/content/Product Details_v2.xlsx'
-
-
-# Load the dataframe
-dfn = dfm.drop(columns=['wait_time', 'legend', 'Status',
-                        # 'Daily Utilization'
-                       ]).copy()
+# Initialize dfm in session state
+if "dfm" not in st.session_state:
+    st.session_state.dfm = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
 
 def modify():
     # Add Tabs Below
@@ -30,7 +21,7 @@ def modify():
     date_col = ['Order Processing Date', 'Promised Delivery Date']
 
     with tabs[0]:  # In House
-        df_in = dfn[dfn['Process Type'] == 'In House']
+        df_in = st.session_state.dfm[st.session_state.dfm['Process Type'] == 'In House']
         in_products = df_in['Product Name'].unique()
         in_selected_product = st.selectbox(
             'Select product name:',
@@ -69,30 +60,20 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
-                df_in.loc[
-                (dfm['Product Name'] == in_selected_product) &
-                (dfm['Components'] == in_selected_components),
+            st.session_state.dfm.loc[
+                (st.session_state.dfm['Product Name'] == in_selected_product) &
+                (st.session_state.dfm['Components'] == in_selected_components),
                 in_selected_fields
-                ] = in_edit_input
-                
-                dfm.loc[
-                (dfm['Product Name'] == in_selected_product) &
-                (dfm['Components'] == in_selected_components),
-                in_selected_fields
-                ] = in_edit_input
-                st.success('Data has been successfully changed!')
+            ] = in_edit_input
+            st.success('Data has been successfully changed!')
 
-            # # Save changes back to Excel
-            # write_excel(dfm, file_path, sheet_name="prodet")
-        
         st.dataframe(df_in[
             (df_in['Product Name'] == in_selected_product) &
             (df_in['Components'] == in_selected_components)
         ])
-        
 
     with tabs[1]:  # Outsource
-        df_out = dfn[dfn['Process Type'] == 'Outsource']
+        df_out = st.session_state.dfm[st.session_state.dfm['Process Type'] == 'Outsource']
         out_products = df_out['Product Name'].unique()
         out_selected_product = st.selectbox(
             'Select product name:',
@@ -117,41 +98,32 @@ def modify():
         if out_selected_fields in int_col:
             out_edit_input = st.number_input(
                 'Enter new value:',
-                key="out_edit_input"
+                key="out_edit_input_out"
             )
         elif out_selected_fields in str_col:
             out_edit_input = st.text_input(
                 'Enter new value:',
-                key="out_edit_text"
+                key="out_edit_text_out"
             )
         else:
             out_edit_input = st.date_input(
                 'Enter new value:',
-                key="out_edit_date"
+                key="out_edit_date_out"
             )
             
         if st.button('Confirm', key="out_confirm"):
-                df_out.loc[
-                (dfm['Product Name'] == in_selected_product) &
-                (dfm['Components'] == in_selected_components),
-                in_selected_fields
-                ] = in_edit_input
-                
-                dfm.loc[
-                (dfm['Product Name'] == out_selected_product) &
-                (dfm['Components'] == out_selected_components),
+            st.session_state.dfm.loc[
+                (st.session_state.dfm['Product Name'] == out_selected_product) &
+                (st.session_state.dfm['Components'] == out_selected_components),
                 out_selected_fields
-                ] = out_edit_input
-                st.success('Data has been successfully changed!')
+            ] = out_edit_input
+            st.success('Data has been successfully changed!')
 
-            # # Save changes back to Excel
-            # write_excel(dfm, file_path, sheet_name="prodet")
-        
         st.dataframe(df_out[
             (df_out['Product Name'] == out_selected_product) &
             (df_out['Components'] == out_selected_components)
         ])
-        
+
     with tabs[2]:  # Time Converter
         # Radio button for conversion options
         conversion_type = st.radio(
@@ -163,21 +135,4 @@ def modify():
         # Input field for the user to provide a value
         input_value = st.number_input(
             "Enter the value to convert:", 
-            min_value=0.0, 
-            step=1.0,
-            format="%.2f",
-            key="conversion_input"
-        )
-        
-        # Perform conversion based on the selected type
-        if conversion_type == "Days to Minutes":
-            result = input_value * 24 * 60
-            st.write(f"{input_value} days is equivalent to {result} minutes.")
-        
-        elif conversion_type == "Hours to Minutes":
-            result = input_value * 60
-            st.write(f"{input_value} hours is equivalent to {result} minutes.")
-        
-        elif conversion_type == "Minutes to Days":
-            result = input_value / (24 * 60)
-            st.write(f"{input_value} minutes is equivalent to {result:.6f} days.")
+            min_value=0
