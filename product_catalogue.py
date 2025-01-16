@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import datetime as dt
 from scheduler import dfm, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
 
 def product_catalogue():
@@ -8,7 +9,8 @@ def product_catalogue():
     dfpc = dfm.copy()
     
     for i in df_list:
-        dfpc[i] = dfpc[i]#.dt.strftime('%Y-%m-%d %H:%M')
+        dfpc[i] = pd.to_datetime(dfpc[i])
+        dfpc[i] = dfpc[i].dt.strftime('%Y-%m-%d %H:%M')
         
     st.write(dfpc.sort_values(by=['Start Time','End Time']))
 
