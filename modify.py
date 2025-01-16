@@ -24,6 +24,12 @@ def modify():
             'select components: ',
             components
         )
+
+        field = dfm.columns
+        selected_fields = st.selectbox(
+            'select fields: ',
+            field
+        )
         
     with tabs[2]:
         # Radio button for conversion options
