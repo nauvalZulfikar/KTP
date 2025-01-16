@@ -61,6 +61,6 @@ def product_list_change():
         input2 = st.number_input("Second UniqueID:")
 
         if st.button("Swap"):
-            dfm.loc[df['UniqueID']==input1,'UniqueID'] = input2
-            dfm.loc[df['UniqueID']==input2,'UniqueID'] = input1
+            dfm.loc[dfm['UniqueID']==input1,'UniqueID'] = input2
+            dfm.loc[dfm['UniqueID']==input2,'UniqueID'] = input1
             st.info(f"Product '{input1}' swapped with product '{input2}' successfully.")
