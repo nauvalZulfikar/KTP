@@ -17,18 +17,18 @@ st.set_page_config(
 # Main Title
 st.title("Machine Production Scheduler")
 
-# File Download Button
-@st.cache_data
-def convert_df_to_csv(df):
-    return df.to_csv(index=False).encode('utf-8')
+# # File Download Button
+# @st.cache_data
+# def convert_df_to_excel(df):
+#     return df.to_excel(index=False).encode('utf-8')
 
-csv_file = convert_df_to_csv(dfm)
-st.download_button(
-    label="📥 Download Current File",
-    data=csv_file,
-    file_name="Machine_Production_Schedule.csv",
-    mime="text/csv"
-)
+# csv_file = convert_df_to_excel(dfm)
+# st.download_button(
+#     label="📥 Download Current File",
+#     data=csv_file,
+#     file_name="Machine_Production_Schedule.csv",
+#     mime="text/csv"
+# )
 
 # Add Tabs Below
 tabs = st.tabs([
