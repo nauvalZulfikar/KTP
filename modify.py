@@ -10,103 +10,100 @@ def modify():
         "Out Source", 
         "Time Converter"
         ])
+
+    int_col = ['UniqueID','Sr. No','Quantity Required','Run Time (min/1000)','Cycle Time (seconds)','Setup time (seconds)']
+    str_col = ['Product Name','Components','Operation','Process Type','Machine Number']
+    date_col = ['Order Processing Date','Promised Delivery Date']
+
     with tabs[0]: # In House
         df_in = dfn[dfn['Process Type']=='In House']
-        products = df_in['Product Name'].unique()  # Get unique product names
-        selected_product = st.selectbox(
+        in_products = df_in['Product Name'].unique()  # Get unique product names
+        in_selected_product = st.selectbox(
             'Select product name:',
-            products  # Pass the array directly without wrapping it in a list
+            in_products  # Pass the array directly without wrapping it in a list
         )
 
-        components = df_in[df_in['Product Name']==selected_product]['Components'].unique()
-        selected_components = st.selectbox(
+        in_components = df_in[df_in['Product Name']==selected_product]['Components'].unique()
+        in_selected_components = st.selectbox(
             'select components: ',
-            components
+            in_components
         )
 
-        field = df_in.columns
-        selected_fields = st.selectbox(
+        in_field = df_in.columns
+        in_selected_fields = st.selectbox(
             'select fields: ',
-            field
+            in_field
         )
 
-        int_col = ['UniqueID','Sr. No','Quantity Required','Run Time (min/1000)','Cycle Time (seconds)','Setup time (seconds)']
-        str_col = ['Product Name','Components','Operation','Process Type','Machine Number']
-        date_col = ['Order Processing Date','Promised Delivery Date']
-
-        if selected_fields in int_col:
-            edit_input = st.number_input(
+        if in_selected_fields in int_col:
+            in_edit_input = st.number_input(
                 'Enter new value: '
             )
-        elif selected_fields in str_col:
-            edit_input = st.text_input(
+        elif in_selected_fields in str_col:
+            in_edit_input = st.text_input(
                 'Enter new value: '
             )
         else:
-            edit_input = st.date_input(
+            in_edit_input = st.date_input(
                 'Enter new value: '
             )
             
         if st.button('Confirm'):
             df_in.loc[
-             (df_in['Product Name']==selected_product)&
-             (df_in['Components']==selected_components),
-             selected_fields
-             ] = edit_input
+             (df_in['Product Name']==in_selected_product)&
+             (df_in['Components']==in_selected_components),
+             in_selected_fields
+             ] = in_edit_input
         
         st.dataframe(df_in[
-                     (df_in['Product Name']==selected_product)&
-                     (df_in['Components']==selected_components)
+                     (df_in['Product Name']==in_selected_product)&
+                     (df_in['Components']==in_selected_components)
                      ])
 
     
     with tabs[1]:  # Outsource
         df_out = dfn[dfn['Process Type']=='Outsource']
-        products = df_out['Product Name'].unique()  # Get unique product names
-        selected_product = st.selectbox(
+        out_products = df_out['Product Name'].unique()  # Get unique product names
+        out_selected_product = st.selectbox(
             'Select product name:',
-            products  # Pass the array directly without wrapping it in a list
+            out_products  # Pass the array directly without wrapping it in a list
         )
 
-        components = df_out[df_out['Product Name']==selected_product]['Components'].unique()
-        selected_components = st.selectbox(
+        out_components = df_out[df_out['Product Name']==selected_product]['Components'].unique()
+        out_selected_components = st.selectbox(
             'select components: ',
             components
         )
 
-        field = df_out.columns
-        selected_fields = st.selectbox(
+        out_field = df_out.columns
+        out_selected_fields = st.selectbox(
             'select fields: ',
             field
         )
-
-        int_col = ['UniqueID','Sr. No','Quantity Required','Run Time (min/1000)','Cycle Time (seconds)','Setup time (seconds)']
-        str_col = ['Product Name','Components','Operation','Process Type','Machine Number']
-        date_col = ['Order Processing Date','Promised Delivery Date']
-
-        if selected_fields in int_col:
-            edit_input = st.number_input(
+        
+        if out_selected_fields in int_col:
+            out_edit_input = st.number_input(
                 'Enter new value: '
             )
-        elif selected_fields in str_col:
-            edit_input = st.text_input(
+        elif out_selected_fields in str_col:
+            out_edit_input = st.text_input(
                 'Enter new value: '
             )
         else:
-            edit_input = st.date_input(
+            out_edit_input = st.date_input(
                 'Enter new value: '
             )
             
         if st.button('Confirm'):
             df_out.loc[
-             (df_out['Product Name']==selected_product)&
-             (df_out['Components']==selected_components),
-             selected_fields
-             ] = edit_input
+             (df_out['Product Name']==out_selected_product)&
+             (df_out['Components']==out_selected_components),
+             out_selected_fields
+             ] = out_edit_input
         
         st.dataframe(df_out[
-                     (df_out['Product Name']==selected_product)&
-                     (df_out['Components']==selected_components)
+                     (df_out['Product Name']==out_selected_product)&
+                     (df_out['Components']==out_selected_components)
                      ])
         
     with tabs[2]:
