@@ -221,24 +221,24 @@ def visualisation(dfm,st):
 
     if selected_visualization == "Product Components Status":
         # Progressive animation
-        if st.session_state.auto_refresh and st.session_state.rows_added_status < st.session_state.total_rows_status:
-            st_autorefresh(interval=1000, limit=None, key="autorefresh_status")  # Refresh every second
+        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
             # Add the next row to the progress DataFrame
-            st.session_state.dfm_progress_status = pd.concat(
-                [st.session_state.dfm_progress_status, dfm.iloc[st.session_state.rows_added_status:st.session_state.rows_added_status + 1]],
+            st.session_state.dfm_progress = pd.concat(
+                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
                 ignore_index=True
             )
-            st.session_state.rows_added_status += 1  # Increment the counter
+            st.session_state.rows_added += 1  # Increment the counter
     
         # Stop animation when all rows are added
-        if st.session_state.rows_added_status >= st.session_state.total_rows_status:
+        if st.session_state.rows_added >= st.session_state.total_rows:
             st.session_state.auto_refresh = False
             st.success("Animation complete! Reload the page to reset.")
     
         # Create a scatter plot for progressive animation or static visualization
         fig = go.Figure()
     
-        for _, entry in st.session_state.dfm_progress_status.iterrows():  # Iterate over rows using .iterrows()
+        for _, entry in st.session_state.dfm_progress.iterrows():  # Iterate over rows using .iterrows()
             fig.add_trace(go.Scatter(
                 x=[entry['Product Name']],
                 y=[entry['Components']],
