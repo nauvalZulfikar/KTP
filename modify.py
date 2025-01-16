@@ -1,6 +1,8 @@
 import streamlit as st
 from scheduler import dfm
 
+dfn = dfm.drop(columns=['wait_time','legend']).copy()
+
 def modify():
     # Add Tabs Below
     tabs = st.tabs([
@@ -13,27 +15,38 @@ def modify():
 
     
     with tabs[1]:  # Outsource
-        products = dfm['Product Name'].unique()  # Get unique product names
+        products = dfn['Product Name'].unique()  # Get unique product names
         selected_product = st.selectbox(
             'Select product name:',
             products  # Pass the array directly without wrapping it in a list
         )
 
-        components = dfm[dfm['Product Name']==selected_product]['Components'].unique()
+        components = dfn[dfn['Product Name']==selected_product]['Components'].unique()
         selected_components = st.selectbox(
             'select components: ',
             components
         )
 
-        field = dfm.columns
+        field = dfn.columns
         selected_fields = st.selectbox(
             'select fields: ',
             field
         )
 
-        st.dataframe(dfm[
-                     (dfm['Product Name']==selected_product)&
-                     (dfm['Components']==selected_components)
+        edit_input = st.text_input(
+            'Enter new value: '
+        )
+
+        if st.button('Confirm'):
+            dfn.loc[
+             (dfn['Product Name']==selected_product)&
+             (dfn['Components']==selected_components),
+             selected_fields
+             ] = edit_input
+        
+        st.dataframe(dfn[
+                     (dfn['Product Name']==selected_product)&
+                     (dfn['Components']==selected_components)
                      ])
         
     with tabs[2]:
