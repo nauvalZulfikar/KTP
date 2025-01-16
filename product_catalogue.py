@@ -5,7 +5,7 @@ from scheduler import dfm, calculate_machine_utilization, component_waiting_df, 
 def product_catalogue():
     df_list = ['Order Processing Date','Promised Delivery Date','Start Time','End Time']
 
-    dfpc = dfm.drop(columns=['Binary']).copy()
+    dfpc = dfm.copy()
     
     for i in df_list:
         dfpc[i] = dfpc[i].dt.strftime('%Y-%m-%d %H:%M')
