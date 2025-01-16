@@ -19,7 +19,7 @@ def modify():
             products  # Pass the array directly without wrapping it in a list
         )
 
-        components = dfm[dfm['Product Name']==selected_product].unique()
+        components = dfm[dfm['Product Name']==selected_product]['Components'].unique()
         selected_components = st.selectbox(
             'select components: ',
             components
