@@ -271,20 +271,20 @@ def visualisation(dfm,st):
     #         st.session_state.auto_refresh = False
     #         st.success("Animation complete! Reload the page to reset.")
     
-        # Create bar chart
-        component_chart = create_bar_chart(
-            product_waiting_progress,
-            x_col="Components",
-            y_col="Average Days",
-        )
+        # # Create bar chart
+        # component_chart = create_bar_chart(
+        #     product_waiting_progress,
+        #     x_col="Components",
+        #     y_col="Average Days",
+        # )
     
-        # Display the bar chart
-        st.plotly_chart(component_chart, use_container_width=True)
+        # # Display the bar chart
+        # st.plotly_chart(component_chart, use_container_width=True)
 
 
 # =========================================================================================
     
-    elif selected_visualization == "Component Waiting Time":
+    # elif selected_visualization == "Component Waiting Time":
         # # Progressive animation
         # if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
         #     st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
@@ -316,15 +316,15 @@ def visualisation(dfm,st):
         #     st.session_state.auto_refresh = False
         #     st.success("Animation complete! Reload the page to reset.")
     
-        # Create bar chart
-        product_chart = create_bar_chart(
-            component_waiting_progress,
-            x_col="Product Name",
-            y_col="Average Days",
-        )
+        # # Create bar chart
+        # product_chart = create_bar_chart(
+        #     component_waiting_progress,
+        #     x_col="Product Name",
+        #     y_col="Average Days",
+        # )
     
-        # Display the bar chart
-        st.plotly_chart(product_chart, use_container_width=True)
+        # # Display the bar chart
+        # st.plotly_chart(product_chart, use_container_width=True)
 
 
 # =========================================================================================
