@@ -72,7 +72,7 @@ def modify():
         out_components = df_out[df_out['Product Name']==out_selected_product]['Components'].unique()
         out_selected_components = st.selectbox(
             'select components: ',
-            components
+            out_components
         )
 
         out_field = df_out.columns
