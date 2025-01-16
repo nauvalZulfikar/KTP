@@ -237,7 +237,16 @@ def visualisation(dfm,st):
     
         # Create a scatter plot for progressive animation or static visualization
         fig = go.Figure()
-    
+
+        # Map status to colors
+        status_color_map = {
+            "InProgress_Outsource": "orange",
+            "InProgress_In House": "yellow",
+            "Completed_In House": "cyan",
+            "Completed_Outsource": "blue",
+            "Late": "red"  # Use a common color for both Late statuses
+            }
+        
         for _, entry in st.session_state.dfm_progress.iterrows():  # Iterate over rows using .iterrows()
             fig.add_trace(go.Scatter(
                 x=[entry['Product Name']],
