@@ -30,6 +30,11 @@ def modify():
             'select fields: ',
             field
         )
+
+        st.dataframe(dfm[
+                     (dfm['Product Name']==selected_product)&
+                     (dfm['Components']==selected_components)
+                     ])
         
     with tabs[2]:
         # Radio button for conversion options
