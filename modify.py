@@ -67,12 +67,13 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
-                dfm.loc[
+                dfin.loc[
                 (dfm['Product Name'] == in_selected_product) &
                 (dfm['Components'] == in_selected_components),
                 in_selected_fields
                 ] = in_edit_input
-                dfin.loc[
+                
+                dfm.loc[
                 (dfm['Product Name'] == in_selected_product) &
                 (dfm['Components'] == in_selected_components),
                 in_selected_fields
@@ -128,16 +129,17 @@ def modify():
             )
             
         if st.button('Confirm', key="out_confirm"):
-                dfm.loc[
-                (dfm['Product Name'] == out_selected_product) &
-                (dfm['Components'] == out_selected_components),
-                out_selected_fields
-                ] = out_edit_input
                 df_out.loc[
                 (dfm['Product Name'] == in_selected_product) &
                 (dfm['Components'] == in_selected_components),
                 in_selected_fields
                 ] = in_edit_input
+                
+                dfm.loc[
+                (dfm['Product Name'] == out_selected_product) &
+                (dfm['Components'] == out_selected_components),
+                out_selected_fields
+                ] = out_edit_input
                 st.success('Data has been successfully changed!')
 
             # # Save changes back to Excel
