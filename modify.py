@@ -9,18 +9,9 @@ def write_excel(df, file_path, sheet_name):
     print(df)
     with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
         df.to_excel(writer, sheet_name=sheet_name, index=False)
+        
 # Load the dataframe
 dfn = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
-
-def save_to_excel(df, sheet_name):
-    """Save the updated dataframe back to the Excel file."""
-    try:
-        book = load_workbook(file_path)
-        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-            writer.book = book
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
-    except Exception as e:
-        st.error(f"Error saving data to Excel: {e}")
 
 def modify():
     # Add Tabs Below
