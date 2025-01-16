@@ -330,162 +330,68 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-        st.session_state.df_progress.loc[st.session_state.df_progress['Process Type'] == 'Outsource', 'status'] = 'InProgress_Outsource'
-        st.session_state.df_progress.loc[st.session_state.df_progress['Process Type'] == 'In House', 'status'] = 'InProgress_In House'
-    
-        # # Initialize session state for control
-        # if 'df_progress' not in st.session_state:
-        #     st.session_state.df_progress = df.copy()
-    
-        if "rows_to_display" not in st.session_state:
-            st.session_state.rows_to_display = 0
-    
-        if "is_running" not in st.session_state:
-            st.session_state.is_running = False
-    
-        # # Start/Stop button
-        # if st.button("Start" if not st.session_state.is_running else "Stop"):
-        #     st.session_state.is_running = not st.session_state.is_running
-
-        # Triggered by the Start button
-        if st.session_state.is_running:
-            # Ensure rows_to_display is within bounds
-            if st.session_state.rows_to_display < len(st.session_state.df_progress):
-                st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
-    
-                current_row = st.session_state.df_progress.iloc[st.session_state.rows_to_display]
-    
-                # Process and update the row's status based on conditions
-                if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
-                    if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                        st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_Outsource'
-                    elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                        st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_In House'
-                    elif current_row['End Time'] > current_row['Promised Delivery Date']:
-                        st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Late'
-    
-                # Move to the next row
-                st.session_state.rows_to_display += 1
-    
-                # Delay for animation
-                time.sleep(1)
-            else:
-                # Stop the animation when all rows are processed
-                st.session_state.is_running = False
-                st.success("All rows have been processed. Animation stopped.")
-    
+        # Auto-refresh logic
+        if st.session_state.is_running and st.session_state.rows_to_display < st.session_state.total_rows:
+            st_autorefresh(interval=1000, key="autorefresh")  # Refresh every second
+        
+            # Add the next row to the progress DataFrame
+            st.session_state.df_progress = pd.concat(
+                [st.session_state.df_progress, df.iloc[st.session_state.rows_to_display:st.session_state.rows_to_display + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_to_display += 1  # Increment the counter
+        
+            # Display current progress
+            st.write(f"Processing row {st.session_state.rows_to_display} of {st.session_state.total_rows}")
+        
+            # Update the row's status based on conditions
+            current_row = df.iloc[st.session_state.rows_to_display - 1]
+            if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
+                if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display - 1, 'status'] = 'Completed_Outsource'
+                elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display - 1, 'status'] = 'Completed_In House'
+                elif current_row['End Time'] > current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display - 1, 'status'] = 'Late'
+        
         # Prepare the visualization data
         df_visual = st.session_state.df_progress.copy()
-    
+        
         # Assign colors based on status
         status_colors = {
-            'InProgress_Outsource': '#FFD700',
+            'InProgress_Outsource': 'orange',
             'InProgress_In House': 'brown',
             'Completed_Outsource': 'darkgreen',
             'Completed_In House': 'olivedrab',
             'Late': 'red'
         }
         df_visual['color'] = df_visual['status'].map(status_colors)
-    
-        # Create a scatter plot
+        
+        # Progressive visualization
         fig = go.Figure()
-    
+        
         for _, row in df_visual.iterrows():
             fig.add_trace(go.Scatter(
                 x=[row['Product Name']],
                 y=[row['Components']],
                 mode='markers+text',
                 marker=dict(size=20, color=row['color'], symbol='square'),
-                text=row['Machine Number'],  # Display machine info
+                text=row['Machine Number'],
                 textposition='top center',
                 name=row['status']
             ))
-    
+        
         fig.update_layout(
-            title="Status of Each Product Component",
+            # title="Status of Each Product Component (Progressive)",
             xaxis=dict(title="Product Name"),
             yaxis=dict(title="Components"),
             legend_title="Status and Process Type",
             template="plotly_white"
         )
-    
-        # Display the plot
+        
         st.plotly_chart(fig)
-    
-        # Check if all rows have been processed
-        if st.session_state.rows_to_display >= len(st.session_state.df_progress):
+        
+        # Completion message
+        if st.session_state.rows_to_display >= st.session_state.total_rows:
             st.session_state.is_running = False
-            st.success("Animation completed. All rows have been processed.")
-        # # Ensure rows_to_display is within bounds
-        # if st.session_state.is_running
-        # if st.session_state.rows_to_display < len(st.session_state.df_progress):
-        #     st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
-    
-        #     current_row = st.session_state.df_progress.iloc[st.session_state.rows_to_display]
-    
-        #     # Process and update the row's status based on conditions
-        #     if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
-        #         if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_Outsource'
-        #         elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_In House'
-        #         elif current_row['End Time'] > current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Late'
-    
-        # # Prepare the visualization data
-        # df_visual = st.session_state.df_progress.copy()
-    
-        # # Assign colors based on status
-        # status_colors = {
-        #     'InProgress_Outsource': '#FFD700',
-        #     'InProgress_In House': 'brown',
-        #     'Completed_Outsource': 'darkgreen',
-        #     'Completed_In House': 'olivedrab',
-        #     'Late': 'red'
-        # }
-        # df_visual['color'] = df_visual['status'].map(status_colors)
-    
-        # # Create a scatter plot
-        # fig = go.Figure()
-    
-        # for _, row in df_visual.iterrows():
-        #     fig.add_trace(go.Scatter(
-        #         x=[row['Product Name']],
-        #         y=[row['Components']],
-        #         mode='markers+text',
-        #         marker=dict(size=20, color=row['color'], symbol='square'),
-        #         text=row['Machine Number'],  # Display machine info
-        #         textposition='top center',
-        #         name=row['status']
-        #     ))
-    
-        # fig.update_layout(
-        #     title="Status of Each Product Component",
-        #     xaxis=dict(title="Product Name"),
-        #     yaxis=dict(title="Components"),
-        #     legend_title="Status and Process Type",
-        #     template="plotly_white"
-        # )
-    
-        # # Display the plot
-        # st.plotly_chart(fig)
-    
-        # # Check if all rows have been processed
-        # if st.session_state.df_progress['status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
-        #     st.session_state.is_running = False
-        #     st.success("All rows have been processed. Animation stopped.")
-        # else:
-        #     # Auto-refresher logic
-        #     if st.session_state.is_running:
-        #         st.write("Auto-refresh is running...")
-        #         refresh_rate = 1  # in seconds
-        #         st.write(f"Refreshing every {refresh_rate} seconds...")
-        #         time.sleep(refresh_rate)
-    
-        #         # Update the number of rows to display
-        #         st.session_state.rows_to_display += 1
-    
-        #         # Trigger rerun
-        #         st.experimental_rerun()
-        #     else:
-        #         st.write("Auto-refresh is stopped. Press Start to begin.")
+            st.success("All rows have been processed. Animation complete!")
