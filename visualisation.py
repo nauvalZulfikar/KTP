@@ -89,7 +89,7 @@ def visualisation(dfm,st):
     if selected_visualization == "Gantt Chart":
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
-            fig_static = px.timeline(
+            gc_static = px.timeline(
                 st.session_state.dfm_progress,
                 x_start="Start Time",
                 x_end="End Time",
@@ -97,13 +97,13 @@ def visualisation(dfm,st):
                 color="legend",  # Use Components for color differentiation
                 # labels={"Components": "Component", "Machine Number": "Machine"}
             )
-            fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
-            fig_static.update_layout(
+            gc_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
+            gc_static.update_layout(
                 legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(fig_static, use_container_width=True)
+            st.plotly_chart(gc_static, use_container_width=True)
 
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -122,7 +122,7 @@ def visualisation(dfm,st):
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-            fig_animated = px.timeline(
+            gc_animated = px.timeline(
                 st.session_state.dfm_progress,
                 x_start="Start Time",
                 x_end="End Time",
@@ -130,13 +130,13 @@ def visualisation(dfm,st):
                 color="legend",  # Use Components for color differentiation
                 labels={"Components": "Component", "Machine Number": "Machine"}
             )
-            fig_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
-            fig_animated.update_layout(
+            gc_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
+            gc_animated.update_layout(
                 legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(fig_animated, use_container_width=True)
+            st.plotly_chart(gc_animated, use_container_width=True)
 
 # =========================================================================================
 
@@ -152,17 +152,8 @@ def visualisation(dfm,st):
             axis=1)
         
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
-        #     fig_static = px.timeline(
-        #         st.session_state.dfm_progress,
-        #         x_start="Start Time",
-        #         x_end="End Time",
-        #         y="Product Name",
-        #         color="legend",  # Use Components for color differentiation
-        #         # labels={"Components": "Component", "Machine Number": "Machine"}
-        #     )
-        # )
             # Step 3: Create a horizontal bar chart
-            fig_static = px.bar(
+            gcu_static = px.bar(
                 data,
                 x="Duration",  # Horizontal axis
                 y="Product Name",  # Vertical axis
@@ -172,7 +163,7 @@ def visualisation(dfm,st):
                 # title="Horizontal Bar Chart of Task Durations"
             )
 
-            fig_static.update_layout(
+            gcu_static.update_layout(
                 xaxis_title="Task Duration (minutes)",
                 yaxis_title="Products",
                 legend_title="Components",
@@ -180,7 +171,7 @@ def visualisation(dfm,st):
             )
 
             # Step 4: Integrate into Streamlit
-            st.plotly_chart(fig_static, use_container_width=True)
+            st.plotly_chart(gcu_static, use_container_width=True)
 
                     # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -199,7 +190,7 @@ def visualisation(dfm,st):
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-            fig_animated = px.bar(
+            gcu_animated = px.bar(
                 data,
                 x="Duration",  # Horizontal axis
                 y="Product Name",  # Vertical axis
@@ -209,7 +200,7 @@ def visualisation(dfm,st):
                 # title="Horizontal Bar Chart of Task Durations"
             )
 
-            fig_animated.update_layout(
+            gcu_animated.update_layout(
                 xaxis_title="Task Duration (minutes)",
                 yaxis_title="Products",
                 legend_title="Components",
@@ -217,7 +208,7 @@ def visualisation(dfm,st):
             )
 
             # Step 4: Integrate into Streamlit
-            st.plotly_chart(fig_animated, use_container_width=True)
+            st.plotly_chart(gcu_animated, use_container_width=True)
 
 # =========================================================================================
     
