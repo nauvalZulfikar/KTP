@@ -13,7 +13,9 @@ file_path = "KTP/Product Details_v1.xlsx"
 
 
 # Load the dataframe
-dfn = dfm.drop(columns=['wait_time', 'legend', 'Status','Daily Utilization']).copy()
+dfn = dfm.drop(columns=['wait_time', 'legend', 'Status',
+                        # 'Daily Utilization'
+                       ]).copy()
 
 def modify():
     # Add Tabs Below
