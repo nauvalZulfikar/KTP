@@ -221,12 +221,7 @@ def visualisation(dfm,st):
 
     if selected_visualization == "Product Components Status":
         # Ensure df_viz has the required data
-        df_viz = dfm[['Product Name', 'Components', 'Machine Number']].copy()
-        
-        status = ['InProgress_Outsource','InProgress_In House','Completed_In House','Completed_Outsource','Late']
-        
-        # Add a "Status" column (for demonstration, adjust it according to your data)
-        df_viz['Status'] = np.random.choice(status, size=len(df_viz))
+        df_viz = dfm[['Product Name', 'Components', 'Machine Number','Status']].copy()
         
         products = df_viz['Product Name'].unique()
         components = df_viz['Components'].unique()
@@ -237,8 +232,8 @@ def visualisation(dfm,st):
             "InProgress_In House": "yellow",
             "Completed_In House": "cyan",
             "Completed_Outsource": "blue",
-            "Late": "red"  # Use a common color for both Late statuses
-            }
+            "Late": "red"
+        }
         
         # Create a scatter plot
         fig = go.Figure()
@@ -275,5 +270,9 @@ def visualisation(dfm,st):
             template='plotly_white'
         )
         
-        # Show plot
-        fig.show()
+        # Streamlit app
+        st.title("Product Component Status Visualization")
+        st.write("This scatter plot visualizes the status of each product component.")
+        
+        # Display the Plotly chart
+        st.plotly_chart(fig, use_container_width=True)
