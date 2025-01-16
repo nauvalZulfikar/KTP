@@ -244,12 +244,21 @@ def visualisation(dfm,st):
 # =========================================================================================
     
     elif selected_visualization == "Component Waiting Time":
-        # Map session state variables to new variables for this context
-        component_waiting_progress = st.session_state.dfm_progress
-        auto_refresh_waiting = st.session_state.auto_refresh
-        rows_added_waiting = st.session_state.rows_added
-        total_rows_waiting = st.session_state.total_rows
+        # Progressive animation
+        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress = pd.concat(
+                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_added += 1  # Increment the counter
     
+        # Stop animation when all rows are added
+        if st.session_state.rows_added >= st.session_state.total_rows:
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
+            
         # Progressive animation
         if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
             st_autorefresh(interval=1000, limit=None, key="autorefresh_waiting")  # Refresh every second
@@ -278,14 +287,27 @@ def visualisation(dfm,st):
 
 
 # =========================================================================================
-    
+
     elif selected_visualization == "Product Components Status":
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
             st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+            
             # Add the next row to the progress DataFrame
+            new_row = dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1].copy()
+            
+            # Update status for the new row
+            new_row['Status'] = new_row.apply(
+                lambda row: (
+                    'Completed_In House' if row['Process Type'] == 'In House' and row['End Time'] <= row['Promised Delivery Date']
+                    else 'Completed_Outsource' if row['Process Type'] == 'Outsource' and row['End Time'] <= row['Promised Delivery Date']
+                    else 'Late'
+                ), axis=1
+            )
+            
+            # Concatenate the new row to the progress DataFrame
             st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                [st.session_state.dfm_progress, new_row],
                 ignore_index=True
             )
             st.session_state.rows_added += 1  # Increment the counter
@@ -297,7 +319,7 @@ def visualisation(dfm,st):
     
         # Create a scatter plot for progressive animation or static visualization
         fig = go.Figure()
-
+    
         # Map status to colors
         status_color_map = {
             "InProgress_Outsource": "orange",
@@ -305,7 +327,7 @@ def visualisation(dfm,st):
             "Completed_In House": "cyan",
             "Completed_Outsource": "blue",
             "Late": "red"  # Use a common color for both Late statuses
-            }
+        }
         
         for _, entry in st.session_state.dfm_progress.iterrows():  # Iterate over rows using .iterrows()
             fig.add_trace(go.Scatter(
@@ -340,3 +362,65 @@ def visualisation(dfm,st):
     
         # Display the Plotly chart
         st.plotly_chart(fig, use_container_width=True)
+
+    # elif selected_visualization == "Product Components Status":
+    #     # Progressive animation
+    #     if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+    #         st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+    #         # Add the next row to the progress DataFrame
+    #         st.session_state.dfm_progress = pd.concat(
+    #             [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+    #             ignore_index=True
+    #         )
+    #         st.session_state.rows_added += 1  # Increment the counter
+    
+    #     # Stop animation when all rows are added
+    #     if st.session_state.rows_added >= st.session_state.total_rows:
+    #         st.session_state.auto_refresh = False
+    #         st.success("Animation complete! Reload the page to reset.")
+    
+    #     # Create a scatter plot for progressive animation or static visualization
+    #     fig = go.Figure()
+
+    #     # Map status to colors
+    #     status_color_map = {
+    #         "InProgress_Outsource": "orange",
+    #         "InProgress_In House": "yellow",
+    #         "Completed_In House": "cyan",
+    #         "Completed_Outsource": "blue",
+    #         "Late": "red"  # Use a common color for both Late statuses
+    #         }
+        
+    #     for _, entry in st.session_state.dfm_progress.iterrows():  # Iterate over rows using .iterrows()
+    #         fig.add_trace(go.Scatter(
+    #             x=[entry['Product Name']],
+    #             y=[entry['Components']],
+    #             mode='markers+text',
+    #             marker=dict(
+    #                 size=20,
+    #                 color=status_color_map[entry['Status']],  # Use status color mapping
+    #                 symbol='square'
+    #             ),
+    #             text=entry['Machine Number'],  # Add machine name as text
+    #             textposition='middle center',  # Place text in the middle of the square
+    #             showlegend=False  # Suppress duplicate legends
+    #         ))
+    
+    #     # Add legend manually
+    #     for status, color in status_color_map.items():
+    #         fig.add_trace(go.Scatter(
+    #             x=[None], y=[None], mode='markers',
+    #             marker=dict(size=15, color=color, symbol='square'),
+    #             name=status
+    #         ))
+    
+    #     # Update layout
+    #     fig.update_layout(
+    #         xaxis=dict(title='Product Name', tickvals=dfm['Product Name'].unique()),
+    #         yaxis=dict(title='Components', tickvals=dfm['Components'].unique()),
+    #         legend_title='Status and Process Type',
+    #         template='plotly_white'
+    #     )
+    
+    #     # Display the Plotly chart
+    #     st.plotly_chart(fig, use_container_width=True)
