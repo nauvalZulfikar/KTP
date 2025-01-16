@@ -221,10 +221,10 @@ def visualisation(dfm,st):
 
     if selected_visualization == "Product Components Status":
         # Ensure df_viz has the required data
-        df_viz = dfm[['Product Name', 'Components', 'Machine Number','Status']].copy()
+        # df_viz = dfm[['Product Name', 'Components', 'Machine Number','Status']].copy()
         
-        products = df_viz['Product Name'].unique()
-        components = df_viz['Components'].unique()
+        products = dfm['Product Name'].unique()
+        components = dfm['Components'].unique()
         
         # Map status to colors
         status_color_map = {
@@ -238,7 +238,7 @@ def visualisation(dfm,st):
         # Create a scatter plot
         fig = go.Figure()
         
-        for _, entry in df_viz.iterrows():  # Iterate over rows using .iterrows()
+        for _, entry in dfm.iterrows():  # Iterate over rows using .iterrows()
             fig.add_trace(go.Scatter(
                 x=[entry['Product Name']],
                 y=[entry['Components']],
