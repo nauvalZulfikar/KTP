@@ -30,7 +30,7 @@ def modify():
     date_col = ['Order Processing Date', 'Promised Delivery Date']
 
     with tabs[0]:  # In House
-        df_in = dfm[dfm['Process Type'] == 'In House']
+        df_in = dfn[dfn['Process Type'] == 'In House']
         in_products = df_in['Product Name'].unique()
         in_selected_product = st.selectbox(
             'Select product name:',
@@ -92,7 +92,7 @@ def modify():
         
 
     with tabs[1]:  # Outsource
-        df_out = dfm[dfm['Process Type'] == 'Outsource']
+        df_out = dfn[dfn['Process Type'] == 'Outsource']
         out_products = df_out['Product Name'].unique()
         out_selected_product = st.selectbox(
             'Select product name:',
