@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 from scheduler import dfm, adjust_to_working_hours_and_days, calculate_machine_utilization, product_waiting_df, component_waiting_df
