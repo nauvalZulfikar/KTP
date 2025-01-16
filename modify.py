@@ -13,7 +13,7 @@ def modify():
 
     
     with tabs[1]:  # Outsource
-        products = dfm['Product Name'].unique()  # Get unique product names
+        products = dfm['Product Name'].unique().to_list()  # Get unique product names
         selected_product = st.selectbox(
             'Select product name:',
             products  # Pass the array directly without wrapping it in a list
