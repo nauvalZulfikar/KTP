@@ -12,14 +12,11 @@ def modify():
         st.subheader("In House")
 
     
-    with tabs[1]: # Outsource
-        products = dfm['Product Name'].unique()
-        product_name = [
-            products
-        ]
+    with tabs[1]:  # Outsource
+        products = dfm['Product Name'].unique()  # Get unique product names
         selected_product = st.selectbox(
-            'select product name: ',
-            product_name
+            'Select product name:',
+            products  # Pass the array directly without wrapping it in a list
         )
 
         # product_name = [
