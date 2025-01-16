@@ -527,8 +527,8 @@ product_waiting_df = calculate_waiting_time(
 
 dfm['legend'] = dfm['Components'].copy()
 for i in range(len(dfm)):
-  if dfm['Machine Number'] == 'OutSrc':
-    dfm['legend'] = 'OutSrc'
+  if dfm['Machine Number'][i] == 'OutSrc':
+    dfm['legend'][i] = 'OutSrc'
 
 def late_products(dfm):
     late = dfm.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
