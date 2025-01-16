@@ -182,6 +182,43 @@ def visualisation(dfm,st):
             # Step 4: Integrate into Streamlit
             st.plotly_chart(fig_static, use_container_width=True)
 
+                    # Progressive animation
+        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+            # Add the next row to the progress DataFrame
+            st.session_state.dfm_progress = pd.concat(
+                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                ignore_index=True
+            )
+            st.session_state.rows_added += 1  # Increment the counter
+
+        # Stop animation when all rows are added
+        if st.session_state.rows_added >= st.session_state.total_rows:
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
+
+        # Display the progressive Gantt chart during animation
+        if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+            fig_animated = px.bar(
+                data,
+                x="Duration",  # Horizontal axis
+                y="Product Name",  # Vertical axis
+                color="Components",  # Color by components
+                orientation="h",  # Horizontal bars
+                labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+                # title="Horizontal Bar Chart of Task Durations"
+            )
+
+            fig_animated.update_layout(
+                xaxis_title="Task Duration (minutes)",
+                yaxis_title="Products",
+                legend_title="Components",
+                template="plotly_white"
+            )
+
+            # Step 4: Integrate into Streamlit
+            st.plotly_chart(fig_animated, use_container_width=True)
+
 # =========================================================================================
     
     elif selected_visualization == "Machine Utilisation":
