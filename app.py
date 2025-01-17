@@ -17,8 +17,8 @@ st.set_page_config(
 # Main Title
 st.title("Machine Production Scheduler")
 
-if "df" in st.session_state:
-    st.dataframe(st.session_state.df)
+if "dfm" in st.session_state:
+    st.dataframe(st.session_state.dfm)
 
 # # File Download Button
 # @st.cache_data
