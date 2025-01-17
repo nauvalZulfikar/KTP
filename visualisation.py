@@ -290,12 +290,9 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-        # Initialize rows_to_display in session state
-        if "rows_to_display" not in st.session_state:
-            st.session_state.rows_to_display = 0
 
         # Filter and visualize only the rows up to rows_to_display
-        df_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_to_display + 1].copy()
+        df_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
 
         # Assign colors based on status
         status_colors = {
@@ -331,10 +328,10 @@ def visualisation(dfm,st):
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 
         # Check if all rows have been displayed
-        if st.session_state.rows_to_display < len(st.session_state.df_progress) - 1:
+        if st.session_state.rows_added < len(st.session_state.df_progress) - 1:
             if st.session_state.auto_refresh:
                 # Increment rows_to_display for animation
-                st.session_state.rows_to_display += 1
+                st.session_state.rows_added += 1
                 st_autorefresh(interval=1000, key="autorefresh_product_status")  # Auto-refresh every second
         else:
             st.session_state.auto_refresh = False
