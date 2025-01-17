@@ -397,6 +397,9 @@ def calculate_machine_utilization(df):
 
     return average_daily_utilization_per_machine
 
+if "machine_utilization_df" not in st.session_state:
+    st.session_state.machine_utilization_df = calculate_machine_utilization(st.session_state.dfm)
+
 def calculate_waiting_time(df, group_by_column, date_columns):
     start_col, end_col = date_columns
 
