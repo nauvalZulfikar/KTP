@@ -6,7 +6,7 @@ from visualisation import visualisation  # Import Gantt chart visualization
 from modify import modify
 from product_list_change import product_list_change
 from product_catalogue import product_catalogue
-a
+
 # Set page configuration
 st.set_page_config(
     page_title="Machine Production Scheduler",
