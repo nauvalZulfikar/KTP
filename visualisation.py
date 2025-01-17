@@ -350,7 +350,7 @@ def visualisation(dfm,st):
         # Filter and visualize only the rows up to rows_to_display
         df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_added].copy()
         dfm_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
-
+    
         # Assign colors based on status
         status_colors = {
             'InProgress_Outsource': 'orange',
@@ -360,8 +360,7 @@ def visualisation(dfm,st):
             'Late': 'red'
         }
         df_visual['color'] = df_visual['Status'].map(status_colors)
-        dfm_visual['color'] = dfm_visual['Status'].map(status_colors)
-
+    
         # Create Plotly figure
         fig = go.Figure()
         
@@ -371,12 +370,12 @@ def visualisation(dfm,st):
                 y=[row["Components"]],
                 mode='markers+text',
                 marker=dict(
-                    color=status_colors,
+                    color=row["color"],  # Assign the specific color for this row
                     size=15
                 ),
                 text=row["Machine Number"],
                 textposition="top center",
-                name=row["Process Type"]
+                name=row["Status"]  # Use 'Status' for the legend
             ))
         
         # Update layout
@@ -389,7 +388,7 @@ def visualisation(dfm,st):
         )
         
         # Display in Streamlit
-        st.plotly_chart(fig, use_container_width=True, key = 'product_component_status')
+        st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 # ============================================================================================================= 
         # # Static Gantt chart displayed immediately when the page loads
         # if not st.session_state.auto_refresh:  # Show the static chart if not animating
