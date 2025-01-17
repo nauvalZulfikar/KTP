@@ -476,4 +476,4 @@ def late_products(dfm):
 if "late_df" not in st.session_state:
     st.session_state.late_df = late_products(st.session_state.dfm)
 
-st.session_state.dfm = st.session_state.dfm.drop(columns=['Daily Utilization','wait_time','legend'])
+# st.session_state.dfm = st.session_state.dfm.drop(columns=['Daily Utilization','wait_time','legend'])
