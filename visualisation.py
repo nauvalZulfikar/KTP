@@ -292,7 +292,8 @@ def visualisation(dfm,st):
     elif selected_visualization == "Product Components Status":
 
         # Filter and visualize only the rows up to rows_to_display
-        df_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
+        df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_added + 1].copy()
+        dfm_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
 
         # Assign colors based on status
         status_colors = {
@@ -303,6 +304,7 @@ def visualisation(dfm,st):
             'Late': 'red'
         }
         df_visual['color'] = df_visual['Status'].map(status_colors)
+        dfm_visual['color'] = dfm_visual['Status'].map(status_colors)
         
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
@@ -333,7 +335,7 @@ def visualisation(dfm,st):
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
             # Create a scatter plot
             fig = go.Figure()
-            for _, row in df_visual.iterrows():
+            for _, row in dfm_visual.iterrows():
                 fig.add_trace(go.Scatter(
                     x=[row['Product Name']],
                     y=[row['Components']],
