@@ -345,11 +345,11 @@ def visualisation(dfm,st):
         
         # Check if all rows have been processed
         if st.session_state.df_progress['Status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
-            st.session_state.is_running = False
+            st.session_state.auto_refresher = False
             st.success("All rows have been processed. Animation stopped.")
         else:
             # Auto-refresher logic
-            if st.session_state.is_running:
+            if st.session_state.auto_refresher:
                 st.write("Auto-refresh is running...")
                 refresh_rate = 1  # in seconds
                 st.write(f"Refreshing every {refresh_rate} seconds...")
