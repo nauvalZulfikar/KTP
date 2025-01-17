@@ -361,74 +361,103 @@ def visualisation(dfm,st):
         }
         df_visual['color'] = df_visual['Status'].map(status_colors)
         dfm_visual['color'] = dfm_visual['Status'].map(status_colors)
+
+        # Create Plotly figure
+        fig = go.Figure()
         
-        # Static Gantt chart displayed immediately when the page loads
-        if not st.session_state.auto_refresh:  # Show the static chart if not animating
-            # Create a scatter plot
-            fig = go.Figure()
+        for i, row in df_visual.iterrows():
+            fig.add_trace(go.Scatter(
+                x=[row["Product"]],
+                y=[row["Component"]],
+                mode='markers+text',
+                marker=dict(
+                    color=color_mapping[row["Process Type"]],
+                    size=15
+                ),
+                text=row["Machine"],
+                textposition="top center",
+                name=row["Process Type"]
+            ))
+        
+        # Update layout
+        fig.update_layout(
+            title="Status of Each Product Component",
+            xaxis_title="Product",
+            yaxis_title="Component",
+            legend_title="Status and Process Type",
+            showlegend=True
+        )
+        
+        # Display in Streamlit
+        st.plotly_chart(fig, use_container_width=True, key = 'product_component_status')
+# ============================================================================================================= 
+        # # Static Gantt chart displayed immediately when the page loads
+        # if not st.session_state.auto_refresh:  # Show the static chart if not animating
+        #     # Create a scatter plot
+        #     fig = go.Figure()
             
-            # Group the data by status to avoid duplicate legend entries
-            for status, group in df_visual.groupby('Status'):
-                color = status_colors.get(status, 'gray')  # Default to gray if status not in map
-                fig.add_trace(go.Scatter(
-                    x=group['Product Name'],
-                    y=group['Components'],
-                    mode='markers+text',
-                    marker=dict(size=20, color=color, symbol='square'),
-                    text=group['Machine Number'],  # Display machine info
-                    textposition='top center',
-                    name=status  # Use status as the legend label
-                ))
+        #     # Group the data by status to avoid duplicate legend entries
+        #     for status, group in df_visual.groupby('Status'):
+        #         color = status_colors.get(status, 'gray')  # Default to gray if status not in map
+        #         fig.add_trace(go.Scatter(
+        #             x=group['Product Name'],
+        #             y=group['Components'],
+        #             mode='markers+text',
+        #             marker=dict(size=20, color=color, symbol='square'),
+        #             text=group['Machine Number'],  # Display machine info
+        #             textposition='top center',
+        #             name=status  # Use status as the legend label
+        #         ))
             
-            fig.update_layout(
-                xaxis=dict(title="Product Name"),
-                yaxis=dict(title="Components"),
-                legend_title="Status and Process Type",
-                template="plotly_white"
-            )
+        #     fig.update_layout(
+        #         xaxis=dict(title="Product Name"),
+        #         yaxis=dict(title="Components"),
+        #         legend_title="Status and Process Type",
+        #         template="plotly_white"
+        #     )
             
-            # Display the plot
-            st.plotly_chart(fig, use_container_width=True, key='product_component_status_static')
+        #     # Display the plot
+        #     st.plotly_chart(fig, use_container_width=True, key='product_component_status_static')
 
-        # Display the progressive Gantt chart during animation
-        if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-            # Create a scatter plot
-            # Create a scatter plot
-            fig = go.Figure()
+        # # Display the progressive Gantt chart during animation
+        # if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+        #     # Create a scatter plot
+        #     # Create a scatter plot
+        #     fig = go.Figure()
             
-            # Group the data by status to avoid duplicate legend entries
-            for status, group in dfm_visual.groupby('Status'):
-                color = status_colors.get(status, 'gray')  # Default to gray if status not in map
-                fig.add_trace(go.Scatter(
-                    x=group['Product Name'],
-                    y=group['Components'],
-                    mode='markers+text',
-                    marker=dict(size=20, color=color, symbol='square'),
-                    text=group['Machine Number'],  # Display machine info
-                    textposition='top center',
-                    name=status  # Use status as the legend label
-                ))
+        #     # Group the data by status to avoid duplicate legend entries
+        #     for status, group in dfm_visual.groupby('Status'):
+        #         color = status_colors.get(status, 'gray')  # Default to gray if status not in map
+        #         fig.add_trace(go.Scatter(
+        #             x=group['Product Name'],
+        #             y=group['Components'],
+        #             mode='markers+text',
+        #             marker=dict(size=20, color=color, symbol='square'),
+        #             text=group['Machine Number'],  # Display machine info
+        #             textposition='top center',
+        #             name=status  # Use status as the legend label
+        #         ))
             
-            fig.update_layout(
-                xaxis=dict(title="Product Name"),
-                yaxis=dict(title="Components"),
-                legend_title="Status and Process Type",
-                template="plotly_white"
-            )
+        #     fig.update_layout(
+        #         xaxis=dict(title="Product Name"),
+        #         yaxis=dict(title="Components"),
+        #         legend_title="Status and Process Type",
+        #         template="plotly_white"
+        #     )
             
-            # Display the plot
-            st.plotly_chart(fig, use_container_width=True, key='product_component_status_animate')
+        #     # Display the plot
+        #     st.plotly_chart(fig, use_container_width=True, key='product_component_status_animate')
 
-        # Check if all rows have been displayed
-        if st.session_state.rows_added < len(st.session_state.df_progress) - 1:
-            if st.session_state.auto_refresh:
-                # Increment rows_to_display for animation
-                st.session_state.rows_added += 1
-                st_autorefresh(interval=1000, key="autorefresh_product_status")  # Auto-refresh every second
-        else:
-            st.session_state.auto_refresh = False
-            st.success("All rows have been displayed. Animation complete!")
-
+        # # Check if all rows have been displayed
+        # if st.session_state.rows_added < len(st.session_state.df_progress) - 1:
+        #     if st.session_state.auto_refresh:
+        #         # Increment rows_to_display for animation
+        #         st.session_state.rows_added += 1
+        #         st_autorefresh(interval=1000, key="autorefresh_product_status")  # Auto-refresh every second
+        # else:
+        #     st.session_state.auto_refresh = False
+        #     st.success("All rows have been displayed. Animation complete!")
+# ===================================================================================================
         # # Ensure rows_to_display is within bounds
         # if st.session_state.rows_added < len(st.session_state.df_progress):
         #     # st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
