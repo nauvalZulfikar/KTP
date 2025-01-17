@@ -140,26 +140,26 @@ with st.container():
     #             yaxis_title="Products"
     #         )
     #         st.plotly_chart(gc_static, use_container_width=True, key='static_gantt_chart')
-        if selected_visualization == "Gantt Chart":
-            # Filter data based on centralized rows_added
-            st.session_state.dfm_progress = st.session_state.dfm.iloc[:st.session_state.rows_added].copy()
-        
-            # Create Gantt chart
-            gc_animated = px.timeline(
-                st.session_state.dfm_progress,
-                x_start="Start Time",
-                x_end="End Time",
-                y="Product Name",
-                color="legend",
-                labels={"Components": "Component", "Machine Number": "Machine"}
-            )
-            gc_animated.update_yaxes(categoryorder="total ascending")
-            gc_animated.update_layout(
-                legend_title="Component",
-                xaxis_title="Time",
-                yaxis_title="Products"
-            )
-            st.plotly_chart(gc_animated, use_container_width=True, key='animated_gantt_chart')
+    if selected_visualization == "Gantt Chart":
+        # Filter data based on centralized rows_added
+        st.session_state.dfm_progress = st.session_state.dfm.iloc[:st.session_state.rows_added].copy()
+    
+        # Create Gantt chart
+        gc_animated = px.timeline(
+            st.session_state.dfm_progress,
+            x_start="Start Time",
+            x_end="End Time",
+            y="Product Name",
+            color="legend",
+            labels={"Components": "Component", "Machine Number": "Machine"}
+        )
+        gc_animated.update_yaxes(categoryorder="total ascending")
+        gc_animated.update_layout(
+            legend_title="Component",
+            xaxis_title="Time",
+            yaxis_title="Products"
+        )
+        st.plotly_chart(gc_animated, use_container_width=True, key='animated_gantt_chart')
 
 
         # Progressive animation
