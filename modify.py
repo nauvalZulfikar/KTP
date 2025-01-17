@@ -5,6 +5,7 @@ file_path = "KTP/Product Details_v1.xlsx"
 
 def modify():
     # Add Tabs Below
+    st.write(st.session_state.dfm.loc[st.session_state.rows_added:][st.session_state.dfm['Process Type'] == 'In House']
     tabs = st.tabs([
         "In House", 
         "Out Source", 
