@@ -337,12 +337,11 @@ def visualisation(dfm,st):
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
             # Create a scatter plot
-            # Create a scatter plot
             fig = go.Figure()
             
             # Group the data by status to avoid duplicate legend entries
             for status, group in dfm_visual.groupby('Status'):
-                color = status_colors.get(status, 'gray')  # Default to gray if status not in map
+                color = status_colors.get(status, 'green')  # Default to gray if status not in map
                 fig.add_trace(go.Scatter(
                     x=group['Product Name'],
                     y=group['Components'],
@@ -372,74 +371,3 @@ def visualisation(dfm,st):
         else:
             st.session_state.auto_refresh = False
             st.success("All rows have been displayed. Animation complete!")
-# ===================================================================================================
-        # # Ensure rows_to_display is within bounds
-        # if st.session_state.rows_added < len(st.session_state.df_progress):
-        #     # st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
-        
-        #     current_row = st.session_state.df_progress.iloc[st.session_state.rows_added]
-        
-        #     # Process and update the row's status based on conditions
-        #     if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
-        #         if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Completed_Outsource'
-        #         elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Completed_In House'
-        #         elif current_row['End Time'] > current_row['Promised Delivery Date']:
-        #             st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Late'
-                
-        # # Prepare the visualization data
-        # df_visual = st.session_state.df_progress.copy()
-        
-        # # Assign colors based on status
-        # status_colors = {
-        #     'InProgress_Outsource': 'orange',
-        #     'InProgress_In House': 'brown',
-        #     'Completed_Outsource': 'darkgreen',
-        #     'Completed_In House': 'olivedrab',
-        #     'Late': 'red'
-        # }
-        # df_visual['color'] = df_visual['Status'].map(status_colors)
-
-        # # Create a scatter plot
-        # fig = go.Figure()
-        
-        # for _, row in df_visual.iterrows():
-        #     fig.add_trace(go.Scatter(
-        #         x=[row['Product Name']],
-        #         y=[row['Components']],
-        #         mode='markers+text',
-        #         marker=dict(size=20, color=row['color'], symbol='square'),
-        #         text=row['Machine Number'],  # Display machine info
-        #         textposition='top center',
-        #         name=row['Status']
-        #     ))
-        
-        # fig.update_layout(
-        #     # title="Status of Each Product Component",
-        #     xaxis=dict(title="Product Name"),
-        #     yaxis=dict(title="Components"),
-        #     legend_title="Status and Process Type",
-        #     template="plotly_white"
-        # )
-        
-        # # Display the plot
-        # st.plotly_chart(fig, use_container_width=True, key='product_component_status')
-        
-        # # Check if all rows have been processed
-        # if st.session_state.df_progress['Status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
-        #     st.session_state.auto_refresh = False
-        #     st.success("All rows have been processed. Animation stopped.")
-        # else:
-        #     # Auto-refresher logic
-        #     if st.session_state.auto_refresh:
-        #         refresh_rate = 1  # in seconds
-        #         time.sleep(refresh_rate)
-        
-        #         # Update the number of rows to display
-        #         st.session_state.rows_added += 1
-        
-        #         # Trigger rerun
-        #         st.experimental_rerun()
-        #     else:
-        #         st.session_state.rows_added = 0
