@@ -4,10 +4,6 @@ from scheduler import dfm
 
 file_path = "KTP/Product Details_v1.xlsx"
 
-# Initialize dfm in session state
-if "dfm" in st.session_state:
-    dfm = st.session_state.dfm # Store the original dfm in session state
-
 def modify():
     # Add Tabs Below
     tabs = st.tabs([
