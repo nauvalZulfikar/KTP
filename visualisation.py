@@ -153,7 +153,7 @@ def visualisation(dfm,st):
         
         # Step 3: Create a horizontal bar chart
         gcu_static = px.bar(
-            st.session_state.dfm,
+            data,
             x="Duration",  # Horizontal axis
             y="Product Name",  # Vertical axis
             color="Components",  # Color by components
