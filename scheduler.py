@@ -310,6 +310,7 @@ if "dfm" not in st.session_state:
     st.session_state.dfm = st.session_state.df.copy()
 st.session_state.dfm = schedule_production_with_days(st.session_state.dfm)
 st.session_state.dfm = adjust_end_time_and_start_time(st.session_state.dfm)  # Adjust Start and End Times
+st.session_state.dfm = st.session_state.dfm.sort_values(by=['Start Time','End Time','Promised Delivery Date'])
 
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
