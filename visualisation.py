@@ -353,8 +353,8 @@ def visualisation(dfm,st):
     
         # Assign colors based on status
         status_colors = {
-            'InProgress_Outsource': 'orange',
-            'InProgress_In House': 'brown',
+            'InProgress_Outsource': 'gray',
+            'InProgress_In House': 'dimgray',
             'Completed_Outsource': 'darkgreen',
             'Completed_In House': 'olivedrab',
             'Late': 'red'
