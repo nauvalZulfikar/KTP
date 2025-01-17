@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-from scheduler import dfm
 
 file_path = "KTP/Product Details_v1.xlsx"
 
