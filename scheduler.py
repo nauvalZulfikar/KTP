@@ -241,7 +241,7 @@ def schedule_production_with_days(data):
     # Return the completed schedule
     return data
 
-def calculate_gaps(df):
+def calculate_gaps(dfm):
     loop_len = max(df['Product Name'].value_counts())
     dfm = df.groupby('Product Name', as_index=False).first().sort_values(by=['Promised Delivery Date', 'Start Time','End Time']).reset_index(drop=True)
 
@@ -398,7 +398,7 @@ def calculate_machine_utilization(df):
     return average_daily_utilization_per_machine
 
 if "machine_utilization_df" not in st.session_state:
-    st.session_state.machine_utilization_df = calculate_machine_utilization(st.session_state.dfm)
+    st.session_state.machine_utilization_df = calculate_machine_utilization(st.session_state.dfm.copy())
 
 def calculate_waiting_time(df, group_by_column, date_columns):
     start_col, end_col = date_columns
@@ -475,3 +475,5 @@ def late_products(dfm):
 
 if "late_df" not in st.session_state:
     st.session_state.late_df = late_products(st.session_state.dfm)
+
+st.session_state.dfm = st.session_state.dfm.drop(columns=['Daily Utilization','wait_time','legend'])
