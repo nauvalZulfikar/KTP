@@ -290,12 +290,24 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-
-        st.write(st.session_state.df)
-        # Progressive visualization for Product Components Status
-        if "rows_to_display" not in st.session_state:
-            st.session_state.rows_to_display = 0
-
+        # Ensure rows_to_display is within bounds
+        if st.session_state.rows_added < len(st.session_state.df_progress):
+            # st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
+        
+            current_row = st.session_state.df_progress.iloc[st.session_state.rows_to_display]
+        
+            # Process and update the row's status based on conditions
+            if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
+                if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_Outsource'
+                elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Completed_In House'
+                elif current_row['End Time'] > current_row['Promised Delivery Date']:
+                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'status'] = 'Late'
+                
+        # Prepare the visualization data
+        df_visual = st.session_state.df_progress.copy()
+        
         # Assign colors based on status
         status_colors = {
             'InProgress_Outsource': 'orange',
@@ -304,43 +316,49 @@ def visualisation(dfm,st):
             'Completed_In House': 'olivedrab',
             'Late': 'red'
         }
+        df_visual['color'] = df_visual['status'].map(status_colors)
 
-        # Auto-refresh for animation
-        if st.session_state.auto_refresh and st.session_state.rows_to_display < len(dfm):
-            st_autorefresh(interval=1000, key="autorefresh_product_components_status")  # Refresh every second
-
-            # Add the next row to the progress DataFrame
-            st.session_state.rows_to_display += 1
-
-        # Prepare the visualization data
-        df_visual = dfm.iloc[:st.session_state.rows_to_display].copy()
-        df_visual['color'] = df_visual['Status'].map(status_colors)
-
-        # Create scatter plot
-        pcs = go.Figure()
-
+        # Create a scatter plot
+        fig = go.Figure()
+        
         for _, row in df_visual.iterrows():
-            pcs.add_trace(go.Scatter(
+            fig.add_trace(go.Scatter(
                 x=[row['Product Name']],
                 y=[row['Components']],
                 mode='markers+text',
                 marker=dict(size=20, color=row['color'], symbol='square'),
-                text=row['Machine Number'],
+                text=row['Machine Number'],  # Display machine info
                 textposition='top center',
-                name=row['Status']
+                name=row['status']
             ))
-
-        pcs.update_layout(
-            # title="Status of Each Product Component (Progressive)",
+        
+        fig.update_layout(
+            # title="Status of Each Product Component",
             xaxis=dict(title="Product Name"),
             yaxis=dict(title="Components"),
             legend_title="Status and Process Type",
             template="plotly_white"
         )
-
-        st.plotly_chart(pcs, use_container_width=True)
-
-        # Stop animation when all rows are added
-        if st.session_state.rows_to_display >= len(dfm):
-            st.session_state.auto_refresh = False
-            st.success("Animation complete! Reload the page to reset.")
+        
+        # Display the plot
+        st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+        
+        # Check if all rows have been processed
+        if st.session_state.df_progress['status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
+            st.session_state.is_running = False
+            st.success("All rows have been processed. Animation stopped.")
+        else:
+            # Auto-refresher logic
+            if st.session_state.is_running:
+                st.write("Auto-refresh is running...")
+                refresh_rate = 1  # in seconds
+                st.write(f"Refreshing every {refresh_rate} seconds...")
+                time.sleep(refresh_rate)
+        
+                # Update the number of rows to display
+                st.session_state.rows_to_display += 1
+        
+                # Trigger rerun
+                st.experimental_rerun()
+            else:
+                st.session_state.rows_to_display = 0
