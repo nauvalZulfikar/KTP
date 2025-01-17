@@ -88,7 +88,6 @@ def visualisation(dfm,st):
     
     if selected_visualization == "Gantt Chart":
         # Static Gantt chart displayed immediately when the page loads
-        st.write(f'{st.session_state.rows_added}th steps')
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
             gc_static = px.timeline(
                 st.session_state.dfm_progress,
@@ -123,6 +122,7 @@ def visualisation(dfm,st):
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+            st.write(f'{st.session_state.rows_added}th steps')
             gc_animated = px.timeline(
                 st.session_state.dfm_progress,
                 x_start="Start Time",
