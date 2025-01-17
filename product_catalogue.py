@@ -1,17 +1,13 @@
 import pandas as pd
 import streamlit as st
 import datetime as dt
-from scheduler import dfm, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
-
-# Use `dfm` from scheduler.py and ensure connection
-if "dfm" in st.session_state:
-    dfm = st.session_state.dfm  # Store dfm in session state
+from scheduler import calculate_machine_utilization
 
 def product_catalogue():
     df_list = ['Order Processing Date', 'Promised Delivery Date', 'Start Time', 'End Time']
 
     # Use a temporary DataFrame for display purposes
-    display_df = dfm.drop(columns=['Status', 'wait_time', 'legend'], errors='ignore')
+    display_df = st.session_state.dfm.drop(columns=['Status', 'wait_time', 'legend'], errors='ignore')
 
     # Format date columns in `display_df` only for display
     for col in df_list:
@@ -34,18 +30,18 @@ def product_catalogue():
         st.write(st.session_state.machine_utilization_df)
 
         st.subheader("Component Waiting Time")
-        if "component_waiting_df" not in st.session_state:
-            st.session_state.component_waiting_df = component_waiting_df
+        # if "component_waiting_df" not in st.session_state:
+        #     st.session_state.component_waiting_df = component_waiting_df
         st.write(st.session_state.component_waiting_df)
 
     # Product Waiting Time and Late Products in the second column
     with col2:
         st.subheader("Late Products")
-        if "late_products_df" not in st.session_state:
-            st.session_state.late_products_df = late_products(st.session_state.dfm)
+        # if "late_products_df" not in st.session_state:
+        #     st.session_state.late_products_df = late_products(st.session_state.dfm)
         st.write(st.session_state.late_products_df)
 
         st.subheader("Product Waiting Time")
-        if "product_waiting_df" not in st.session_state:
-            st.session_state.product_waiting_df = product_waiting_df
+        # if "product_waiting_df" not in st.session_state:
+        #     st.session_state.product_waiting_df = product_waiting_df
         st.write(st.session_state.product_waiting_df)
