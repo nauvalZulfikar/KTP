@@ -42,7 +42,7 @@ def visualisation(dfm,st):
 
     # Centralized animation logic
     if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-        st_autorefresh(interval=1000, key="autorefresh")  # Refresh every second
+        st_autorefresh(interval=1000, key="autorefresher")  # Refresh every second
         st.session_state.rows_added += 1  # Increment rows_added globally
 
     # Stop animation when all rows are added
@@ -257,7 +257,7 @@ def visualisation(dfm,st):
     # elif selected_visualization == "Component Waiting Time":
         # # Progressive animation
         # if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-        #     st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+        #     st_(interval=1000, limit=None, key="")  # Refresh every second
         #     # Add the next row to the progress DataFrame
         #     st.session_state.dfm_progress = pd.concat(
         #         [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
@@ -272,7 +272,7 @@ def visualisation(dfm,st):
             
         # # Progressive animation
         # if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
-        #     st_autorefresh(interval=1000, limit=None, key="autorefresh_waiting")  # Refresh every second
+        #     st_(interval=1000, limit=None, key="_waiting")  # Refresh every second
         #     # Add the next row to the progress DataFrame
         #     st.session_state.dfm_progress = pd.concat(
         #         [component_waiting_progress,
@@ -377,7 +377,7 @@ def visualisation(dfm,st):
             if st.session_state.auto_refresh:
                 # Increment rows_to_display for animation
                 st.session_state.rows_added += 1
-                st_autorefresh(interval=1000, key="autorefresh_product_status")  # Auto-refresh every second
+                st_(interval=1000, key="autorefresh_product_status")  # Auto-refresh every second
         else:
             st.session_state.auto_refresh = False
             st.success("All rows have been displayed. Animation complete!")
