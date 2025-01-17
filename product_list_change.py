@@ -2,9 +2,6 @@ import pandas as pd
 import streamlit as st
 # from scheduler import dfm 
 
-if "dfm" not in st.session_state:
-    st.session_state.dfm = dfm  # Store dfm in session state
-
 def product_list_change():
     st.title("Product List Management")
 
@@ -49,14 +46,14 @@ def product_list_change():
                 'Cycle Time':input11,
                 'Setup Time (seconds)':input12,
             })
-            dfm = pd.concat([dfm,pd.DataFrame(new_row)])        
+            st.session_state.dfm = pd.concat([st.session_state.dfm,pd.DataFrame(new_row)])        
             st.success(f"Product '{input2}' added successfully.")
 
     elif selected_visualization == "Delete Product":
         input1 = st.number_input("UniqueID:")
 
         if st.button("Delete"):
-            dfm = dfm[dfm['UniqueID']!=input1]
+            st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['UniqueID']!=input1]
             st.warning(f"Product with ID '{input1}' deleted successfully.")
 
     elif selected_visualization == "Swap Product":
@@ -64,6 +61,6 @@ def product_list_change():
         input2 = st.number_input("Second UniqueID:")
 
         if st.button("Swap"):
-            dfm.loc[dfm['UniqueID']==input1,'UniqueID'] = input2
-            dfm.loc[dfm['UniqueID']==input2,'UniqueID'] = input1
+            st.session_state.dfm.loc[st.session_state.dfm['UniqueID']==input1,'UniqueID'] = input2
+            st.session_state.dfm.loc[st.session_state.dfm['UniqueID']==input2,'UniqueID'] = input1
             st.info(f"Product '{input1}' swapped with product '{input2}' successfully.")
