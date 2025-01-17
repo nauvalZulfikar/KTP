@@ -329,7 +329,7 @@ def visualisation(dfm,st):
                 marker=dict(size=20, color=row['color'], symbol='square'),
                 text=row['Machine Number'],  # Display machine info
                 textposition='top center',
-                name=row['status']
+                name=row['Status']
             ))
         
         fig.update_layout(
