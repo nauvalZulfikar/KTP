@@ -39,46 +39,11 @@ def visualisation(dfm,st):
         st.session_state.rows_added = len(st.session_state.dfm) # Start with all rows added
     if "total_rows" not in st.session_state:
         st.session_state.total_rows = len(st.session_state.dfm) # Total rows in the DataFrame
-
-    # Centralized animation logic
-    if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-        st_autorefresh(interval=1000, key="autorefresher")  # Refresh every second
-        st.session_state.rows_added += 1  # Increment rows_added globally
-
-    # Stop animation when all rows are added
-    if st.session_state.rows_added >= st.session_state.total_rows:
-        st.session_state.auto_refresh = False
-        st.success("Animation complete! Reload the page to reset.")
   
     # Layout for buttons
     with st.container():
         col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
         
-        # with col1:
-        #     if st.button("Start"):
-        #         if not st.session_state.auto_refresh:  # If not already animating
-        #             if st.session_state.rows_added == 0:  # If starting fresh
-        #                 st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-        #             st.session_state.auto_refresh = True  # Set auto-refresh to True
-        # with col2:
-        #     if st.button("Pause"):
-        #         # Pause the auto-refresh
-        #         st.session_state.auto_refresh = False
-        #         st.info("Animation paused.")
-        # with col3:
-        #     if st.button("Reschedule"):
-        #         # Reschedule logic - reset the progress to start fresh
-        #         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-        #         st.session_state.rows_added = 0
-        #         st.info("Rescheduling initiated. Click 'Start' to animate again.")
-        # with col4:
-        #     if st.button("Reset"):
-        #         # Reset all session state variables
-        #         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-        #         st.session_state.rows_added = 0
-        #         st.session_state.auto_refresh = False
-        #         st.success("Progress reset successfully.")
-
         with col1:
             if st.button("Start"):
                 if not st.session_state.auto_refresh:  # If not already animating
