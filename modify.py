@@ -120,8 +120,8 @@ def modify():
             
         if st.button('Confirm', key="out_confirm"):
             df_out.loc[
-                (df_out.dfm['Product Name'] == out_selected_product) &
-                (df_out.dfm['Components'] == out_selected_components),
+                (df_out['Product Name'] == out_selected_product) &
+                (df_out['Components'] == out_selected_components),
                 out_selected_fields
             ] = out_edit_input
             
