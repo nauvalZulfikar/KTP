@@ -105,7 +105,7 @@ def visualisation(dfm,st):
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(fig_static, use_container_width=True)
+            st.plotly_chart(fig_static, use_container_width=True, key = 'gantt_chart_static')
 
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -138,7 +138,7 @@ def visualisation(dfm,st):
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(fig_animated, use_container_width=True)
+            st.plotly_chart(fig_animated, use_container_width=True, key = 'gantt_chart_animated')
 
 # =========================================================================================
 
