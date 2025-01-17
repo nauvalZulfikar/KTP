@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from scheduler import dfm  # Import the processed `dfm` from the backend
+# from scheduler import dfm  # Import the processed `dfm` from the backend
 from visualisation import visualisation  # Import Gantt chart visualization
 from results import results
 from modify import modify
@@ -42,7 +42,7 @@ tabs = st.tabs([
 
 # Tab Content
 with tabs[0]:  # Visualisation Tab
-    visualisation(dfm,st)
+    visualisation(st.session_state.dfm,st)
     
 with tabs[1]:
     modify()
