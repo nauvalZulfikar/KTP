@@ -1,4 +1,4 @@
-import pandas as pda
+import pandas as pd
 import numpy as np
 import random
 from datetime import datetime, timedelta
@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 import math
 from collections import defaultdict
 import streamlit as st
-
+a
 # df, dfm, component_waiting_df, product_waiting_df, late_df
 
 if "df" not in st.session_state:
