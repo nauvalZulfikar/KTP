@@ -187,8 +187,8 @@ def visualisation(dfm,st):
         fig = px.bar(
             utilization_df,
             x="Machine Number",
-            y="Average Utilization (%)",
-            text="Average Utilization (%)",
+            y="Average Utilisation (%)",
+            text="Average Utilisation (%)",
             labels={"Average Utilization (%)": "Utilization (%)", "Machine Number": "Machine"},
             # title="Average Daily Machine Utilization",
             color="Machine Number",
@@ -309,50 +309,58 @@ def visualisation(dfm,st):
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
             # Create a scatter plot
+            # Create a scatter plot
             fig = go.Figure()
-            for _, row in df_visual.iterrows():
+            
+            # Group the data by status to avoid duplicate legend entries
+            for status, group in df_visual.groupby('Status'):
+                color = status_colors.get(status, 'gray')  # Default to gray if status not in map
                 fig.add_trace(go.Scatter(
-                    x=[row['Product Name']],
-                    y=[row['Components']],
+                    x=group['Product Name'],
+                    y=group['Components'],
                     mode='markers+text',
-                    marker=dict(size=20, color=row['color'], symbol='square'),
-                    text=row['Machine Number'],  # Display machine info
+                    marker=dict(size=20, color=color, symbol='square'),
+                    text=group['Machine Number'],  # Display machine info
                     textposition='top center',
-                    name=row['Status']
+                    name=status  # Use status as the legend label
                 ))
-    
+            
             fig.update_layout(
                 xaxis=dict(title="Product Name"),
                 yaxis=dict(title="Components"),
                 legend_title="Status and Process Type",
                 template="plotly_white"
             )
-    
+            
             # Display the plot
             st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
             # Create a scatter plot
+            # Create a scatter plot
             fig = go.Figure()
-            for _, row in dfm_visual.iterrows():
+            
+            # Group the data by status to avoid duplicate legend entries
+            for status, group in dfm_visual.groupby('Status'):
+                color = status_colors.get(status, 'gray')  # Default to gray if status not in map
                 fig.add_trace(go.Scatter(
-                    x=[row['Product Name']],
-                    y=[row['Components']],
+                    x=group['Product Name'],
+                    y=group['Components'],
                     mode='markers+text',
-                    marker=dict(size=20, color=row['color'], symbol='square'),
-                    text=row['Machine Number'],  # Display machine info
+                    marker=dict(size=20, color=color, symbol='square'),
+                    text=group['Machine Number'],  # Display machine info
                     textposition='top center',
-                    name=row['Status']
+                    name=status  # Use status as the legend label
                 ))
-    
+            
             fig.update_layout(
                 xaxis=dict(title="Product Name"),
                 yaxis=dict(title="Components"),
                 legend_title="Status and Process Type",
                 template="plotly_white"
             )
-    
+            
             # Display the plot
             st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 
