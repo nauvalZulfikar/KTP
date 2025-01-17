@@ -16,7 +16,7 @@ def product_catalogue():
                 display_df[col] = display_df[col].dt.strftime('%Y-%m-%d %H:%M')
 
         # Display the DataFrame
-        st.write(display_df[display_df['Quantity Required']>0].sort_values(by=['Start Time', 'End Time'].reset_index(drop=True))
+        st.write(display_df[display_df['Quantity Required']>0].sort_values(by=['Start Time', 'End Time'])
 
     st.subheader("Production Scheduling Results")
 
