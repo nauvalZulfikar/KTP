@@ -303,29 +303,56 @@ def visualisation(dfm,st):
             'Late': 'red'
         }
         df_visual['color'] = df_visual['Status'].map(status_colors)
+        
+        # Static Gantt chart displayed immediately when the page loads
+        if not st.session_state.auto_refresh:  # Show the static chart if not animating
+            # Create a scatter plot
+            fig = go.Figure()
+            for _, row in df_visual.iterrows():
+                fig.add_trace(go.Scatter(
+                    x=[row['Product Name']],
+                    y=[row['Components']],
+                    mode='markers+text',
+                    marker=dict(size=20, color=row['color'], symbol='square'),
+                    text=row['Machine Number'],  # Display machine info
+                    textposition='top center',
+                    name=row['Status']
+                ))
+    
+            fig.update_layout(
+                xaxis=dict(title="Product Name"),
+                yaxis=dict(title="Components"),
+                legend_title="Status and Process Type",
+                template="plotly_white"
+            )
+    
+            # Display the plot
+            st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 
-        # Create a scatter plot
-        fig = go.Figure()
-        for _, row in df_visual.iterrows():
-            fig.add_trace(go.Scatter(
-                x=[row['Product Name']],
-                y=[row['Components']],
-                mode='markers+text',
-                marker=dict(size=20, color=row['color'], symbol='square'),
-                text=row['Machine Number'],  # Display machine info
-                textposition='top center',
-                name=row['Status']
-            ))
-
-        fig.update_layout(
-            xaxis=dict(title="Product Name"),
-            yaxis=dict(title="Components"),
-            legend_title="Status and Process Type",
-            template="plotly_white"
-        )
-
-        # Display the plot
-        st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+        # Display the progressive Gantt chart during animation
+        if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+            # Create a scatter plot
+            fig = go.Figure()
+            for _, row in df_visual.iterrows():
+                fig.add_trace(go.Scatter(
+                    x=[row['Product Name']],
+                    y=[row['Components']],
+                    mode='markers+text',
+                    marker=dict(size=20, color=row['color'], symbol='square'),
+                    text=row['Machine Number'],  # Display machine info
+                    textposition='top center',
+                    name=row['Status']
+                ))
+    
+            fig.update_layout(
+                xaxis=dict(title="Product Name"),
+                yaxis=dict(title="Components"),
+                legend_title="Status and Process Type",
+                template="plotly_white"
+            )
+    
+            # Display the plot
+            st.plotly_chart(fig, use_container_width=True, key='product_component_status')
 
         # Check if all rows have been displayed
         if st.session_state.rows_added < len(st.session_state.df_progress) - 1:
