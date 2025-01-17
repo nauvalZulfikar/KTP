@@ -367,14 +367,14 @@ def visualisation(dfm,st):
         
         for i, row in df_visual.iterrows():
             fig.add_trace(go.Scatter(
-                x=[row["Product"]],
-                y=[row["Component"]],
+                x=[row["Product Name"]],
+                y=[row["Components"]],
                 mode='markers+text',
                 marker=dict(
                     color=color_mapping[row["Process Type"]],
                     size=15
                 ),
-                text=row["Machine"],
+                text=row["Machine Number"],
                 textposition="top center",
                 name=row["Process Type"]
             ))
