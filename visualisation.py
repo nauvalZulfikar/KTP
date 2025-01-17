@@ -96,7 +96,7 @@ def visualisation(dfm,st):
 
 # =========================================================================================
     
-   if selected_visualization == "Gantt Chart":
+    if selected_visualization == "Gantt Chart":
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
             fig_static = px.timeline(
