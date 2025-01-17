@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
-from scheduler import df, dfm, adjust_to_working_hours_and_days, calculate_machine_utilization, product_waiting_df, component_waiting_df
+from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -25,20 +25,20 @@ def create_bar_chart(data, x_col, y_col, color=None):
     )
     return fig
 
-def visualisation(dfm,st):
+def visualisation(st.session_state.dfm,st):
     st.subheader("Visualisation")
 
     # Initialize session state for progressive visualization
-    if "dfm_progress" not in st.session_state:
-        st.session_state.dfm_progress = dfm.copy()  # Initially show the full DataFrame
-    if "df_progress" not in st.session_state:
-        st.session_state.df_progress = df.copy()  # Initially show the full DataFrame
-    if "auto_refresh" not in st.session_state:
-        st.session_state.auto_refresh = False  # Auto-refresh toggle
-    if "rows_added" not in st.session_state:
-        st.session_state.rows_added = len(dfm)  # Start with all rows added
-    if "total_rows" not in st.session_state:
-        st.session_state.total_rows = len(dfm)  # Total rows in the DataFrame
+    # if "dfm_progress" not in st.session_state:
+    st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
+    # if "df_progress" not in st.session_state:
+    st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
+    # if "auto_refresh" not in st.session_state:
+    st.session_state.auto_refresh = False  # Auto-refresh toggle
+    # if "rows_added" not in st.session_state:
+    st.session_state.rows_added = len(st.session_state.dfm)  # Start with all rows added
+    # if "total_rows" not in st.session_state:
+    st.session_state.total_rows = len(st.session_state.dfm)  # Total rows in the DataFrame
 
     # Layout for buttons with reduced spacing
     with st.container():
@@ -47,7 +47,7 @@ def visualisation(dfm,st):
         with col1:
             if st.button("Start"):
                 # Reset the progress DataFrame and counters for animation
-                st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
                 st.session_state.rows_added = 0
                 st.session_state.auto_refresh = True
         with col2:
@@ -58,13 +58,13 @@ def visualisation(dfm,st):
         with col3:
             if st.button("Reschedule"):
                 # Reschedule logic - reset the progress to start fresh
-                st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
                 st.session_state.rows_added = 0
                 st.info("Rescheduling initiated. Click 'Start' to animate again.")
         with col4:
             if st.button("Reset"):
                 # Reset all session state variables
-                st.session_state.dfm_progress = pd.DataFrame(columns=dfm.columns)
+                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
                 st.session_state.rows_added = 0
                 st.session_state.auto_refresh = False
                 st.success("Progress reset successfully.")
@@ -110,7 +110,7 @@ def visualisation(dfm,st):
             st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
             # Add the next row to the progress DataFrame
             st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                [st.session_state.dfm_progress, st.session_state.dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
                 ignore_index=True
             )
             st.session_state.rows_added += 1  # Increment the counter
@@ -142,7 +142,7 @@ def visualisation(dfm,st):
 
     elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Step 1: Calculate durations
-        data = dfm.copy()  # Ensure the original DataFrame is not modified
+        data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
         
         # Step 2: Adjust durations for working hours and days
@@ -180,7 +180,7 @@ def visualisation(dfm,st):
             st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
             # Add the next row to the progress DataFrame
             st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+                [st.session_state.dfm_progress, st.session_state.dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
                 ignore_index=True
             )
             st.session_state.rows_added += 1  # Increment the counter
@@ -216,7 +216,7 @@ def visualisation(dfm,st):
     
     elif selected_visualization == "Machine Utilisation":
         # Calculate machine utilization
-        average_utilization = calculate_machine_utilization(dfm)
+        average_utilization = calculate_machine_utilization(st.session_state.dfm)
 
         # Prepare data for visualization
         utilization_df = average_utilization.reset_index()
