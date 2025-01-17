@@ -30,7 +30,7 @@ def visualisation(dfm,st):
 
     # Initialize session state for progressive visualization
     if "dfm_progress" not in st.session_state:
-        st.session_state.dfm_progress = st.session_state.dfm.copy() # Initially show the full DataFrame
+        st.session_state.dfm_progress = st.session_state.dfm.sort_values(by=['Start Time','End Time'].copy() # Initially show the full DataFrame
     if "df_progress" not in st.session_state:
         st.session_state.df_progress = st.session_state.df.copy() # Initially show the full DataFrame
     if "auto_refresh" not in st.session_state:
