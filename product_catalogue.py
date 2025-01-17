@@ -4,8 +4,8 @@ import datetime as dt
 from scheduler import dfm, calculate_machine_utilization, component_waiting_df, product_waiting_df, late_products
 
 # Use `dfm` from scheduler.py and ensure connection
-if "dfm" not in st.session_state:
-    st.session_state.dfm = dfm  # Store dfm in session state
+if "dfm" in st.session_state:
+    dfm = st.session_state.dfm  # Store dfm in session state
 
 def product_catalogue():
     df_list = ['Order Processing Date', 'Promised Delivery Date', 'Start Time', 'End Time']
