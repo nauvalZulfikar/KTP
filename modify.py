@@ -67,7 +67,7 @@ def modify():
             st.dataframe(st.session_state.dfm[
                 (st.session_state.dfm['Product Name'] == in_selected_product) & 
                 (st.session_state.dfm['Components'] == in_selected_components)
-            ].drop(columns=['Daily Utilization','wait_time','legend'])
+            ])
     
         with tabs[1]:  # Outsource
             df_out = st.session_state.dfm[st.session_state.dfm['Process Type'] == 'Outsource'].iloc[st.session_state.rows_added-1:]
@@ -120,7 +120,7 @@ def modify():
             st.dataframe(st.session_state.dfm[
                 (st.session_state.dfm['Product Name'] == out_selected_product) & 
                 (st.session_state.dfm['Components'] == out_selected_components)
-            ].drop(columns=['Daily Utilization','wait_time','legend'])
+            ])
     
         with tabs[2]:  # Time Converter
             # Radio button for conversion options
