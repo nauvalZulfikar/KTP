@@ -1,12 +1,12 @@
+import pandas as pd
 import streamlit as st
 from scheduler import dfm
-import pandas as pd
 
 file_path = "KTP/Product Details_v1.xlsx"
 
 # Initialize dfm in session state
 if "dfm" not in st.session_state:
-    st.session_state.dfm = dfm.drop(columns=['wait_time', 'legend', 'Status']).copy()
+    st.session_state.dfm = dfm  # Store the original dfm in session state
 
 def modify():
     # Add Tabs Below
@@ -60,23 +60,17 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
-            df_in.loc[
-                (df_in['Product Name'] == in_selected_product) &
-                (df_in['Components'] == in_selected_components),
-                in_selected_fields
-            ] = in_edit_input
-            
             st.session_state.dfm.loc[
-                (st.session_state.dfm['Product Name'] == in_selected_product) &
-                (st.session_state.dfm['Components'] == in_selected_components),
+                (st.session_state.dfm['Product Name'] == in_selected_product) & 
+                (st.session_state.dfm['Components'] == in_selected_components), 
                 in_selected_fields
             ] = in_edit_input
             
             st.success('Data has been successfully changed!')
 
-        st.dataframe(df_in[
-            (df_in['Product Name'] == in_selected_product) &
-            (df_in['Components'] == in_selected_components)
+        st.dataframe(st.session_state.dfm[
+            (st.session_state.dfm['Product Name'] == in_selected_product) & 
+            (st.session_state.dfm['Components'] == in_selected_components)
         ])
 
     with tabs[1]:  # Outsource
@@ -119,22 +113,17 @@ def modify():
             )
             
         if st.button('Confirm', key="out_confirm"):
-            df_out.loc[
-                (df_out['Product Name'] == out_selected_product) &
-                (df_out['Components'] == out_selected_components),
+            st.session_state.dfm.loc[
+                (st.session_state.dfm['Product Name'] == out_selected_product) & 
+                (st.session_state.dfm['Components'] == out_selected_components), 
                 out_selected_fields
             ] = out_edit_input
             
-            st.session_state.dfm.loc[
-                (st.session_state.dfm['Product Name'] == out_selected_product) &
-                (st.session_state.dfm['Components'] == out_selected_components),
-                out_selected_fields
-            ] = out_edit_input
             st.success('Data has been successfully changed!')
 
-        st.dataframe(df_out[
-            (df_out['Product Name'] == out_selected_product) &
-            (df_out['Components'] == out_selected_components)
+        st.dataframe(st.session_state.dfm[
+            (st.session_state.dfm['Product Name'] == out_selected_product) & 
+            (st.session_state.dfm['Components'] == out_selected_components)
         ])
 
     with tabs[2]:  # Time Converter
@@ -148,4 +137,18 @@ def modify():
         # Input field for the user to provide a value
         input_value = st.number_input(
             "Enter the value to convert:", 
-            min_value=0)
+            min_value=0
+        )
+        
+        # Perform conversion based on the selected type
+        if conversion_type == "Days to Minutes":
+            result = input_value * 24 * 60
+            st.write(f"{input_value} days is equivalent to {result} minutes.")
+        
+        elif conversion_type == "Hours to Minutes":
+            result = input_value * 60
+            st.write(f"{input_value} hours is equivalent to {result} minutes.")
+        
+        elif conversion_type == "Minutes to Days":
+            result = input_value / (24 * 60)
+            st.write(f"{input_value} minutes is equivalent to {result:.6f} days.")
