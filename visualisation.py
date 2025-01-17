@@ -294,16 +294,16 @@ def visualisation(dfm,st):
         if st.session_state.rows_added < len(st.session_state.df_progress):
             # st.write(f"Processing row {st.session_state.rows_to_display + 1} of {len(st.session_state.df_progress)}:")
         
-            current_row = st.session_state.df_progress.iloc[st.session_state.rows_to_display]
+            current_row = st.session_state.df_progress.iloc[st.session_state.rows_added]
         
             # Process and update the row's status based on conditions
             if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
                 if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'Status'] = 'Completed_Outsource'
+                    st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Completed_Outsource'
                 elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'Status'] = 'Completed_In House'
+                    st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Completed_In House'
                 elif current_row['End Time'] > current_row['Promised Delivery Date']:
-                    st.session_state.df_progress.loc[st.session_state.rows_to_display, 'Status'] = 'Late'
+                    st.session_state.df_progress.loc[st.session_state.rows_added, 'Status'] = 'Late'
                 
         # Prepare the visualization data
         df_visual = st.session_state.df_progress.copy()
@@ -350,15 +350,13 @@ def visualisation(dfm,st):
         else:
             # Auto-refresher logic
             if st.session_state.auto_refresh:
-                st.write("Auto-refresh is running...")
                 refresh_rate = 1  # in seconds
-                st.write(f"Refreshing every {refresh_rate} seconds...")
                 time.sleep(refresh_rate)
         
                 # Update the number of rows to display
-                st.session_state.rows_to_display += 1
+                st.session_state.rows_added += 1
         
                 # Trigger rerun
                 st.experimental_rerun()
             else:
-                st.session_state.rows_to_display = 0
+                st.session_state.rows_added = 0
