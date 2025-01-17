@@ -458,10 +458,10 @@ if "product_waiting_df" not in st.session_state:
         date_columns=('Order Processing Date', 'Start Time')
     )
 
-dfm['legend'] = dfm['Components']
+st.session_state.dfm['legend'] = st.session_state.dfm['Components']
 for i in range(len(dfm)):
-  if dfm['Machine Number'][i] == 'OutSrc':
-    dfm['legend'][i] = 'OutSrc'
+  if st.session_state.dfm['Machine Number'][i] == 'OutSrc':
+    st.session_state.dfm['legend'][i] = 'OutSrc'
 
 def late_products(dfm):
     late = dfm.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
