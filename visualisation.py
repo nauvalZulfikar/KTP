@@ -29,16 +29,16 @@ def visualisation(dfm,st):
     st.subheader("Visualisation")
 
     # Initialize session state for progressive visualization
-    # if "dfm_progress" not in st.session_state:
-    st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
-    # if "df_progress" not in st.session_state:
-    st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
-    # if "auto_refresh" not in st.session_state:
-    st.session_state.auto_refresh = False  # Auto-refresh toggle
-    # if "rows_added" not in st.session_state:
-    st.session_state.rows_added = len(st.session_state.dfm)  # Start with all rows added
-    # if "total_rows" not in st.session_state:
-    st.session_state.total_rows = len(st.session_state.dfm)  # Total rows in the DataFrame
+    if "dfm_progress" not in st.session_state:
+        st.session_state.dfm_progress = st.session_state.dfm.copy() # Initially show the full DataFrame
+    if "df_progress" not in st.session_state:
+        st.session_state.df_progress = st.session_state.df.copy() # Initially show the full DataFrame
+    if "auto_refresh" not in st.session_state:
+        st.session_state.auto_refresh = False  # Auto-refresh toggle
+    if "rows_added" not in st.session_state:
+        st.session_state.rows_added = len(st.session_state.dfm) # Start with all rows added
+    if "total_rows" not in st.session_state:
+        st.session_state.total_rows = len(st.session_state.dfm) # Total rows in the DataFrame
 
     # Layout for buttons with reduced spacing
     with st.container():
