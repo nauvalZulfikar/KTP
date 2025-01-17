@@ -17,7 +17,7 @@ def modify():
 
     if 'dfm' in st.session_state:
         with tabs[0]:  # In House
-            df_in = st.session_state.dfm[st.session_state.dfm['Process Type'] == 'In House'].iloc[st.session_state.rows_added:]
+            df_in = st.session_state.dfm.loc[st.session_state.rows_added:][st.session_state.dfm['Process Type'] == 'In House']
             in_products = df_in['Product Name'].unique()
             in_selected_product = st.selectbox(
                 'Select product name:',
@@ -70,7 +70,7 @@ def modify():
             ])
     
         with tabs[1]:  # Outsource
-            df_out = st.session_state.dfm[st.session_state.dfm['Process Type'] == 'Outsource'].iloc[st.session_state.rows_added:]
+            df_out = st.session_state.dfm.loc[st.session_state.rows_added:][st.session_state.dfm['Process Type'] == 'Outsource']
             out_products = df_out['Product Name'].unique()
             out_selected_product = st.selectbox(
                 'Select product name:',
