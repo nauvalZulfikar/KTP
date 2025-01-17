@@ -13,21 +13,20 @@ import streamlit as st
 
 if "df" not in st.session_state:
     st.session_state.df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
-df = st.session_state.df
 
 # Convert columns to appropriate types
-df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
-df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
-df['Start Time'] = pd.NaT  # Initialize as empty datetime
-df['End Time'] = pd.NaT  # Initialize as empty datetime
-df['Status'] = ''  # Initialize the Status column
+st.session_state.df['Order Processing Date'] = pd.to_datetime(st.session_state.df['Order Processing Date'])
+st.session_state.df['Promised Delivery Date'] = pd.to_datetime(st.session_state.df['Promised Delivery Date'])
+st.session_state.df['Start Time'] = pd.NaT  # Initialize as empty datetime
+st.session_state.df['End Time'] = pd.NaT  # Initialize as empty datetime
+st.session_state.df['Status'] = ''  # Initialize the Status column
 
 # Assign values to 'Status' column based on 'Process Type' using .loc[]
-df.loc[df['Process Type'] == 'In House', 'Status'] = 'InProgress_In House'
-df.loc[df['Process Type'] == 'Outsource','Status'] = 'InProgress_Outsource'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'In House', 'Status'] = 'InProgress_In House'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'Outsource','Status'] = 'InProgress_Outsource'
 
 # Sort the data by Promised Delivery Date, Product Name, and Component order
-df = df.sort_values(by=['Promised Delivery Date',
+st.session_state.df = st.session_state.df.sort_values(by=['Promised Delivery Date',
                         'Product Name',
                         'Components']).reset_index(drop=True)
 
@@ -309,9 +308,8 @@ def adjust_to_working_hours_and_days(start_time, run_time_minutes):
 # Call the function with the dataset
 if "dfm" not in st.session_state:
     st.session_state.dfm = st.session_state.df.copy()
-dfm = st.session_state.dfm
-dfm = schedule_production_with_days(dfm)
-dfm = adjust_end_time_and_start_time(dfm)  # Adjust Start and End Times
+st.session_state.dfm = schedule_production_with_days(st.session_state.dfm)
+st.session_state.dfm = adjust_end_time_and_start_time(st.session_state.dfm)  # Adjust Start and End Times
 
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
@@ -371,13 +369,13 @@ def calculate_machine_utilization(df):
         return daily_utilization
 
     # Apply the function to calculate daily utilization for each task
-    dfm["Daily Utilization"] = dfm.apply(
+    st.session_state.dfm["Daily Utilization"] = st.session_state.dfm.apply(
         lambda row: calculate_daily_utilization(row["Start Time"], row["End Time"]),
         axis=1,
     )
 
     # Expand the daily utilization into a separate DataFrame
-    daily_utilization_expanded = dfm.explode("Daily Utilization").reset_index()
+    daily_utilization_expanded = st.session_state.dfm.explode("Daily Utilization").reset_index()
 
     # Extract the date and production minutes
     daily_utilization_expanded[["Production Date", "Production Minutes"]] = daily_utilization_expanded[
@@ -419,13 +417,13 @@ def calculate_waiting_time(df, group_by_column, date_columns):
         return total_hours
 
     # Apply the business hours calculation
-    df['wait_time'] = df.apply(
+    st.session_state.dfm['wait_time'] = st.session_state.dfm.apply(
         lambda row: business_hours_split(row[start_col], row[end_col]),
         axis=1
     )
 
     # Group and calculate the average waiting time
-    wait_time_grouped = df.groupby(group_by_column)['wait_time'].mean()
+    wait_time_grouped = st.session_state.dfm.groupby(group_by_column)['wait_time'].mean()
 
     # Format the results
     formatted_results = []
@@ -452,7 +450,6 @@ if "component_waiting_df" not in st.session_state:
         group_by_column='Components',
         date_columns=('Order Processing Date', 'Start Time')
     )
-component_waiting_df = st.session_state.component_waiting_df
 
 if "product_waiting_df" not in st.session_state:
     st.session_state.product_waiting_df = calculate_waiting_time(
@@ -460,7 +457,6 @@ if "product_waiting_df" not in st.session_state:
         group_by_column='Product Name',
         date_columns=('Order Processing Date', 'Start Time')
     )
-product_waiting_df = st.session_state.product_waiting_df
 
 dfm['legend'] = dfm['Components']
 for i in range(len(dfm)):
@@ -476,4 +472,3 @@ def late_products(dfm):
 
 if "late_df" not in st.session_state:
     st.session_state.late_df = late_products(st.session_state.dfm)
-late_df = st.session_state.late_df
