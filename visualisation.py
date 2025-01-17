@@ -371,7 +371,7 @@ def visualisation(dfm,st):
                 y=[row["Components"]],
                 mode='markers+text',
                 marker=dict(
-                    color=color_mapping[row["Process Type"]],
+                    color=status_colors,
                     size=15
                 ),
                 text=row["Machine Number"],
