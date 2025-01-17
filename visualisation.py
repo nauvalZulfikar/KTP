@@ -295,7 +295,7 @@ def visualisation(dfm,st):
             st.session_state.rows_to_display = 0
 
         # Filter and visualize only the rows up to rows_to_display
-        df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_to_display + 1].copy()
+        df_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_to_display + 1].copy()
 
         # Assign colors based on status
         status_colors = {
