@@ -459,7 +459,7 @@ if "product_waiting_df" not in st.session_state:
     )
 
 st.session_state.dfm['legend'] = st.session_state.dfm['Components']
-for i in range(len(dfm)):
+for i in range(len(st.session_state.dfm)):
   if st.session_state.dfm['Machine Number'][i] == 'OutSrc':
     st.session_state.dfm['legend'][i] = 'OutSrc'
 
