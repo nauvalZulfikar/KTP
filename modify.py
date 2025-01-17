@@ -15,16 +15,28 @@ def modify():
     str_col = ['Product Name', 'Components', 'Operation', 'Process Type', 'Machine Number']
     date_col = ['Order Processing Date', 'Promised Delivery Date']
 
-    if 'dfm' in st.session_state:
+    if "dfm" in st.session_state:
         with tabs[0]:  # In House
-            df_in = st.session_state.dfm.loc[st.session_state.rows_added:]
-            df_in = df_in[st.session_state.dfm['Process Type'] == 'In House']
+            # Reset the index to avoid KeyError due to missing index values
+            st.session_state.dfm = st.session_state.dfm.reset_index(drop=True)
+            
+            # Ensure rows_added does not exceed the available range
+            rows_added = min(st.session_state.rows_added, len(st.session_state.dfm))
+    
+            # Slice the DataFrame safely
+            df_in = st.session_state.dfm.iloc[rows_added:]
+    
+            # Filter the DataFrame
+            df_in = df_in[df_in['Process Type'] == 'In House']
+    
+            # Proceed with unique product selection
             in_products = df_in['Product Name'].unique()
             in_selected_product = st.selectbox(
                 'Select product name:',
                 in_products,
                 key="in_product"
             )
+
     
             in_components = df_in[df_in['Product Name'] == in_selected_product]['Components'].unique()
             in_selected_components = st.selectbox(
