@@ -22,8 +22,8 @@ st.session_state.df['End Time'] = pd.NaT  # Initialize as empty datetime
 st.session_state.df['Status'] = ''  # Initialize the Status column
 
 # Assign values to 'Status' column based on 'Process Type' using .loc[]
-st.session_state.df.loc[st.session_state.df['Process Type'] == 'In House', 'Status'] = 'Completed_In House'
-st.session_state.df.loc[st.session_state.df['Process Type'] == 'Outsource','Status'] = 'Completed_Outsource'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'In House', 'Status'] = 'InProgress_In House'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'Outsource','Status'] = 'InProgress_Outsource'
 
 # Sort the data by Promised Delivery Date, Product Name, and Component order
 st.session_state.df = st.session_state.df.sort_values(by=['Promised Delivery Date',
