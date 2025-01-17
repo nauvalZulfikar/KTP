@@ -87,7 +87,7 @@ def visualisation(dfm,st):
     )
 
 # =========================================================================================
-    
+    st.write(st.session_state.dfm_progress)
     if selected_visualization == "Gantt Chart":
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
