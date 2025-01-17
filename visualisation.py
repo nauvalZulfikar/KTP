@@ -81,10 +81,10 @@ def visualisation(dfm,st):
 
         with col1:
             if st.button("Start"):
-                # Reset the progress DataFrame and counters for animation
-                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-                st.session_state.rows_added = 0
-                st.session_state.auto_refresh = True
+                if not st.session_state.auto_refresh:  # If not already animating
+                    if st.session_state.rows_added == 0:  # If starting fresh
+                        st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
+                    st.session_state.auto_refresh = True  # Set auto-refresh to True
         with col2:
             if st.button("Pause"):
                 # Pause the auto-refresh
