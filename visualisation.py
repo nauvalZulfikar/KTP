@@ -86,6 +86,21 @@ def visualisation(dfm,st):
         visualization_options
     )
 
+    # Progressive animation
+    if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+        st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+        # Add the next row to the progress DataFrame
+        st.session_state.dfm_progress = pd.concat(
+            [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+            ignore_index=True
+        )
+        st.session_state.rows_added += 1  # Increment the counter
+
+    # Stop animation when all rows are added
+    if st.session_state.rows_added >= st.session_state.total_rows:
+        st.session_state.auto_refresh = False
+        st.success("Animation complete! Reload the page to reset.")
+
 # =========================================================================================
 
     if selected_visualization == "Gantt Chart":
@@ -107,20 +122,20 @@ def visualisation(dfm,st):
             )
             st.plotly_chart(fig_static, use_container_width=True, key = 'gantt_chart_static')
 
-        # Progressive animation
-        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
-            # Add the next row to the progress DataFrame
-            st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
-                ignore_index=True
-            )
-            st.session_state.rows_added += 1  # Increment the counter
+        # # Progressive animation
+        # if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+        #     st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+        #     # Add the next row to the progress DataFrame
+        #     st.session_state.dfm_progress = pd.concat(
+        #         [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+        #         ignore_index=True
+        #     )
+        #     st.session_state.rows_added += 1  # Increment the counter
 
-        # Stop animation when all rows are added
-        if st.session_state.rows_added >= st.session_state.total_rows:
-            st.session_state.auto_refresh = False
-            st.success("Animation complete! Reload the page to reset.")
+        # # Stop animation when all rows are added
+        # if st.session_state.rows_added >= st.session_state.total_rows:
+        #     st.session_state.auto_refresh = False
+        #     st.success("Animation complete! Reload the page to reset.")
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
