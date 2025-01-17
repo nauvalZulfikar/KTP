@@ -17,9 +17,6 @@ st.set_page_config(
 # Main Title
 st.title("Machine Production Scheduler")
 
-if "dfm" in st.session_state:
-    st.dataframe(st.session_state.dfm)
-
 # # File Download Button
 # @st.cache_data
 # def convert_df_to_excel(df):
@@ -45,12 +42,8 @@ tabs = st.tabs([
 
 # Tab Content
 with tabs[0]:  # Visualisation Tab
-    # if "dfm" not in st.session_state:
-    #     st.error("Error: 'dfm' is not initialized in session state.")
-    #     # Optionally, initialize it here if appropriate
-    #     # st.session_state.dfm = pd.DataFrame()  # Replace with your default DataFrame
-    # else:
-    visualisation(st.session_state.dfm, st)
+    if "dfm" in st.session_state:
+        visualisation(st.session_state.dfm, st)
 
     
 with tabs[1]:
