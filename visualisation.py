@@ -103,7 +103,7 @@ def visualisation(dfm,st):
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(gc_static, use_container_width=True)
+            st.plotly_chart(gc_static, use_container_width=True, key='static_gantt_chart')
 
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -137,7 +137,7 @@ def visualisation(dfm,st):
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(gc_animated, use_container_width=True)
+            st.plotly_chart(gc_animated, use_container_width=True, key='animated_gantt_chart')
 
 # =========================================================================================
 
@@ -151,67 +151,67 @@ def visualisation(dfm,st):
             lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
             axis=1)
         
-        if 'data_progress' not in st.session_state:
-            st.session_state.data_progress = data.copy()
+        # if 'data_progress' not in st.session_state:
+        #     st.session_state.data_progress = data.copy()
         
-        if not st.session_state.auto_refresh:  # Show the static chart if not animating
-            # Step 3: Create a horizontal bar chart
-            gcu_static = px.bar(
-                st.session_state.data_progress,
-                x="Duration",  # Horizontal axis
-                y="Product Name",  # Vertical axis
-                color="Components",  # Color by components
-                orientation="h",  # Horizontal bars
-                labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-                # title="Horizontal Bar Chart of Task Durations"
-            )
+        # if not st.session_state.auto_refresh:  # Show the static chart if not animating
+        # Step 3: Create a horizontal bar chart
+        gcu_static = px.bar(
+            st.session_state.data_progress,
+            x="Duration",  # Horizontal axis
+            y="Product Name",  # Vertical axis
+            color="Components",  # Color by components
+            orientation="h",  # Horizontal bars
+            labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+            # title="Horizontal Bar Chart of Task Durations"
+        )
 
-            gcu_static.update_layout(
-                xaxis_title="Task Duration (minutes)",
-                yaxis_title="Products",
-                legend_title="Components",
-                template="plotly_white"
-            )
+        gcu_static.update_layout(
+            xaxis_title="Task Duration (minutes)",
+            yaxis_title="Products",
+            legend_title="Components",
+            template="plotly_white"
+        )
 
-            # Step 4: Integrate into Streamlit
-            st.plotly_chart(gcu_static, use_container_width=True)
+        # Step 4: Integrate into Streamlit
+        st.plotly_chart(gcu_static, use_container_width=True,key='gantt_chart_unscheduled')
 
-                    # Progressive animation
-        if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-            st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
-            # Add the next row to the progress DataFrame
-            st.session_state.dfm_progress = pd.concat(
-                [st.session_state.dfm_progress, st.session_state.dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
-                ignore_index=True
-            )
-            st.session_state.rows_added += 1  # Increment the counter
+        #             # Progressive animation
+        # if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+        #     st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
+        #     # Add the next row to the progress DataFrame
+        #     st.session_state.dfm_progress = pd.concat(
+        #         [st.session_state.dfm_progress, st.session_state.dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+        #         ignore_index=True
+        #     )
+        #     st.session_state.rows_added += 1  # Increment the counter
 
-        # Stop animation when all rows are added
-        if st.session_state.rows_added >= st.session_state.total_rows:
-            st.session_state.auto_refresh = False
-            st.success("Animation complete! Reload the page to reset.")
+        # # Stop animation when all rows are added
+        # if st.session_state.rows_added >= st.session_state.total_rows:
+        #     st.session_state.auto_refresh = False
+        #     st.success("Animation complete! Reload the page to reset.")
 
-        # Display the progressive Gantt chart during animation
-        if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-            gcu_animated = px.bar(
-                st.session_state.data_progress,
-                x="Duration",  # Horizontal axis
-                y="Product Name",  # Vertical axis
-                color="Components",  # Color by components
-                orientation="h",  # Horizontal bars
-                labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-                # title="Horizontal Bar Chart of Task Durations"
-            )
+        # # Display the progressive Gantt chart during animation
+        # if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+        #     gcu_animated = px.bar(
+        #         st.session_state.data_progress,
+        #         x="Duration",  # Horizontal axis
+        #         y="Product Name",  # Vertical axis
+        #         color="Components",  # Color by components
+        #         orientation="h",  # Horizontal bars
+        #         labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+        #         # title="Horizontal Bar Chart of Task Durations"
+        #     )
 
-            gcu_animated.update_layout(
-                xaxis_title="Task Duration (minutes)",
-                yaxis_title="Products",
-                legend_title="Components",
-                template="plotly_white"
-            )
+        #     gcu_animated.update_layout(
+        #         xaxis_title="Task Duration (minutes)",
+        #         yaxis_title="Products",
+        #         legend_title="Components",
+        #         template="plotly_white"
+        #     )
 
-            # Step 4: Integrate into Streamlit
-            st.plotly_chart(gcu_animated, use_container_width=True)
+        #     # Step 4: Integrate into Streamlit
+        #     st.plotly_chart(gcu_animated, use_container_width=True)
 
 # =========================================================================================
     
