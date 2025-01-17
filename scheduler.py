@@ -22,8 +22,8 @@ st.session_state.df['End Time'] = pd.NaT  # Initialize as empty datetime
 st.session_state.df['Status'] = ''  # Initialize the Status column
 
 # Assign values to 'Status' column based on 'Process Type' using .loc[]
-st.session_state.df.loc[st.session_state.df['Process Type'] == 'In House', 'Status'] = 'InProgress_In House'
-st.session_state.df.loc[st.session_state.df['Process Type'] == 'Outsource','Status'] = 'InProgress_Outsource'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'In House', 'Status'] = 'Completed_In House'
+st.session_state.df.loc[st.session_state.df['Process Type'] == 'Outsource','Status'] = 'Completed_Outsource'
 
 # Sort the data by Promised Delivery Date, Product Name, and Component order
 st.session_state.df = st.session_state.df.sort_values(by=['Promised Delivery Date',
@@ -311,6 +311,16 @@ if "dfm" not in st.session_state:
 st.session_state.dfm = schedule_production_with_days(st.session_state.dfm)
 st.session_state.dfm = adjust_end_time_and_start_time(st.session_state.dfm)  # Adjust Start and End Times
 st.session_state.dfm = st.session_state.dfm.sort_values(by=['Start Time','End Time','Promised Delivery Date'])
+
+
+st.session_state.dfm.loc[
+    (st.session_state.dfm['Process Type'] == 'In House') &
+    (st.session_state.dfm['End Time'] > st.session_state.dfm['Promised Delivery Date']), 'Status'] = 'Completed_In House'
+st.session_state.dfm.loc[
+    (st.session_state.dfm['Process Type'] == 'Outsource') &
+    (st.session_state.dfm['End Time'] > st.session_state.dfm['Promised Delivery Date']), 'Status'] = 'Completed_Outsource'
+st.session_state.dfm.loc[
+    (st.session_state.dfm['End Time'] < st.session_state.dfm['Promised Delivery Date']), 'Status'] = 'Late'
 
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
