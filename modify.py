@@ -60,11 +60,18 @@ def modify():
             )
             
         if st.button('Confirm', key="in_confirm"):
+            df_in.loc[
+                (df_in['Product Name'] == in_selected_product) &
+                (df_in['Components'] == in_selected_components),
+                in_selected_fields
+            ] = in_edit_input
+            
             st.session_state.dfm.loc[
                 (st.session_state.dfm['Product Name'] == in_selected_product) &
                 (st.session_state.dfm['Components'] == in_selected_components),
                 in_selected_fields
             ] = in_edit_input
+            
             st.success('Data has been successfully changed!')
 
         st.dataframe(df_in[
@@ -112,6 +119,12 @@ def modify():
             )
             
         if st.button('Confirm', key="out_confirm"):
+            df_out.loc[
+                (df_out.dfm['Product Name'] == out_selected_product) &
+                (df_out.dfm['Components'] == out_selected_components),
+                out_selected_fields
+            ] = out_edit_input
+            
             st.session_state.dfm.loc[
                 (st.session_state.dfm['Product Name'] == out_selected_product) &
                 (st.session_state.dfm['Components'] == out_selected_components),
