@@ -289,56 +289,58 @@ def visualisation(dfm,st):
 
 # =========================================================================================
 
-    # elif selected_visualization == "Product Components Status":
-        # # Progressive visualization for Product Components Status
-        # if "rows_to_display" not in st.session_state:
-        #     st.session_state.rows_to_display = 0
+    elif selected_visualization == "Product Components Status":
 
-        # # Assign colors based on status
-        # status_colors = {
-        #     'InProgress_Outsource': 'orange',
-        #     'InProgress_In House': 'brown',
-        #     'Completed_Outsource': 'darkgreen',
-        #     'Completed_In House': 'olivedrab',
-        #     'Late': 'red'
-        # }
+        st.write(st.session_state.df)
+        # Progressive visualization for Product Components Status
+        if "rows_to_display" not in st.session_state:
+            st.session_state.rows_to_display = 0
 
-        # # Auto-refresh for animation
-        # if st.session_state.auto_refresh and st.session_state.rows_to_display < len(dfm):
-        #     st_autorefresh(interval=1000, key="autorefresh_product_components_status")  # Refresh every second
+        # Assign colors based on status
+        status_colors = {
+            'InProgress_Outsource': 'orange',
+            'InProgress_In House': 'brown',
+            'Completed_Outsource': 'darkgreen',
+            'Completed_In House': 'olivedrab',
+            'Late': 'red'
+        }
 
-        #     # Add the next row to the progress DataFrame
-        #     st.session_state.rows_to_display += 1
+        # Auto-refresh for animation
+        if st.session_state.auto_refresh and st.session_state.rows_to_display < len(dfm):
+            st_autorefresh(interval=1000, key="autorefresh_product_components_status")  # Refresh every second
 
-        # # Prepare the visualization data
-        # df_visual = dfm.iloc[:st.session_state.rows_to_display].copy()
-        # df_visual['color'] = df_visual['Status'].map(status_colors)
+            # Add the next row to the progress DataFrame
+            st.session_state.rows_to_display += 1
 
-        # # Create scatter plot
-        # pcs = go.Figure()
+        # Prepare the visualization data
+        df_visual = dfm.iloc[:st.session_state.rows_to_display].copy()
+        df_visual['color'] = df_visual['Status'].map(status_colors)
 
-        # for _, row in df_visual.iterrows():
-        #     pcs.add_trace(go.Scatter(
-        #         x=[row['Product Name']],
-        #         y=[row['Components']],
-        #         mode='markers+text',
-        #         marker=dict(size=20, color=row['color'], symbol='square'),
-        #         text=row['Machine Number'],
-        #         textposition='top center',
-        #         name=row['Status']
-        #     ))
+        # Create scatter plot
+        pcs = go.Figure()
 
-        # pcs.update_layout(
-        #     # title="Status of Each Product Component (Progressive)",
-        #     xaxis=dict(title="Product Name"),
-        #     yaxis=dict(title="Components"),
-        #     legend_title="Status and Process Type",
-        #     template="plotly_white"
-        # )
+        for _, row in df_visual.iterrows():
+            pcs.add_trace(go.Scatter(
+                x=[row['Product Name']],
+                y=[row['Components']],
+                mode='markers+text',
+                marker=dict(size=20, color=row['color'], symbol='square'),
+                text=row['Machine Number'],
+                textposition='top center',
+                name=row['Status']
+            ))
 
-        # st.plotly_chart(pcs, use_container_width=True)
+        pcs.update_layout(
+            # title="Status of Each Product Component (Progressive)",
+            xaxis=dict(title="Product Name"),
+            yaxis=dict(title="Components"),
+            legend_title="Status and Process Type",
+            template="plotly_white"
+        )
 
-        # # Stop animation when all rows are added
-        # if st.session_state.rows_to_display >= len(dfm):
-        #     st.session_state.auto_refresh = False
-        #     st.success("Animation complete! Reload the page to reset.")
+        st.plotly_chart(pcs, use_container_width=True)
+
+        # Stop animation when all rows are added
+        if st.session_state.rows_to_display >= len(dfm):
+            st.session_state.auto_refresh = False
+            st.success("Animation complete! Reload the page to reset.")
