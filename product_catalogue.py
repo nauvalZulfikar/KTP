@@ -8,7 +8,7 @@ def product_catalogue():
 
     # Use a temporary DataFrame for display purposes
     if 'dfm' in st.session_state:
-        display_df = st.session_state.dfm.drop(columns=['Status', 'wait_time', 'legend'], errors='ignore')
+        display_df = st.session_state.dfm.drop(columns=['Status', 'wait_time', 'legend','Daily Utilization'], errors='ignore')
 
         # Format date columns in `display_df` only for display
         for col in df_list:
