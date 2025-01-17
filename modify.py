@@ -72,7 +72,7 @@ def modify():
     
         with tabs[1]:  # Outsource
             df_out = st.session_state.dfm.loc[st.session_state.rows_added:]
-            df_out = df_out[st.session_state.dfm['Process Type'] == 'In House']
+            df_out = df_out[st.session_state.dfm['Process Type'] == 'Outsource']
             out_products = df_out['Product Name'].unique()
             out_selected_product = st.selectbox(
                 'Select product name:',
