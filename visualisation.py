@@ -388,7 +388,7 @@ def visualisation(dfm,st):
             )
             
             # Display the plot
-            st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+            st.plotly_chart(fig, use_container_width=True, key='product_component_status_static')
 
         # Display the progressive Gantt chart during animation
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
@@ -417,7 +417,7 @@ def visualisation(dfm,st):
             )
             
             # Display the plot
-            st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+            st.plotly_chart(fig, use_container_width=True, key='product_component_status_animate')
 
         # Check if all rows have been displayed
         if st.session_state.rows_added < len(st.session_state.df_progress) - 1:
