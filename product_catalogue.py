@@ -11,7 +11,7 @@ def product_catalogue():
     df_list = ['Order Processing Date', 'Promised Delivery Date', 'Start Time', 'End Time']
 
     # Use a temporary DataFrame for display purposes
-    display_df = st.session_state.dfm.drop(columns=['Status', 'wait_time', 'legend'], errors='ignore')
+    display_df = dfm.drop(columns=['Status', 'wait_time', 'legend'], errors='ignore')
 
     # Format date columns in `display_df` only for display
     for col in df_list:
