@@ -40,34 +40,70 @@ def visualisation(dfm,st):
     if "total_rows" not in st.session_state:
         st.session_state.total_rows = len(st.session_state.dfm) # Total rows in the DataFrame
 
+    # Centralized animation logic
+    if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+        st_autorefresh(interval=1000, key="autorefresh")  # Refresh every second
+        st.session_state.rows_added += 1  # Increment rows_added globally
+
+    # Stop animation when all rows are added
+    if st.session_state.rows_added >= st.session_state.total_rows:
+        st.session_state.auto_refresh = False
+        st.success("Animation complete! Reload the page to reset.")
+        
     # Layout for buttons with reduced spacing
     with st.container():
         col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
-    
-        with col1:
-            if st.button("Start"):
-                if not st.session_state.auto_refresh:  # If not already animating
-                    if st.session_state.rows_added == 0:  # If starting fresh
-                        st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-                    st.session_state.auto_refresh = True  # Set auto-refresh to True
-        with col2:
-            if st.button("Pause"):
-                # Pause the auto-refresh
-                st.session_state.auto_refresh = False
-                st.info("Animation paused.")
-        with col3:
-            if st.button("Reschedule"):
-                # Reschedule logic - reset the progress to start fresh
-                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-                st.session_state.rows_added = 0
-                st.info("Rescheduling initiated. Click 'Start' to animate again.")
-        with col4:
-            if st.button("Reset"):
-                # Reset all session state variables
-                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-                st.session_state.rows_added = 0
-                st.session_state.auto_refresh = False
-                st.success("Progress reset successfully.")
+
+        # Layout for buttons
+with st.container():
+    col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
+
+    with col1:
+        if st.button("Start"):
+            if not st.session_state.auto_refresh:
+                st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)  # Reset progress
+                st.session_state.rows_added = 0  # Start from the beginning
+                st.session_state.auto_refresh = True
+    with col2:
+        if st.button("Pause"):
+            st.session_state.auto_refresh = False
+            st.info("Animation paused.")
+    with col3:
+        if st.button("Reschedule"):
+            st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)  # Reset progress
+            st.session_state.rows_added = 0
+            st.info("Rescheduling initiated. Click 'Start' to animate again.")
+    with col4:
+        if st.button("Reset"):
+            st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)  # Reset progress
+            st.session_state.rows_added = 0
+            st.session_state.auto_refresh = False
+            st.success("Progress reset successfully.")
+
+        # with col1:
+        #     if st.button("Start"):
+        #         if not st.session_state.auto_refresh:  # If not already animating
+        #             if st.session_state.rows_added == 0:  # If starting fresh
+        #                 st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
+        #             st.session_state.auto_refresh = True  # Set auto-refresh to True
+        # with col2:
+        #     if st.button("Pause"):
+        #         # Pause the auto-refresh
+        #         st.session_state.auto_refresh = False
+        #         st.info("Animation paused.")
+        # with col3:
+        #     if st.button("Reschedule"):
+        #         # Reschedule logic - reset the progress to start fresh
+        #         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
+        #         st.session_state.rows_added = 0
+        #         st.info("Rescheduling initiated. Click 'Start' to animate again.")
+        # with col4:
+        #     if st.button("Reset"):
+        #         # Reset all session state variables
+        #         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
+        #         st.session_state.rows_added = 0
+        #         st.session_state.auto_refresh = False
+        #         st.success("Progress reset successfully.")
 
     # Dropdown (Selectbox) for visualization options
     visualization_options = [
@@ -86,24 +122,45 @@ def visualisation(dfm,st):
 
 # =========================================================================================
     
-    if selected_visualization == "Gantt Chart":
-        # Static Gantt chart displayed immediately when the page loads
-        if not st.session_state.auto_refresh:  # Show the static chart if not animating
-            gc_static = px.timeline(
+    # if selected_visualization == "Gantt Chart":
+    #     # Static Gantt chart displayed immediately when the page loads
+    #     if not st.session_state.auto_refresh:  # Show the static chart if not animating
+    #         gc_static = px.timeline(
+    #             st.session_state.dfm_progress,
+    #             x_start="Start Time",
+    #             x_end="End Time",
+    #             y="Product Name",
+    #             color="legend",  # Use Components for color differentiation
+    #             # labels={"Components": "Component", "Machine Number": "Machine"}
+    #         )
+    #         gc_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
+    #         gc_static.update_layout(
+    #             legend_title="Component",
+    #             xaxis_title="Time",
+    #             yaxis_title="Products"
+    #         )
+    #         st.plotly_chart(gc_static, use_container_width=True, key='static_gantt_chart')
+        if selected_visualization == "Gantt Chart":
+            # Filter data based on centralized rows_added
+            st.session_state.dfm_progress = st.session_state.dfm.iloc[:st.session_state.rows_added].copy()
+        
+            # Create Gantt chart
+            gc_animated = px.timeline(
                 st.session_state.dfm_progress,
                 x_start="Start Time",
                 x_end="End Time",
                 y="Product Name",
-                color="legend",  # Use Components for color differentiation
-                # labels={"Components": "Component", "Machine Number": "Machine"}
+                color="legend",
+                labels={"Components": "Component", "Machine Number": "Machine"}
             )
-            gc_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
-            gc_static.update_layout(
+            gc_animated.update_yaxes(categoryorder="total ascending")
+            gc_animated.update_layout(
                 legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            st.plotly_chart(gc_static, use_container_width=True, key='static_gantt_chart')
+            st.plotly_chart(gc_animated, use_container_width=True, key='animated_gantt_chart')
+
 
         # Progressive animation
         if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -290,9 +347,8 @@ def visualisation(dfm,st):
 # =========================================================================================
 
     elif selected_visualization == "Product Components Status":
-
         # Filter and visualize only the rows up to rows_to_display
-        df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_added + 1].copy()
+        df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_added].copy()
         dfm_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
 
         # Assign colors based on status
@@ -308,7 +364,6 @@ def visualisation(dfm,st):
         
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
-            # Create a scatter plot
             # Create a scatter plot
             fig = go.Figure()
             
