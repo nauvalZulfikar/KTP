@@ -8,7 +8,11 @@ import matplotlib.dates as mdates
 import math
 from collections import defaultdict
 
-df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
+# df, dfm, component_waiting_df, product_waiting_df, late_df
+
+if "df" not in st.session_state:
+    st.session_state.df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
+df = st.session_state.df
 
 # Convert columns to appropriate types
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
@@ -302,7 +306,9 @@ def adjust_to_working_hours_and_days(start_time, run_time_minutes):
     return current_time
 
 # Call the function with the dataset
-dfm = df.copy()
+if "dfm" not in st.session_state:
+    st.session_state.dfm = st.session_state.df.copy()
+dfm = st.session_state.dfm
 dfm = schedule_production_with_days(dfm)
 dfm = adjust_end_time_and_start_time(dfm)  # Adjust Start and End Times
 
@@ -439,17 +445,21 @@ def calculate_waiting_time(df, group_by_column, date_columns):
     formatted_df = pd.DataFrame(formatted_results)
     return formatted_df
 
-component_waiting_df = calculate_waiting_time(
-    dfm,
-    group_by_column='Components',
-    date_columns=('Order Processing Date', 'Start Time')
-)
+if "component_waiting_df" not in st.session_state:
+    st.session_state.component_waiting_df = calculate_waiting_time(
+        st.session_state.dfm,
+        group_by_column='Components',
+        date_columns=('Order Processing Date', 'Start Time')
+    )
+component_waiting_df = st.session_state.component_waiting_df
 
-product_waiting_df = calculate_waiting_time(
-    dfm,
-    group_by_column='Product Name',
-    date_columns=('Order Processing Date', 'Start Time')
-)
+if "product_waiting_df" not in st.session_state:
+    st.session_state.product_waiting_df = calculate_waiting_time(
+        st.session_state.dfm,
+        group_by_column='Product Name',
+        date_columns=('Order Processing Date', 'Start Time')
+    )
+product_waiting_df = st.session_state.product_waiting_df
 
 dfm['legend'] = dfm['Components']
 for i in range(len(dfm)):
@@ -462,3 +472,7 @@ def late_products(dfm):
     late_df = late.groupby('late')['late'].count()
 
     return late_df
+
+if "late_df" not in st.session_state:
+    st.session_state.late_df = late_products(st.session_state.dfm)
+late_df = st.session_state.late_df
