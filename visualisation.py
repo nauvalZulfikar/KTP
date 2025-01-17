@@ -69,6 +69,8 @@ def visualisation(dfm,st):
                 st.session_state.auto_refresh = False
                 st.success("Progress reset successfully.")
 
+        st.write(f'{st.session_state.rows_added}th step')
+
     # Dropdown (Selectbox) for visualization options
     visualization_options = [
         "Gantt Chart",
