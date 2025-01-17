@@ -26,7 +26,7 @@ def product_catalogue():
     # Machine Utilization in the first column
     with col1:
         st.subheader("Machine Utilization")
-        if "machine_utilization_df" not in st.session_state:
+        if "dfm" not in st.session_state:
             st.session_state.machine_utilization_df = calculate_machine_utilization(st.session_state.dfm)
         st.write(st.session_state.machine_utilization_df)
 
