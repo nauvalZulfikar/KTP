@@ -1,5 +1,11 @@
 import streamlit as st
 # from streamlit_gsheets import GSheetsConnection
+st.set_page_config(
+    page_title="Machine Production Scheduler",
+    page_icon="🦾",
+    layout="wide"
+)
+
 import pandas as pd
 from visualisation import visualisation_tab  # Import Gantt chart visualization
 from modify import modify_tab
@@ -10,11 +16,7 @@ from scheduler import late_products, calculate_waiting_time, calculate_machine_u
 
 # gspread_link = 'https://docs.google.com/spreadsheets/d/1rg9IsiTwd9dGGOww29eHJF_4gkp6gK4B/edit?usp=sharing&ouid=116867237747845550170&rtpof=true&sd=true'
 # Set page configuration
-st.set_page_config(
-    page_title="Machine Production Scheduler",
-    page_icon="🦾",
-    layout="wide"
-)
+
 
 # Main Title
 st.title("Machine Production Scheduler")
