@@ -261,7 +261,7 @@ def visualisation_tab():
             text="Average Days",
             # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
             title="Average Components Waiting Time",
-            color="Product Name",
+            color="Components",
         )
 
         fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
@@ -274,7 +274,7 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
-        st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
+        st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
 
 
 # =========================================================================================
