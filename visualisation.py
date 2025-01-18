@@ -4,7 +4,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
-from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization
+from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, initialise_state
+
+initialise_state()
+# df = st.session_state.df
+# dfm = st.session_state.dfm
+# product_waiting_df = st.session_state.product_waiting_df
+# component_waiting_df =  st.session_state.component_waiting_df 
+# late_df = st.session_state.dfm
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -25,7 +32,7 @@ def create_bar_chart(data, x_col, y_col, color=None):
     )
     return fig
 
-def visualisation(dfm,st):
+def visualisation_tab():
     st.subheader("Visualisation")
 
     # Initialize session state for progressive visualization
@@ -91,7 +98,7 @@ def visualisation(dfm,st):
         st_autorefresh(interval=1000, limit=None, key="autorefresh")  # Refresh every second
         # Add the next row to the progress DataFrame
         st.session_state.dfm_progress = pd.concat(
-            [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
+            [st.session_state.dfm_progress, st.session_state.dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
             ignore_index=True
         )
         st.session_state.rows_added += 1  # Increment the counter
@@ -172,7 +179,7 @@ def visualisation(dfm,st):
             data,
             x="Duration",  # Horizontal axis
             y="Product Name",  # Vertical axis
-            color="Components",  # Color by components
+            color="legend",  # Color by components
             orientation="h",  # Horizontal bars
             labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
             # title="Horizontal Bar Chart of Task Durations"
@@ -386,3 +393,16 @@ def visualisation(dfm,st):
         else:
             st.session_state.auto_refresh = False
             st.success("All rows have been displayed. Animation complete!")
+
+
+
+# # if "late_df" not in st.session_state:
+# st.session_state.late_df = late_df
+# # if "df" not in st.session_state:
+# st.session_state.df = df
+# # if "dfm" not in st.session_state:  # Adjust Start and End Times
+# st.session_state.dfm = dfm
+# # if "component_waiting_df" not in st.session_state:
+# st.session_state.component_waiting_df = component_waiting_df
+# # if "product_waiting_df" not in st.session_state:
+# st.session_state.product_waiting_df = product_waiting_df
