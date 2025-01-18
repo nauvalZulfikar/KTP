@@ -38,7 +38,6 @@ def modify_tab():
                 key="in_product"
             )
 
-    
             in_components = df_in[df_in['Product Name'] == in_selected_product]['Components'].unique()
             in_selected_components = st.selectbox(
                 'Select components:',
@@ -70,9 +69,15 @@ def modify_tab():
                 )
                 
             if st.button('Confirm', key="in_confirm"):
-                dfm = st.session_state.dfm.loc[
+                st.session_state.dfm = st.session_state.dfm.loc[
                     (st.session_state.dfm['Product Name'] == in_selected_product) & 
                     (st.session_state.dfm['Components'] == in_selected_components), 
+                    in_selected_fields
+                ] = in_edit_input
+
+                st.session_state.df = st.session_state.df.loc[
+                    (st.session_state.df['Product Name'] == in_selected_product) & 
+                    (st.session_state.df['Components'] == in_selected_components), 
                     in_selected_fields
                 ] = in_edit_input
                 
@@ -82,6 +87,16 @@ def modify_tab():
                 (st.session_state.dfm['Product Name'] == in_selected_product) & 
                 (st.session_state.dfm['Components'] == in_selected_components)
             ])
+
+            with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
+                st.session_state.df.to_excel(writer, sheet_name='P', index=False)
+                st.session_state.dfm.to_excel(writer, sheet_name='prodet', index=False)
+                # df_pivot.to_excel(writer, sheet_name='Similarity')
+                st.session_state.machine_utilization_df.to_excel(writer, sheet_name='Machine Utilisation')
+                st.session_state.product_waiting_df.to_excel(writer, sheet_name='Product Waiting Time')
+                st.session_state.component_waiting_df.to_excel(writer, sheet_name='Component Waiting Time')
+                st.session_state.late_df.to_excel(writer, sheet_name='Late Products')
+            # st.session_state.dfm.to_excel('Product Details_v1.xlsx',index=False)
     
         with tabs[1]:  # Outsource
             df_out = st.session_state.dfm.loc[st.session_state.rows_added:]
@@ -123,19 +138,34 @@ def modify_tab():
                     key="out_edit_date_out"
                 )
                 
-            if st.button('Confirm', key="out_confirm"):
-                dfm = st.session_state.dfm.loc[
-                    (st.session_state.dfm['Product Name'] == out_selected_product) & 
-                    (st.session_state.dfm['Components'] == out_selected_components), 
-                    out_selected_fields
-                ] = out_edit_input
+            if st.button('Confirm', key="in_confirm"):
+                st.session_state.dfm = st.session_state.dfm.loc[
+                    (st.session_state.dfm['Product Name'] == in_selected_product) & 
+                    (st.session_state.dfm['Components'] == in_selected_components), 
+                    in_selected_fields
+                ] = in_edit_input
+
+                st.session_state.df = st.session_state.df.loc[
+                    (st.session_state.df['Product Name'] == in_selected_product) & 
+                    (st.session_state.df['Components'] == in_selected_components), 
+                    in_selected_fields
+                ] = in_edit_input
                 
                 st.success('Data has been successfully changed!')
     
             st.dataframe(st.session_state.dfm[
-                (st.session_state.dfm['Product Name'] == out_selected_product) & 
-                (st.session_state.dfm['Components'] == out_selected_components)
+                (st.session_state.dfm['Product Name'] == in_selected_product) & 
+                (st.session_state.dfm['Components'] == in_selected_components)
             ])
+
+            with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
+                st.session_state.df.to_excel(writer, sheet_name='P', index=False)
+                st.session_state.dfm.to_excel(writer, sheet_name='prodet', index=False)
+                # df_pivot.to_excel(writer, sheet_name='Similarity')
+                st.session_state.machine_utilization_df.to_excel(writer, sheet_name='Machine Utilisation')
+                st.session_state.product_waiting_df.to_excel(writer, sheet_name='Product Waiting Time')
+                st.session_state.component_waiting_df.to_excel(writer, sheet_name='Component Waiting Time')
+                st.session_state.late_df.to_excel(writer, sheet_name='Late Products')
     
         with tabs[2]:  # Time Converter
             # Radio button for conversion options
