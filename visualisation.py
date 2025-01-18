@@ -199,15 +199,15 @@ def visualisation_tab():
         # Prepare data for visualization
         utilization_df = average_utilization.reset_index()
         utilization_df.columns = ["Machine Number", "Average Utilization"]
-        utilization_df["Average Utilisation (%)"] = utilization_df["Average Utilisation"] * 100
+        utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
 
         # Create a bar chart
         fig = px.bar(
             utilization_df,
             x="Machine Number",
-            y="Average Utilisation (%)",
-            text="Average Utilisation (%)",
-            labels={"Average Utilisation (%)": "Utilization (%)", "Machine Number": "Machine"},
+            y="Average Utilization (%)",
+            text="Average Utilization (%)",
+            labels={"Average Utilization (%)": "Utilization (%)", "Machine Number": "Machine"},
             # title="Average Daily Machine Utilization",
             color="Machine Number",
         )
