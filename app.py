@@ -1,5 +1,5 @@
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
+# from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 from visualisation import visualisation_tab  # Import Gantt chart visualization
 from modify import modify_tab
