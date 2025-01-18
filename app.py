@@ -1,13 +1,14 @@
 import streamlit as st
+from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-# from scheduler import dfm  # Import the processed `dfm` from the backend
 from visualisation import visualisation_tab  # Import Gantt chart visualization
-# from results import results
 from modify import modify_tab
 from product_list_change import product_list_change
 from product_catalogue import product_catalogue
 from scheduler import late_products, calculate_waiting_time, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days
 
+
+# gspread_link = 'https://docs.google.com/spreadsheets/d/1rg9IsiTwd9dGGOww29eHJF_4gkp6gK4B/edit?usp=sharing&ouid=116867237747845550170&rtpof=true&sd=true'
 # Set page configuration
 st.set_page_config(
     page_title="Machine Production Scheduler",
