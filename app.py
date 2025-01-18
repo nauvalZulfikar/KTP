@@ -18,7 +18,7 @@ st.set_page_config(
 # Main Title
 st.title("Machine Production Scheduler")
 
-# st.write(st.session_state)
+st.write(st.session_state)
 
 # if "df" not in st.session_state:
 #     st.session_state.dfm = df
