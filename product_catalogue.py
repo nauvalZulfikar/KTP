@@ -43,7 +43,7 @@ def product_catalogue():
         # if "late_products_df" not in st.session_state:
         #     st.session_state.late_products_df = late_products(st.session_state.dfm)
         # if "late_products_df" in st.session_state:    
-        st.write(st.session_state.late_products_df)
+        st.write(st.session_state.late_df)
 
         st.subheader("Product Waiting Time")
         # if "product_waiting_df" not in st.session_state:
