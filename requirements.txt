@@ -4,6 +4,3 @@ streamlit
 plotly
 streamlit-autorefresh
 openpyxl
-streamlit git+htpps://github.com/streamlit/gsheets-connection
-streamlit_gsheets
-st-gsheets-connection
