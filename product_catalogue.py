@@ -1,7 +1,6 @@
 import pandas as pd
 import streamlit as st
 import datetime as dt
-from scheduler import calculate_machine_utilization#, initialise_state
 
 # initialise_state()
 
