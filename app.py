@@ -21,6 +21,15 @@ st.title("Machine Production Scheduler")
 
 # st.write(st.session_state)
 
+# Create a connection object.
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+# Read data from the Google Sheet.
+df = conn.read()
+
+# Display the data.
+st.write(df)
+
 # df, dfm, component_waiting_df, product_waiting_df, late_df
 df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
