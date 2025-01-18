@@ -230,11 +230,11 @@ def visualisation_tab():
         # Create a bar chart
         fig = px.bar(
             st.session_state.product_waiting_df,
-            x="Machine Number",
+            x="Product Name",
             y="Average Days",
             text="Average Days",
             # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
-            # title="Average Production Waiting Time",
+            title="Average Product Waiting Time",
             color="Product Name",
         )
 
@@ -249,82 +249,32 @@ def visualisation_tab():
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
         st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
-        
-        # # Map session state variables to new variables for this context
-        # product_waiting_progress = st.session_state.dfm_progress
-        # auto_refresh_waiting = st.session_state.auto_refresh
-        # rows_added_waiting = st.session_state.rows_added
-        # total_rows_waiting = st.session_state.total_rows
-    
-        # Progressive animation
-        if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
-            st_autorefresh(interval=1000, limit=None, key="autorefresh_product_waiting")  # Refresh every second
-            # Add the next row to the progress DataFrame
-            st.session_state.dfm_progress = pd.concat(
-                [product_waiting_progress,
-                 component_waiting_df.iloc[rows_added_waiting:rows_added_waiting + 1]],
-                ignore_index=True
-            )
-            st.session_state.rows_added += 1  # Increment the counter
-    
-        # Stop animation when all rows are added
-        if rows_added_waiting >= total_rows_waiting:
-            st.session_state.auto_refresh = False
-            st.success("Animation complete! Reload the page to reset.")
-    
-        # Create bar chart
-        component_chart = create_bar_chart(
-            product_waiting_progress,
-            x_col="Components",
-            y_col="Average Days",
-        )
-    
-        # Display the bar chart
-        st.plotly_chart(component_chart, use_container_width=True)
 
 # =========================================================================================
     
-    # elif selected_visualization == "Component Waiting Time":
-    #     # Progressive animation
-    #     if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
-    #         st_(interval=1000, limit=None, key="")  # Refresh every second
-    #         # Add the next row to the progress DataFrame
-    #         st.session_state.dfm_progress = pd.concat(
-    #             [st.session_state.dfm_progress, dfm.iloc[st.session_state.rows_added:st.session_state.rows_added + 1]],
-    #             ignore_index=True
-    #         )
-    #         st.session_state.rows_added += 1  # Increment the counter
-    
-    #     # Stop animation when all rows are added
-    #     if st.session_state.rows_added >= st.session_state.total_rows:
-    #         st.session_state.auto_refresh = False
-    #         st.success("Animation complete! Reload the page to reset.")
-            
-    #     # Progressive animation
-    #     if auto_refresh_waiting and rows_added_waiting < total_rows_waiting:
-    #         st_(interval=1000, limit=None, key="_waiting")  # Refresh every second
-    #         # Add the next row to the progress DataFrame
-    #         st.session_state.dfm_progress = pd.concat(
-    #             [component_waiting_progress,
-    #              product_waiting_df.iloc[rows_added_waiting:rows_added_waiting + 1]],
-    #             ignore_index=True
-    #         )
-    #         st.session_state.rows_added += 1  # Increment the counter
-    
-    #     # Stop animation when all rows are added
-    #     if rows_added_waiting >= total_rows_waiting:
-    #         st.session_state.auto_refresh = False
-    #         st.success("Animation complete! Reload the page to reset.")
-    
-    #     # Create bar chart
-    #     product_chart = create_bar_chart(
-    #         component_waiting_progress,
-    #         x_col="Product Name",
-    #         y_col="Average Days",
-    #     )
-    
-    #     # Display the bar chart
-    #     st.plotly_chart(product_chart, use_container_width=True)
+    elif selected_visualization == "Component Waiting Time":
+        # Create a bar chart
+        fig = px.bar(
+            st.session_state.component_waiting_df,
+            x="Components",
+            y="Average Days",
+            text="Average Days",
+            # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
+            title="Average Components Waiting Time",
+            color="Product Name",
+        )
+
+        fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        fig.update_layout(
+            xaxis_title="Components",
+            yaxis_title="Waiting Time",
+            template="plotly_white",
+            showlegend=True,
+        )
+
+        # Integrate into Streamlit
+        # st.title("Machine Utilization Visualization")
+        st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
 
 
 # =========================================================================================
