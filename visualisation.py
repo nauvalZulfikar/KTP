@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
-from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, initialise_state
+from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization#, initialise_state
 
 initialise_state()
 # df = st.session_state.df
