@@ -332,25 +332,25 @@ def visualisation_tab():
         # Display the plot
         st.plotly_chart(fig)
         
-        # Check if all rows have been processed
-        if st.session_state.dfm_progress['status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
-            st.session_state.auto_refresh = False
-            st.success("All rows have been processed. Animation stopped.")
-        else:
-            # Auto-refresher logic
-            if st.session_state.auto_refresh:
-                st.write("Auto-refresh is running...")
-                refresh_rate = 1  # in seconds
-                st.write(f"Refreshing every {refresh_rate} seconds...")
-                time.sleep(refresh_rate)
+        # # Check if all rows have been processed
+        # if st.session_state.dfm_progress['status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
+        #     st.session_state.auto_refresh = False
+        #     st.success("All rows have been processed. Animation stopped.")
+        # else:
+        #     # Auto-refresher logic
+        #     if st.session_state.auto_refresh:
+        #         # st.write("Auto-refresh is running...")
+        #         refresh_rate = 1  # in seconds
+        #         # st.write(f"Refreshing every {refresh_rate} seconds...")
+        #         # time.sleep(refresh_rate)
         
-                # Update the number of rows to display
-                st.session_state.rows_added += 1
+        #         # Update the number of rows to display
+        #         st.session_state.rows_added += 1
         
-                # Trigger rerun
-                st.experimental_rerun()
-            else:
-                st.session_state.rows_added = 0
+        #         # Trigger rerun
+        #         st.experimental_rerun()
+        #     else:
+        #         st.session_state.rows_added = 0
 #         # Filter and visualize only the rows up to rows_to_display
 #         df_visual = st.session_state.df_progress.iloc[:st.session_state.rows_added].copy()
 #         dfm_visual = st.session_state.dfm_progress.iloc[:st.session_state.rows_added + 1].copy()
