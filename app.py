@@ -6,7 +6,7 @@ from visualisation import visualisation_tab  # Import Gantt chart visualization
 from modify import modify_tab
 from product_list_change import product_list_change
 from product_catalogue import product_catalogue
-# from scheduler import df, dfm, product_waiting_df, component_waiting_df, late_df, initialise_state
+from scheduler import late_products, calculate_waiting_time, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days
 
 # Set page configuration
 st.set_page_config(
