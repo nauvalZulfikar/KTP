@@ -28,25 +28,25 @@ def product_catalogue():
     # Machine Utilization in the first column
     with col1:
         st.subheader("Machine Utilization")
-        if "machine_utilization_df" in st.session_state:
-            st.write(st.session_state.machine_utilization_df)
+        # if "machine_utilization_df" in st.session_state:
+        st.write(st.session_state.machine_utilization_df)
 
         st.subheader("Component Waiting Time")
         # if "component_waiting_df" not in st.session_state:
         #     st.session_state.component_waiting_df = component_waiting_df
-        if "component_waiting_df" in st.session_state:
-            st.write(st.session_state.component_waiting_df)
+        # if "component_waiting_df" in st.session_state:
+        st.write(st.session_state.component_waiting_df)
 
     # Product Waiting Time and Late Products in the second column
     with col2:
         st.subheader("Late Products")
         # if "late_products_df" not in st.session_state:
         #     st.session_state.late_products_df = late_products(st.session_state.dfm)
-        if "late_products_df" in st.session_state:    
-            st.write(st.session_state.late_products_df)
+        # if "late_products_df" in st.session_state:    
+        st.write(st.session_state.late_products_df)
 
         st.subheader("Product Waiting Time")
         # if "product_waiting_df" not in st.session_state:
         #     st.session_state.product_waiting_df = product_waiting_df
-        if "product_waiting_df" in st.session_state:
-            st.write(st.session_state.product_waiting_df)
+        # if "product_waiting_df" in st.session_state:
+        st.write(st.session_state.product_waiting_df)
