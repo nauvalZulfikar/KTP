@@ -37,13 +37,13 @@ dfm = df.copy()
 dfm = schedule_production_with_days(dfm)
 dfm = adjust_end_time_and_start_time(dfm)
 dfm = dfm.sort_values(by=['Start Time','End Time','Promised Delivery Date'])
-dfm.loc[
-    (dfm['Process Type'] == 'In House') &
-    (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_In House'
-dfm.loc[
-    (dfm['Process Type'] == 'Outsource') &
-    (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_Outsource'
-dfm.loc[(dfm['End Time'] < dfm['Promised Delivery Date']), 'Status'] = 'Late'
+# dfm.loc[
+#     (dfm['Process Type'] == 'In House') &
+#     (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_In House'
+# dfm.loc[
+#     (dfm['Process Type'] == 'Outsource') &
+#     (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_Outsource'
+# dfm.loc[(dfm['End Time'] < dfm['Promised Delivery Date']), 'Status'] = 'Late'
 dfm['legend'] = dfm['Components']
 for i in range(len(dfm)):
   if dfm['Machine Number'][i] == 'OutSrc':
