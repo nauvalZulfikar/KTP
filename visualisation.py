@@ -238,7 +238,7 @@ def visualisation_tab():
             color="Product Name",
         )
 
-        fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
         fig.update_layout(
             xaxis_title="Product Name",
             yaxis_title="Waiting Time",
@@ -264,7 +264,7 @@ def visualisation_tab():
             color="Components",
         )
 
-        fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
         fig.update_layout(
             xaxis_title="Components",
             yaxis_title="Waiting Time",
