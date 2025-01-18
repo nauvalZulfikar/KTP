@@ -1,8 +1,11 @@
 import pandas as pd
 import streamlit as st
 import datetime as dt
-from scheduler import calculate_machine_utilization
+from scheduler import calculate_machine_utilization, initialise_state
 
+initialise_state()
+
+st.write(st.session_state)
 def product_catalogue():
     df_list = ['Order Processing Date', 'Promised Delivery Date', 'Start Time', 'End Time']
 
