@@ -9,25 +9,6 @@ import math
 from collections import defaultdict
 import streamlit as st
 
-# df, dfm, component_waiting_df, product_waiting_df, late_df
-df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
-# Convert columns to appropriate types
-df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
-df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
-df['Start Time'] = pd.NaT  # Initialize as empty datetime
-df['End Time'] = pd.NaT  # Initialize as empty datetime
-df['Status'] = ''  # Initialize the Status column
-
-# Assign values to 'Status' column based on 'Process Type' using .loc[]
-df.loc[df['Process Type'] == 'In House', 'Status'] = 'InProgress_In House'
-df.loc[df['Process Type'] == 'Outsource','Status'] = 'InProgress_Outsource'
-
-# Sort the data by Promised Delivery Date, Product Name, and Component order
-df = df.sort_values(by=['Promised Delivery Date',
-                        'Product Name',
-                        'Components']).reset_index(drop=True)
-
-
 # Define working hours and working days
 WORK_HOURS_PER_DAY = 8
 WORK_START = 9  # 9 AM
@@ -239,49 +220,49 @@ def schedule_production_with_days(data):
     # Return the completed schedule
     return data
 
-def calculate_gaps(dfm):
+def calculate_gaps(df):
     loop_len = max(df['Product Name'].value_counts())
-    dfm = df.groupby('Product Name', as_index=False).first().sort_values(by=['Promised Delivery Date', 'Start Time','End Time']).reset_index(drop=True)
+    df = df.groupby('Product Name', as_index=False).first().sort_values(by=['Promised Delivery Date', 'Start Time','End Time']).reset_index(drop=True)
 
     for x in range(1,loop_len+1):
       dfj = df.groupby('Product Name', as_index=False).nth(x).sort_values(by=['Promised Delivery Date', 'Start Time','End Time']).reset_index(drop=True)
-      dfm = pd.concat([dfm, dfj]).sort_values(by=['Promised Delivery Date', 'Start Time']).reset_index(drop=True)
+      df = pd.concat([df, dfj]).sort_values(by=['Promised Delivery Date', 'Start Time']).reset_index(drop=True)
 
       # Calculate gaps based on machine usage
-      dfm = dfm.sort_values(by=['Machine Number','Start Time','End Time']).reset_index(drop=True)
+      df = df.sort_values(by=['Machine Number','Start Time','End Time']).reset_index(drop=True)
       machine_gaps = [0]
       machine_prev = [0]
-      for i in range(len(dfm) - 1):
-          if dfm['Machine Number'].iloc[i] == dfm['Machine Number'].iloc[i + 1]:
-              gap = (dfm['Start Time'].iloc[i + 1] - dfm['End Time'].iloc[i]).total_seconds() / 60  # Minutes
-              prev_m = dfm['UniqueID'][i]
+      for i in range(len(df) - 1):
+          if df['Machine Number'].iloc[i] == df['Machine Number'].iloc[i + 1]:
+              gap = (df['Start Time'].iloc[i + 1] - df['End Time'].iloc[i]).total_seconds() / 60  # Minutes
+              prev_m = df['UniqueID'][i]
           else:
               gap = 0
               prev_m = 0
-          if dfm['Machine Number'].iloc[i] == 'OutSrc':
+          if df['Machine Number'].iloc[i] == 'OutSrc':
               gap = 0
           machine_gaps.append(gap)
           machine_prev.append(prev_m)
-      dfm['machine_gaps'] = machine_gaps
-      dfm['machine_prev'] = machine_prev
+      df['machine_gaps'] = machine_gaps
+      df['machine_prev'] = machine_prev
 
       # Calculate gaps based on product name and components
-      dfm = dfm.sort_values(by=['Start Time','End Time','Product Name','Components',]).reset_index(drop=True)
+      df = df.sort_values(by=['Start Time','End Time','Product Name','Components',]).reset_index(drop=True)
       prod_comp_gaps = [0]
       prod_comp_prev = [0]
-      for i in range(len(dfm) - 1):
-          if dfm['Product Name'].iloc[i] == dfm['Product Name'].iloc[i + 1] and dfm['Components'].iloc[i] != dfm['Components'].iloc[i + 1]:
-              gap = (dfm['Start Time'].iloc[i + 1] - dfm['End Time'].iloc[i]).total_seconds() / 60  # Minutes
-              prev_pc = dfm['UniqueID'][i]
+      for i in range(len(df) - 1):
+          if df['Product Name'].iloc[i] == df['Product Name'].iloc[i + 1] and df['Components'].iloc[i] != df['Components'].iloc[i + 1]:
+              gap = (df['Start Time'].iloc[i + 1] - df['End Time'].iloc[i]).total_seconds() / 60  # Minutes
+              prev_pc = df['UniqueID'][i]
           else:
               gap = 0
               prev_pc = 0
           prod_comp_gaps.append(gap)
           prod_comp_prev.append(prev_pc)
-      dfm['prod_comp_gap'] = prod_comp_gaps
-      dfm['prod_comp_prev'] = prod_comp_prev
+      df['prod_comp_gap'] = prod_comp_gaps
+      df['prod_comp_prev'] = prod_comp_prev
 
-    return dfm
+    return df
 
 # Function to adjust end time for working hours and working days
 def adjust_to_working_hours_and_days(start_time, run_time_minutes):
@@ -303,20 +284,6 @@ def adjust_to_working_hours_and_days(start_time, run_time_minutes):
             current_time = next_working_day(current_time)
     return current_time
 
-# Call the function with the dataset
-dfm = df.copy()
-dfm = schedule_production_with_days(dfm)
-dfm = adjust_end_time_and_start_time(dfm)
-dfm = dfm.sort_values(by=['Start Time','End Time','Promised Delivery Date'])
-
-dfm.loc[
-    (dfm['Process Type'] == 'In House') &
-    (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_In House'
-dfm.loc[
-    (dfm['Process Type'] == 'Outsource') &
-    (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_Outsource'
-dfm.loc[(dfm['End Time'] < dfm['Promised Delivery Date']), 'Status'] = 'Late'
-  
 def calculate_business_hours_split(start_time, end_time):
     # Initialize the total business hours
     total_hours = timedelta()
@@ -375,13 +342,13 @@ def calculate_machine_utilization(df):
         return daily_utilization
 
     # Apply the function to calculate daily utilization for each task
-    dfm["Daily Utilization"] = dfm.apply(
+    df["Daily Utilization"] = df.apply(
         lambda row: calculate_daily_utilization(row["Start Time"], row["End Time"]),
         axis=1,
     )
 
     # Expand the daily utilization into a separate DataFrame
-    daily_utilization_expanded = dfm.explode("Daily Utilization").reset_index()
+    daily_utilization_expanded = df.explode("Daily Utilization").reset_index()
 
     # Extract the date and production minutes
     daily_utilization_expanded[["Production Date", "Production Minutes"]] = daily_utilization_expanded[
@@ -403,8 +370,6 @@ def calculate_machine_utilization(df):
 
     return average_daily_utilization_per_machine
 
-machine_utilization_df = calculate_machine_utilization(dfm.copy())
-
 def calculate_waiting_time(df, group_by_column, date_columns):
     start_col, end_col = date_columns
 
@@ -425,13 +390,13 @@ def calculate_waiting_time(df, group_by_column, date_columns):
         return total_hours
 
     # Apply the business hours calculation
-    dfm['wait_time'] = dfm.apply(
+    df['wait_time'] = df.apply(
         lambda row: business_hours_split(row[start_col], row[end_col]),
         axis=1
     )
 
     # Group and calculate the average waiting time
-    wait_time_grouped = dfm.groupby(group_by_column)['wait_time'].mean()
+    wait_time_grouped = df.groupby(group_by_column)['wait_time'].mean()
 
     # Format the results
     formatted_results = []
@@ -451,41 +416,10 @@ def calculate_waiting_time(df, group_by_column, date_columns):
     # Convert to DataFrame for better display
     formatted_df = pd.DataFrame(formatted_results)
     return formatted_df
-    
-component_waiting_df = calculate_waiting_time(
-        dfm,
-        group_by_column='Components',
-        date_columns=('Order Processing Date', 'Start Time'))
-    
-    
-product_waiting_df = calculate_waiting_time(
-        dfm,
-        group_by_column='Product Name',
-        date_columns=('Order Processing Date', 'Start Time'))
-
-dfm['legend'] = dfm['Components']
-for i in range(len(dfm)):
-  if dfm['Machine Number'][i] == 'OutSrc':
-    dfm['legend'][i] = 'OutSrc'
-
-def late_products(dfm):
-    late = dfm.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
+  
+def late_products(df):
+    late = df.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
     late['late'] = ['late' if late['End Time'][i] > late['Promised Delivery Date'][i] else 'on time' for i in range(len(late))]
     late_df = late.groupby('late')['late'].count()
 
     return late_df
-late_df = late_products(dfm)
-
-def initialise_state():
-  if "df" not in st.session_state:
-    st.session_state.df = df
-  if "dfm" not in st.session_state:  # Adjust Start and End Times
-    st.session_state.dfm = dfm
-  if "machine_utilization_df" not in st.session_state:
-    st.session_state.machine_utilization_df = machine_utilization_df
-  if "component_waiting_df" not in st.session_state:
-    st.session_state.component_waiting_df = component_waiting_df
-  if "product_waiting_df" not in st.session_state:
-    st.session_state.product_waiting_df = product_waiting_df
-  if "late_df" not in st.session_state:
-    st.session_state.late_df = late_df
