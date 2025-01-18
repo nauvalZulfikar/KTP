@@ -295,7 +295,7 @@ def visualisation_tab():
                     st.session_state.dfm_progress.loc[st.session_state.rows_added, 'status'] = 'Late'
         
         # Prepare the visualization data
-        df_visual = st.session_state.df_progress.copy()
+        df_visual = st.session_state.dfm_progress.copy()
         
         # Assign colors based on status
         status_colors = {
@@ -330,7 +330,7 @@ def visualisation_tab():
         )
         
         # Display the plot
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True, key='product_component_status')
         
         # # Check if all rows have been processed
         # if st.session_state.dfm_progress['status'].isin(['Completed_Outsource', 'Completed_In House', 'Late']).all():
