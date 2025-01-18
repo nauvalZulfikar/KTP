@@ -6,12 +6,7 @@ from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization#, initialise_state
 
-initialise_state()
-# df = st.session_state.df
-# dfm = st.session_state.dfm
-# product_waiting_df = st.session_state.product_waiting_df
-# component_waiting_df =  st.session_state.component_waiting_df 
-# late_df = st.session_state.dfm
+# initialise_state()
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
