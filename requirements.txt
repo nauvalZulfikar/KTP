@@ -5,3 +5,4 @@ plotly
 streamlit-autorefresh
 openpyxl
 gspread
+oaauth2client
