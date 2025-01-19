@@ -13,7 +13,7 @@ from product_list_change import product_list_change
 from product_catalogue import product_catalogue
 from scheduler import late_products, calculate_waiting_time, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days
 import gspread
-from oaauth2client.service_account import ServiceAccountCredentials
+from oauth2client.service_account import ServiceAccountCredentials
 
 # Authenticate and connect to Google Sheets
 def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
