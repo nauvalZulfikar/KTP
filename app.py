@@ -19,9 +19,10 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 df = conn.read()
 
-# Print results.
-for row in df.itertuples():
-    st.write(f"{row.name} has a :{row.pet}:")
+st.dataframe(df)
+# # Print results.
+# for row in df.itertuples():
+#     st.write(f"{row.name} has a :{row.pet}:")
     
 # import gspread
 # from google.oauth2.service_account import Credentials
@@ -79,12 +80,6 @@ for row in df.itertuples():
 
 # # df, dfm, component_waiting_df, product_waiting_df, late_df
 # df = read_data()
-df = conn.read(
-    worksheet="Sheet1",
-    ttl="10m",
-    usecols=[0, 1],
-    nrows=3,
-)
 # df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
