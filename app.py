@@ -22,7 +22,7 @@ def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
              "https://www.googleapis.com/auth/drive.file", 
              "https://www.googleapis.com/auth/drive"]
     
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scope)
+    credentials = Credentials.from_service_account_file(creds_json, scope)
     client = gspread.authorize(credentials)
     spreadsheet = client.open(spreadsheet_name)  
     return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
