@@ -15,43 +15,43 @@ from scheduler import late_products, calculate_waiting_time, calculate_machine_u
 import gspread
 from oaauth2client.service_account import ServiceAccountCredentials
 
-# # Authenticate and connect to Google Sheets
-# def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
-#     scope = ["https://spreadsheets.google.com/feeds", 
-#              'https://www.googleapis.com/auth/spreadsheets',
-#              "https://www.googleapis.com/auth/drive.file", 
-#              "https://www.googleapis.com/auth/drive"]
+# Authenticate and connect to Google Sheets
+def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
+    scope = ["https://spreadsheets.google.com/feeds", 
+             'https://www.googleapis.com/auth/spreadsheets',
+             "https://www.googleapis.com/auth/drive.file", 
+             "https://www.googleapis.com/auth/drive"]
     
-#     credentials = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scope)
-#     client = gspread.authorize(credentials)
-#     spreadsheet = client.open(spreadsheet_name)  
-#     return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scope)
+    client = gspread.authorize(credentials)
+    spreadsheet = client.open(spreadsheet_name)  
+    return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
 
-# # Google Sheet credentials and details
-# SPREADSHEET_NAME = ''
-# SHEET_NAME = ''
-# CREDENTIALS_FILE = ''
+# Google Sheet credentials and details
+SPREADSHEET_NAME = 'Product Details_v1'
+SHEET_NAME = 'P'
+CREDENTIALS_FILE = 'ktp credential'
 
-# # Connect to the Google Sheet
-# sheet_by_name = connect_to_gsheet(CREDENTIALS_FILE, SPREADSHEET_NAME, sheet_name=SHEET_NAME)
+# Connect to the Google Sheet
+sheet_by_name = connect_to_gsheet(CREDENTIALS_FILE, SPREADSHEET_NAME, sheet_name=SHEET_NAME)
 
-# # Main Title
-# st.title("Machine Production Scheduler")
+# Main Title
+st.title("Machine Production Scheduler")
 
-# # st.write(st.session_state)
+# st.write(st.session_state)
 
-# # Read Data from Google Sheets
-# def read_data():
-#     data = sheet_by_name.get_all_records()  # Get all records from Google Sheet
-#     return pd.DataFrame(data)
+# Read Data from Google Sheets
+def read_data():
+    data = sheet_by_name.get_all_records()  # Get all records from Google Sheet
+    return pd.DataFrame(data)
 
-# # Add Data to Google Sheets
-# def add_data(row):
-#     sheet_by_name.append_row(row)  # Append the row to the Google Sheet
+# Add Data to Google Sheets
+def add_data(row):
+    sheet_by_name.append_row(row)  # Append the row to the Google Sheet
 
 
-# # df, dfm, component_waiting_df, product_waiting_df, late_df
-# df = read_data()#pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
+# df, dfm, component_waiting_df, product_waiting_df, late_df
+df = read_data()#pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
 
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
