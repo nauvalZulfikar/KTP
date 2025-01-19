@@ -68,7 +68,7 @@ def modify_tab():
                     key="in_edit_date"
                 )
                 
-            if st.button('Confirm', key="in_confirm", key='in_confirm'):
+            if st.button('Confirm', key="in_confirm"):
                 st.session_state.dfm = st.session_state.dfm.loc[
                     (st.session_state.dfm['Product Name'] == in_selected_product) & 
                     (st.session_state.dfm['Components'] == in_selected_components), 
