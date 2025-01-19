@@ -46,7 +46,7 @@ def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
 # Google Sheet credentials and details
 SPREADSHEET_NAME = 'Product Details_v1'
 SHEET_NAME = 'P'
-CREDENTIALS_FILE = 'ktp credential'
+CREDENTIALS_FILE = 'ktp credential.json'
 
 # Connect to the Google Sheet
 sheet_by_name = connect_to_gsheet(CREDENTIALS_FILE, SPREADSHEET_NAME, sheet_name=SHEET_NAME)
