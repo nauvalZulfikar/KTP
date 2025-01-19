@@ -17,15 +17,31 @@ from google.oauth2.service_account import Credentials
 
 # Authenticate and connect to Google Sheets
 def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
-    scope = ['https://www.googleapis.com/auth/spreadsheets',
-             # "https://spreadsheets.google.com/feeds", 
-             # "https://www.googleapis.com/auth/drive.file", 
-             "https://www.googleapis.com/auth/drive"]
+    # Define the required scopes
+    scopes = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
     
-    credentials = Credentials.from_service_account_file(creds_json, scope)
+    # Use the correct keyword argument 'scopes'
+    credentials = Credentials.from_service_account_file(creds_json, scopes=scopes)
     client = gspread.authorize(credentials)
-    spreadsheet = client.open(spreadsheet_name)  
-    return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
+    spreadsheet = client.open(spreadsheet_name)
+    return spreadsheet.worksheet(sheet_name)
+# import gspread
+# from google.oauth2.service_account import Credentials
+
+# # Authenticate and connect to Google Sheets
+# def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
+#     scope = ['https://www.googleapis.com/auth/spreadsheets',
+#              # "https://spreadsheets.google.com/feeds", 
+#              # "https://www.googleapis.com/auth/drive.file", 
+#              "https://www.googleapis.com/auth/drive"]
+    
+#     credentials = Credentials.from_service_account_file(creds_json, scope)
+#     client = gspread.authorize(credentials)
+#     spreadsheet = client.open(spreadsheet_name)  
+#     return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
 
 # Google Sheet credentials and details
 SPREADSHEET_NAME = 'Product Details_v1'
