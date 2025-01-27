@@ -30,7 +30,6 @@ def adjust_end_time_and_start_time(data):
             new_end_time = row['Start Time'] + timedelta(days=1)
             new_end_time = new_end_time.replace(hour=9, minute=0, second=0)
             data.at[idx, 'Start Time'] = new_end_time
-
         # If the End Time is earlier than 9:00 AM
         elif row['End Time'].hour < 9:
             # Adjust the End Time to be exactly 9:00 AM on the same day
@@ -51,7 +50,24 @@ def find_gaps(machine_schedule):
             if next_start > current_end:
                 gaps[machine].append((current_end, next_start))  # Record gap
     return gaps
-  
+
+def extract_machine_state(animated_data):
+    machine_schedule = defaultdict(list)
+    machine_last_end = {}
+
+    for machine in animated_data['Machine Number'].unique():
+        # Get all rows for this machine
+        machine_rows = animated_data[animated_data['Machine Number'] == machine]
+        # Sort by Start Time to ensure proper scheduling order
+        machine_rows = machine_rows.sort_values(by='Start Time')
+
+        # Update the machine_schedule and machine_last_end
+        for _, row in machine_rows.iterrows():
+            machine_schedule[machine].append((row['Start Time'], row['End Time'], row.name))
+        machine_last_end[machine] = machine_rows['End Time'].max()
+
+    return machine_schedule, machine_last_end
+
 def schedule_production_with_days(data):
     # We start by assuming there are tasks that need to be scheduled
     has_empty_rows = True
@@ -70,10 +86,6 @@ def schedule_production_with_days(data):
             machine: next_working_day(data['Order Processing Date'].min().replace(hour=WORK_START, minute=0))
             for machine in data['Machine Number'].unique()
         }
-
-        # Sort tasks by when they are due, their product name, and their component
-        # # This helps ensure we prioritize the most urgent tasks
-        # data = data.sort_values(by=['Promised Delivery Date', 'Product Name', 'Components']).reset_index(drop=True)
 
         # Go through each task, one by one
         for i in range(len(data)):
@@ -94,7 +106,6 @@ def schedule_production_with_days(data):
             # ==========================
             # OUTSOURCE SCHEDULING
             # ==========================
-            # If this task is outsourced and uses an external machine
             if "C1" in component and machine == "OutSrc":
                 # Start the task at 9:00 AM on the order processing date
                 start_time = data['Order Processing Date'][i].replace(hour=WORK_START, minute=0)
@@ -216,7 +227,180 @@ def schedule_production_with_days(data):
         has_empty_rows = data['Start Time'].isna().any() or data['End Time'].isna().any()
 
     data['Quantity Required'] = data['Quantity Required'].apply(lambda x:round(x))
-    
+
+    # Return the completed schedule
+    return data
+
+def reschedule_production_with_days(data, machine_last_end, machine_schedule, previous_schedule):
+    # We start by assuming there are tasks that need to be scheduled
+    has_empty_rows = True
+    # Keep trying to schedule tasks until all tasks have a Start and End Time
+    while has_empty_rows:
+
+        # Go through each task, one by one
+        for i in range(len(data)):
+            # Skip tasks that already have a start and end time
+            if not pd.isna(data.at[i, 'Start Time']) and not pd.isna(data.at[i, 'End Time']):
+                continue
+
+            # This helps ensure we prioritize the most urgent tasks
+            data = data.sort_values(by=['Promised Delivery Date', 'Product Name', 'Components']).reset_index(drop=True)
+
+            # Information about the current task
+            component = data['Components'][i]  # Example: C1, C2, etc.
+            product = data['Product Name'][i]  # Example: Product 1, Product 2
+            machine = data['Machine Number'][i]  # The machine where the task is performed
+            gap_start_time = None  # Start time if the task fits into a gap
+            gap_end_time = None  # End time if the task fits into a gap
+            fallback_start_time = None  # Backup start time
+            fallback_end_time = None  # Backup end time
+            full_start_time = None  # Final fallback start time
+            full_end_time = None  # Final fallback end time
+
+            # ==========================
+            # OUTSOURCE SCHEDULING
+            # ==========================
+            if machine == "OutSrc":
+                # Look for the previous component's end time for the same product
+                prev_component_end_time = data.iloc[:i][
+                    (data.iloc[:i]['Product Name'] == product) &
+                    (data.iloc[:i]['Components'] < component)
+                ]['End Time'].max()
+
+                # Use product's last end time if no previous component exists
+                if pd.isna(prev_component_end_time):
+                    prev_component_end_time = data['Order Processing Date'][i].replace(hour=WORK_START, minute=0)
+
+                # Start this task after the previous component ends
+                start_time = prev_component_end_time
+                # Calculate how long the task will take
+                run_time_minutes = data['Run Time (min/1000)'][i] * data['Quantity Required'][i] / 1000
+                # Determine when the task will end
+                end_time = adjust_to_working_hours_and_days(start_time, run_time_minutes)
+
+                # Save the Start and End Times for this task
+                data.at[i, 'Start Time'] = start_time
+                data.at[i, 'End Time'] = end_time
+                continue  # Move to the next task
+
+            # ==========================
+            # MACHINE SCHEDULING
+            # ==========================
+            # Look for earlier tasks for the same product in the current dataset
+            same_product_prev = data.iloc[:i][data.iloc[:i]['Product Name'] == product]
+            if not same_product_prev.empty:
+                # If there are earlier tasks in the current dataset, use the last task's end time
+                product_last_end = same_product_prev.iloc[-1]['End Time']
+            else:
+                # Otherwise, check the previous schedule for earlier tasks
+                previous_product_prev = previous_schedule[
+                    (previous_schedule['Product Name'] == product) &
+                    (previous_schedule['Components'] < component)
+                ]
+                if not previous_product_prev.empty:
+                    # Use the end time of the last scheduled task in the previous schedule
+                    product_last_end = previous_product_prev['End Time'].max()
+                else:
+                    # If no previous tasks exist, start after the order processing date
+                    product_last_end = data['Order Processing Date'][i]
+
+            # ==========================
+            # FIND GAPS
+            # ==========================
+            # Check if there are gaps in the machine's schedule
+            gaps = find_gaps(machine_schedule)
+            for gap_start, gap_end in gaps.get(machine, []):
+                # Determine the earliest possible start time for the task
+                # Ensure it starts after the previous component (if any) or product's last end time
+                prev_component_end_time = data.iloc[:i][
+                    (data.iloc[:i]['Product Name'] == product) &
+                    (data.iloc[:i]['Components'] < component)
+                ]['End Time'].max()
+
+                # Use product's last end time if no previous component exists
+                if pd.isna(prev_component_end_time):
+                    prev_component_end_time = product_last_end
+
+                # Enforce the dependency rule: Skip gaps that start before the previous component's end time
+                adjusted_gap_start = max(gap_start, prev_component_end_time)
+                if adjusted_gap_start >= gap_end:
+                    continue  # Skip this gap entirely
+
+                # Calculate how long the task will take
+                run_time_minutes = data['Run Time (min/1000)'][i] * data['Quantity Required'][i] / 1000
+                potential_end_time = adjust_to_working_hours_and_days(adjusted_gap_start, run_time_minutes)
+
+                # ==========================
+                # IF TASK FITS IN THE GAP
+                # ==========================
+                # Check if the task fits within the adjusted gap
+                if potential_end_time <= gap_end:
+                    # Task can fit in this gap
+                    gap_start_time = adjusted_gap_start
+                    gap_end_time = potential_end_time
+                    break  # Exit the loop as the task is now scheduled
+
+                # ==========================
+                # IF NOT, SPLIT (FIRST)
+                # ==========================
+                # If the task does not fit, split it into smaller pieces
+                available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
+                # set_end_time = min(run_time_minutes,available_minutes)
+                producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
+
+                # Update the task with the producible quantity
+                remaining_task = data.iloc[i].to_frame().T.copy()
+                data.at[i, 'Quantity Required'] = producible_qty
+
+                # If there’s remaining work, create a new task for it
+                if producible_qty > 0:
+                    remaining_qty = remaining_task['Quantity Required'] - producible_qty
+                    # remaining_task = data.iloc[i].copy()
+                    remaining_task['Quantity Required'] = remaining_qty
+                    remaining_task['Start Time'] = None
+                    remaining_task['End Time'] = None
+                    # Add the new task to the dataset
+                    data = pd.concat([data, remaining_task], ignore_index=True)
+
+                # Schedule the producible part of the task in this gap
+                gap_start_time = adjusted_gap_start
+                gap_end_time = gap_end
+                break  # Exit the loop as the task is now partially scheduled
+
+
+            # ==========================
+            # IF NO GAPS
+            # ==========================
+            if gap_end_time is None:
+                # Schedule the task to start after the machine's last available time
+                fallback_start_time = max(product_last_end, machine_last_end[machine])
+                run_time_minutes = data['Run Time (min/1000)'][i] * data['Quantity Required'][i] / 1000
+                fallback_end_time = adjust_to_working_hours_and_days(fallback_start_time, run_time_minutes)
+
+            # Calculate the final fallback times if everything else fails
+            full_start_time = max(product_last_end, machine_last_end[machine])
+            run_time_minutes = data['Run Time (min/1000)'][i] * data['Quantity Required'][i] / 1000
+            full_end_time = adjust_to_working_hours_and_days(full_start_time, run_time_minutes)
+
+            # Decide the final start and end times for the task
+            start_time = gap_start_time if gap_start_time else fallback_start_time if fallback_start_time else full_start_time
+            end_time = gap_end_time if gap_end_time else fallback_end_time if fallback_end_time else full_end_time
+
+            # Update the machine schedule
+            if machine != "OutSrc":
+                machine_schedule[machine].append((start_time, end_time, i))
+                machine_schedule[machine] = sorted(machine_schedule[machine], key=lambda x: x[0])
+                machine_last_end[machine] = max(machine_last_end[machine], end_time)
+
+            # Save the Start and End Times for the task
+            data.at[i, 'Start Time'] = start_time
+            data.at[i, 'End Time'] = end_time
+
+        # Check if any tasks are still unscheduled
+        has_empty_rows = data['Start Time'].isna().any() or data['End Time'].isna().any()
+
+    data['Quantity Required'] = data['Quantity Required'].apply(lambda x:round(x))
+
     # Return the completed schedule
     return data
 
