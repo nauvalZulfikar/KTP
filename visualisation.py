@@ -96,7 +96,7 @@ def visualisation_tab():
                     by=['Start Time', 'End Time', 'Promised Delivery Date'])
                 # Combine both parts
                 st.session_state.dfm = pd.concat([dfm1, dfm2], ignore_index=True)
-                st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Quantity Required']>=1].reset_index(drop=True,inplace=True)
+                st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Quantity Required']>0].reset_index(drop=True,inplace=True)
                 for i in range(len(st.session_state.dfm)):
                     if st.session_state.dfm['Start Time'][i].hour>9:
                         st.session_state.dfm.at[i,'Start Time'].replace(hour=9)
