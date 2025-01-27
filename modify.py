@@ -18,19 +18,11 @@ def modify_tab():
 
     if "dfm" in st.session_state:
         with tabs[0]:  # In House
-            # Reset the index to avoid KeyError due to missing index values
             st.session_state.dfm = st.session_state.dfm.reset_index(drop=True)
-            
-            # Ensure rows_added does not exceed the available range
             rows_added = min(st.session_state.rows_added, len(st.session_state.dfm))
-    
-            # Slice the DataFrame safely
             df_in = st.session_state.dfm.iloc[rows_added:]
-    
-            # Filter the DataFrame
             df_in = df_in[df_in['Process Type'] == 'In House']
     
-            # Proceed with unique product selection
             in_products = df_in['Product Name'].unique()
             in_selected_product = st.selectbox(
                 'Select product name:',
@@ -54,7 +46,9 @@ def modify_tab():
     
             if in_selected_fields in int_col:
                 in_edit_input = st.number_input(
-                    'Enter new value:',
+                    'Enter new value: ',#(minimum 200)',
+                    # min_value=200,
+                    step=1,
                     key="in_edit_input"
                 )
             elif in_selected_fields in str_col:
@@ -69,13 +63,13 @@ def modify_tab():
                 )
                 
             if st.button('Confirm', key="in_confirm"):
-                st.session_state.dfm = st.session_state.dfm.loc[
+                st.session_state.dfm.loc[
                     (st.session_state.dfm['Product Name'] == in_selected_product) & 
                     (st.session_state.dfm['Components'] == in_selected_components), 
                     in_selected_fields
                 ] = in_edit_input
 
-                st.session_state.df = st.session_state.df.loc[
+                st.session_state.df.loc[
                     (st.session_state.df['Product Name'] == in_selected_product) & 
                     (st.session_state.df['Components'] == in_selected_components), 
                     in_selected_fields
@@ -96,7 +90,6 @@ def modify_tab():
                 st.session_state.product_waiting_df.to_excel(writer, sheet_name='Product Waiting Time')
                 st.session_state.component_waiting_df.to_excel(writer, sheet_name='Component Waiting Time')
                 st.session_state.late_df.to_excel(writer, sheet_name='Late Products')
-            # st.session_state.dfm.to_excel('Product Details_v1.xlsx',index=False)
     
         with tabs[1]:  # Outsource
             df_out = st.session_state.dfm.loc[st.session_state.rows_added:]
@@ -124,7 +117,8 @@ def modify_tab():
             
             if out_selected_fields in int_col:
                 out_edit_input = st.number_input(
-                    'Enter new value:',
+                    'Enter new value: ',#(minimum 200)',
+                    # min_value=200,
                     key="out_edit_input_out"
                 )
             elif out_selected_fields in str_col:
@@ -135,27 +129,28 @@ def modify_tab():
             else:
                 out_edit_input = st.date_input(
                     'Enter new value:',
+                    step=1,  # Ensures input increments in steps of 1
                     key="out_edit_date_out"
                 )
                 
             if st.button('Confirm', key="out_confirm"):
-                st.session_state.dfm = st.session_state.dfm.loc[
-                    (st.session_state.dfm['Product Name'] == in_selected_product) & 
-                    (st.session_state.dfm['Components'] == in_selected_components), 
-                    in_selected_fields
-                ] = in_edit_input
+                st.session_state.dfm.loc[
+                    (st.session_state.dfm['Product Name'] == out_selected_product) & 
+                    (st.session_state.dfm['Components'] == out_selected_components), 
+                    out_selected_fields
+                ] = out_edit_input
 
-                st.session_state.df = st.session_state.df.loc[
-                    (st.session_state.df['Product Name'] == in_selected_product) & 
-                    (st.session_state.df['Components'] == in_selected_components), 
-                    in_selected_fields
-                ] = in_edit_input
+                st.session_state.df.loc[
+                    (st.session_state.df['Product Name'] == out_selected_product) & 
+                    (st.session_state.df['Components'] == out_selected_components), 
+                    out_selected_fields
+                ] = out_edit_input
                 
                 st.success('Data has been successfully changed!')
     
             st.dataframe(st.session_state.dfm[
-                (st.session_state.dfm['Product Name'] == in_selected_product) & 
-                (st.session_state.dfm['Components'] == in_selected_components)
+                (st.session_state.dfm['Product Name'] == out_selected_product) & 
+                (st.session_state.dfm['Components'] == out_selected_components)
             ])
 
             with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
