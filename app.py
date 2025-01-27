@@ -1,5 +1,5 @@
 import streamlit as st
-# from streamlit_gsheets import GSheetsConnection
+
 st.set_page_config(
     page_title="Machine Production Scheduler",
     page_icon="🦾",
@@ -12,75 +12,10 @@ from modify import modify_tab
 from product_list_change import product_list_change
 from product_catalogue import product_catalogue
 from scheduler import late_products, calculate_waiting_time, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days
-from streamlit_gsheets import GSheetsConnection
 
-# Create a connection object.
-conn = st.connection("gsheets", type=GSheetsConnection)
+# df, dfm, component_waiting_df, product_waiting_df, late_df
+df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
 
-df = conn.read()
-
-st.dataframe(df)
-# # Print results.
-# for row in df.itertuples():
-#     st.write(f"{row.name} has a :{row.pet}:")
-    
-# import gspread
-# from google.oauth2.service_account import Credentials
-
-# # Authenticate and connect to Google Sheets
-# def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
-#     # Define the required scopes
-#     scopes = [
-#         'https://www.googleapis.com/auth/spreadsheets',
-#         'https://www.googleapis.com/auth/drive'
-#     ]
-    
-#     # Use the correct keyword argument 'scopes'
-#     credentials = Credentials.from_service_account_file(creds_json, scopes=scopes)
-#     client = gspread.authorize(credentials)
-#     spreadsheet = client.open(spreadsheet_name)
-#     return spreadsheet.worksheet(sheet_name)
-# import gspread
-# from google.oauth2.service_account import Credentials
-
-# # Authenticate and connect to Google Sheets
-# def connect_to_gsheet(creds_json, spreadsheet_name, sheet_name):
-#     scope = ['https://www.googleapis.com/auth/spreadsheets',
-#              # "https://spreadsheets.google.com/feeds", 
-#              # "https://www.googleapis.com/auth/drive.file", 
-#              "https://www.googleapis.com/auth/drive"]
-    
-#     credentials = Credentials.from_service_account_file(creds_json, scope)
-#     client = gspread.authorize(credentials)
-#     spreadsheet = client.open(spreadsheet_name)  
-#     return spreadsheet.worksheet(sheet_name)  # Access specific sheet by name
-
-# # Google Sheet credentials and details
-# SPREADSHEET_NAME = 'Product Details_v1'
-# SHEET_NAME = 'P'
-# CREDENTIALS_FILE = 'ktp credential.json'
-
-# # Connect to the Google Sheet
-# sheet_by_name = connect_to_gsheet(CREDENTIALS_FILE, SPREADSHEET_NAME, sheet_name=SHEET_NAME)
-
-# # Main Title
-# st.title("Machine Production Scheduler")
-
-# # st.write(st.session_state)
-
-# # Read Data from Google Sheets
-# def read_data():
-#     data = sheet_by_name.get_all_records()  # Get all records from Google Sheet
-#     return pd.DataFrame(data)
-
-# # Add Data to Google Sheets
-# def add_data(row):
-#     sheet_by_name.append_row(row)  # Append the row to the Google Sheet
-
-
-# # df, dfm, component_waiting_df, product_waiting_df, late_df
-# df = read_data()
-# df = pd.read_excel('Product Details_v1.xlsx', sheet_name='P')
 df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
 df['Start Time'] = pd.NaT  # Initialize as empty datetime
@@ -94,15 +29,8 @@ df = df.sort_values(by=['Promised Delivery Date',
 
 dfm = df.copy()
 dfm = schedule_production_with_days(dfm)
-dfm = adjust_end_time_and_start_time(dfm)
+# dfm = adjust_end_time_and_start_time(dfm)
 dfm = dfm.sort_values(by=['Start Time','End Time','Promised Delivery Date'])
-# dfm.loc[
-#     (dfm['Process Type'] == 'In House') &
-#     (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_In House'
-# dfm.loc[
-#     (dfm['Process Type'] == 'Outsource') &
-#     (dfm['End Time'] > dfm['Promised Delivery Date']), 'Status'] = 'Completed_Outsource'
-# dfm.loc[(dfm['End Time'] < dfm['Promised Delivery Date']), 'Status'] = 'Late'
 dfm['legend'] = dfm['Components']
 for i in range(len(dfm)):
   if dfm['Machine Number'][i] == 'OutSrc':
@@ -149,12 +77,9 @@ tabs = st.tabs([
     ])
 
 # Tab Content
-with tabs[0]:  # Visualisation Tab
-    # if "dfm" in st.session_state:
-        # dfm = st.session_state.dfm
+with tabs[0]:
     visualisation_tab()
 
-    
 with tabs[1]:
     modify_tab()
 
@@ -169,15 +94,3 @@ with tabs[3]:
 
 # with tabs[5]:
 #     results()
-
-
-# if "late_df" not in st.session_state:
-st.session_state.late_df = late_df
-# if "df" not in st.session_state:
-st.session_state.df = df
-# if "dfm" not in st.session_state:  # Adjust Start and End Times
-st.session_state.dfm = dfm
-# if "component_waiting_df" not in st.session_state:
-st.session_state.component_waiting_df = component_waiting_df
-# if "product_waiting_df" not in st.session_state:
-st.session_state.product_waiting_df = product_waiting_df
