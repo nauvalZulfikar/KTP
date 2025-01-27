@@ -114,7 +114,7 @@ def visualisation_tab():
                     st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)
                 st.success("Progress reset successfully.")
 
-        st.write(st.session_state.dfm)
+        st.write(st.session_state.dfm[st.session_state.dfm['Quantity Required']>0])
         st.write(f'{st.session_state.rows_added+1}th step')
         
         # # Dropdown (Selectbox) for visualization options
