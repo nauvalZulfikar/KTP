@@ -40,6 +40,10 @@ def visualisation_tab():
         st.session_state.df_progress = st.session_state.df.copy() # Initially show the full DataFrame
     if "auto_refresh" not in st.session_state:
         st.session_state.auto_refresh = False   # Auto-refresh toggle
+    if "rows_added" not in st.session_state:
+        st.session_state.rows_added = len(st.session_state.dfm)+1 # Start with all rows added
+    if "total_rows" not in st.session_state:
+        st.session_state.total_rows = len(st.session_state.dfm)+1 # Total rows in the DataFrame
     
     # Layout for buttons
     with st.container():
@@ -112,11 +116,6 @@ def visualisation_tab():
         st.write(st.session_state.dfm)
         st.write(f'{st.session_state.rows_added+1}th step')
         
-    if "rows_added" not in st.session_state:
-        st.session_state.rows_added = len(st.session_state.dfm)+1 # Start with all rows added
-    if "total_rows" not in st.session_state:
-        st.session_state.total_rows = len(st.session_state.dfm)+1 # Total rows in the DataFrame
-
         # # Dropdown (Selectbox) for visualization options
         # visualization_options = [
         #     "Gantt Chart",
