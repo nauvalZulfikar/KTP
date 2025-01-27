@@ -76,10 +76,10 @@ def schedule_production_with_days(data):
         # This dictionary will track when each machine is free or busy
         machine_schedule = defaultdict(list)
         for machine in data['Machine Number'].unique():
-          machine_schedule[machine].append(
-              (data['Order Processing Date'].min().replace(hour=WORK_START, minute=0),
-              data['Order Processing Date'].min().replace(hour=WORK_START, minute=0),
-              None))
+            machine_schedule[machine].append(
+                (data['Order Processing Date'].min().replace(hour=WORK_START, minute=0),
+                 data['Order Processing Date'].min().replace(hour=WORK_START, minute=0),
+                 None))
 
         # Initialize the last available time for each machine to 9:00 AM on the first day
         machine_last_end = {
@@ -88,7 +88,8 @@ def schedule_production_with_days(data):
         }
 
         # Go through each task, one by one
-        for i in range(len(data)):
+        i = 0
+        while i < len(data):  # Use a while loop to dynamically handle new rows
             # This helps ensure we prioritize the most urgent tasks
             data = data.sort_values(by=['Promised Delivery Date', 'Product Name', 'Components']).reset_index(drop=True)
 
@@ -117,7 +118,8 @@ def schedule_production_with_days(data):
                 # Save the Start and End Times for this task
                 data.at[i, 'Start Time'] = start_time
                 data.at[i, 'End Time'] = end_time
-                continue  # Move to the next task
+                i += 1  # Move to the next task
+                continue
 
             # ==========================
             # MACHINE SCHEDULING
@@ -172,28 +174,24 @@ def schedule_production_with_days(data):
                 # ==========================
                 # If the task does not fit, split it into smaller pieces
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
-                # set_end_time = min(run_time_minutes,available_minutes)
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
 
                 # Update the task with the producible quantity
-                remaining_task = data.iloc[i].to_frame().T.copy()
-                data.at[i, 'Quantity Required'] = producible_qty
+                data.at[i, 'Quantity Required'] = int(producible_qty)
 
                 # If there’s remaining work, create a new task for it
                 if producible_qty > 0:
-                    remaining_qty = remaining_task['Quantity Required'] - producible_qty
-                    # remaining_task = data.iloc[i].copy()
+                    remaining_qty = data['Quantity Required'][i] - producible_qty
+                    remaining_task = data.iloc[i].copy()
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
                     remaining_task['End Time'] = None
-                    # Add the new task to the dataset
-                    data = pd.concat([data, remaining_task], ignore_index=True)
+                    data.loc[len(data)] = remaining_task  # Add the new task to the dataset
 
                 # Schedule the producible part of the task in this gap
                 gap_start_time = adjusted_gap_start
                 gap_end_time = gap_end
                 break  # Exit the loop as the task is now partially scheduled
-
 
             # ==========================
             # IF NO GAPS
@@ -223,10 +221,12 @@ def schedule_production_with_days(data):
             data.at[i, 'Start Time'] = start_time
             data.at[i, 'End Time'] = end_time
 
+            i += 1  # Move to the next task
+
         # Check if any tasks are still unscheduled
         has_empty_rows = data['Start Time'].isna().any() or data['End Time'].isna().any()
 
-    data['Quantity Required'] = data['Quantity Required'].apply(lambda x:round(x))
+    data['Quantity Required'] = data['Quantity Required'].apply(lambda x: round(x))
 
     # Return the completed schedule
     return data
@@ -236,11 +236,12 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
     has_empty_rows = True
     # Keep trying to schedule tasks until all tasks have a Start and End Time
     while has_empty_rows:
-
         # Go through each task, one by one
-        for i in range(len(data)):
+        i = 0
+        while i < len(data):  # Use a while loop to dynamically handle new rows
             # Skip tasks that already have a start and end time
             if not pd.isna(data.at[i, 'Start Time']) and not pd.isna(data.at[i, 'End Time']):
+                i += 1
                 continue
 
             # This helps ensure we prioritize the most urgent tasks
@@ -281,7 +282,8 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
                 # Save the Start and End Times for this task
                 data.at[i, 'Start Time'] = start_time
                 data.at[i, 'End Time'] = end_time
-                continue  # Move to the next task
+                i += 1  # Move to the next task
+                continue
 
             # ==========================
             # MACHINE SCHEDULING
@@ -345,28 +347,27 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
                 # ==========================
                 # If the task does not fit, split it into smaller pieces
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
-                # set_end_time = min(run_time_minutes,available_minutes)
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
 
                 # Update the task with the producible quantity
-                remaining_task = data.iloc[i].to_frame().T.copy()
-                data.at[i, 'Quantity Required'] = producible_qty
+                data.at[i, 'Quantity Required'] = int(producible_qty)
 
                 # If there’s remaining work, create a new task for it
                 if producible_qty > 0:
-                    remaining_qty = remaining_task['Quantity Required'] - producible_qty
-                    # remaining_task = data.iloc[i].copy()
+                    remaining_qty = data['Quantity Required'][i] - producible_qty
+                    remaining_task = data.iloc[i].copy()
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
                     remaining_task['End Time'] = None
-                    # Add the new task to the dataset
-                    data = pd.concat([data, remaining_task], ignore_index=True)
+
+                    # Append the new task to the DataFrame
+                    next_index = data.index[-1] + 1  # Determine the next available index
+                    data.loc[next_index] = remaining_task  # Add the new task
 
                 # Schedule the producible part of the task in this gap
                 gap_start_time = adjusted_gap_start
                 gap_end_time = gap_end
                 break  # Exit the loop as the task is now partially scheduled
-
 
             # ==========================
             # IF NO GAPS
@@ -396,10 +397,12 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
             data.at[i, 'Start Time'] = start_time
             data.at[i, 'End Time'] = end_time
 
+            i += 1  # Move to the next task
+
         # Check if any tasks are still unscheduled
         has_empty_rows = data['Start Time'].isna().any() or data['End Time'].isna().any()
 
-    data['Quantity Required'] = data['Quantity Required'].apply(lambda x:round(x))
+    data['Quantity Required'] = data['Quantity Required'].apply(lambda x: round(x))
 
     # Return the completed schedule
     return data
