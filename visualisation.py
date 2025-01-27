@@ -109,7 +109,7 @@ def visualisation_tab():
                     st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)
                 st.success("Progress reset successfully.")
 
-
+        st.write(st.session_state.dfm)
         st.write(f'{st.session_state.rows_added+1}th step')
         
     if "rows_added" not in st.session_state:
