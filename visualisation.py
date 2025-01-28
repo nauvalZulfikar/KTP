@@ -35,40 +35,45 @@ def visualisation_tab():
 
     # Initialize session state for progressive visualization
     if "dfm_progress" not in st.session_state:
-        st.session_state.dfm_progress = st.session_state.dfm.copy() # Initially show the full DataFrame
+        st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
     if "df_progress" not in st.session_state:
-        st.session_state.df_progress = st.session_state.df.copy() # Initially show the full DataFrame
+        st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
     if "auto_refresh" not in st.session_state:
-        st.session_state.auto_refresh = False   # Auto-refresh toggle
+        st.session_state.auto_refresh = False  # Auto-refresh toggle
     if "rows_added" not in st.session_state:
-        st.session_state.rows_added = len(st.session_state.dfm) # Start with all rows added
-    
+        st.session_state.rows_added = len(st.session_state.dfm) + 1  # Start with all rows added
+    if "total_rows" not in st.session_state:
+        st.session_state.total_rows = len(st.session_state.dfm) + 1  # Total rows in the DataFrame
+    if "dataframe_history" not in st.session_state:
+        st.session_state.dataframe_history = []  # List to store the last 4 dataframes
+
     # Layout for buttons
     with st.container():
         col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
-        
+
         with col1:
             if st.button("Start"):
                 if not st.session_state.auto_refresh:  # If not already animating
-                    
                     if st.session_state.rows_added == 0:  # If starting fresh
-                        
                         # Initialize the progress DataFrame
                         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-                        
+
                         st.session_state.machine_schedule = defaultdict(list)
                         for machine in st.session_state.df['Machine Number'].unique():
                             st.session_state.machine_schedule[machine].append(
                                 (st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
-                                st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
-                                None))
-                        
-                        st.session_state.machine_last_end = defaultdict(lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
+                                 st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
+                                 None))
+
+                        st.session_state.machine_last_end = defaultdict(
+                            lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
                         # Extract machine state for rows up to `st.session_state.rows_added`
                         for _, row in st.session_state.dfm.iloc[:st.session_state.rows_added].iterrows():
-                            st.session_state.machine_schedule[row['Machine Number']].append((row['Start Time'], row['End Time'], row['UniqueID']))
-                            st.session_state.machine_last_end[row['Machine Number']] = max(st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
-                    
+                            st.session_state.machine_schedule[row['Machine Number']].append(
+                                (row['Start Time'], row['End Time'], row['UniqueID']))
+                            st.session_state.machine_last_end[row['Machine Number']] = max(
+                                st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
+
                     st.session_state.auto_refresh = True  # Enable auto-refresh
         with col2:
             if st.button("Pause"):
@@ -82,23 +87,27 @@ def visualisation_tab():
                 dfm1 = st.session_state.dfm.iloc[:pause_index].copy().reset_index(drop=True)  # Scheduled portion
                 dfm2 = st.session_state.dfm.iloc[pause_index:].copy().sort_values(
                     by=['Start Time', 'End Time', 'Promised Delivery Date']
-                    ).reset_index(drop=True)  # Remaining unscheduled portion
+                ).reset_index(drop=True)  # Remaining unscheduled portion
 
                 # Reset unscheduled rows
                 dfm2['Start Time'] = pd.NaT
                 dfm2['End Time'] = pd.NaT
 
                 # Reschedule using the existing state
-                dfm2 = reschedule_production_with_days(dfm2, st.session_state.machine_last_end, st.session_state.machine_schedule, dfm1)
+                dfm2 = reschedule_production_with_days(dfm2, st.session_state.machine_last_end,
+                                                      st.session_state.machine_schedule, dfm1)
                 dfm2 = adjust_end_time_and_start_time(dfm2).sort_values(
                     by=['Start Time', 'End Time', 'Promised Delivery Date'])
                 # Combine both parts
-                st.session_state.dfm = pd.concat([dfm1, dfm2], ignore_index=True)
-                st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Quantity Required']>0]
-                st.session_state.dfm = st.session_state.dfm.reset_index(drop=True)
-                for i in range(len(st.session_state.dfm)):
-                    if st.session_state.dfm['Start Time'][i].hour>9:
-                        st.session_state.dfm.at[i,'Start Time'].replace(hour=9)
+                new_dataframe = pd.concat([dfm1, dfm2], ignore_index=True)
+
+                # Append the new dataframe to the history list
+                st.session_state.dataframe_history.append(new_dataframe)
+
+                # Ensure only the last 4 dataframes are retained
+                if len(st.session_state.dataframe_history) > 4:
+                    st.session_state.dataframe_history.pop(0)  # Remove the oldest dataframe
+
                 st.session_state.rows_added = pause_index  # Restart animation from the current index
                 st.info("Rescheduling initiated. Click 'Start' to animate again.")
         with col4:
@@ -112,26 +121,7 @@ def visualisation_tab():
                     st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)
                 st.success("Progress reset successfully.")
 
-        # st.write(st.session_state.dfm[st.session_state.dfm['Quantity Required']>0])
-        st.write(f'{st.session_state.rows_added+1}th step')
-        
-    if "total_rows" not in st.session_state:
-        st.session_state.total_rows = len(st.session_state.dfm) # Total rows in the DataFrame
-        
-        # # Dropdown (Selectbox) for visualization options
-        # visualization_options = [
-        #     "Gantt Chart",
-        #     "Gantt Chart (Unscheduled)",
-        #     "Machine Utilisation",
-        #     "Product Waiting Time",
-        #     "Component Waiting Time",
-        #     "Product Components Status"
-        # ]
-
-        # selected_visualization = st.selectbox(
-        #     "Choose a visualization:",
-        #     visualization_options
-        # )
+        st.write(f'{st.session_state.rows_added + 1}th step')
 
     # Progressive animation
     if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -148,13 +138,12 @@ def visualisation_tab():
         st.session_state.auto_refresh = False
         st.success("Animation complete! Reload the page to reset.")
 
-
     col1, col2 = st.columns(2)
 
-# =========================================================================================
+    # =========================================================================================
 
     with col1:
-        # if selected_visualization == "Gantt Chart":
+        # Gantt Chart
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
@@ -173,7 +162,7 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
-                st.plotly_chart(fig_static, use_container_width=True, key = 'gantt_chart_static')
+                st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
         else:
             # Display the progressive Gantt chart during animation
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
@@ -191,80 +180,19 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
-                st.plotly_chart(fig_animated, use_container_width=True, key = 'gantt_chart_animated')
+                st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
 
-# =========================================================================================
-    
-        # elif selected_visualization == "Gantt Chart (Unscheduled)":        
-        # Step 1: Calculate durations
-        st.markdown("### Gantt Chart (Unscheduled)")
-        data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
-        data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
-        
-        # Step 2: Adjust durations for working hours and days
-        data['Adjusted End Time'] = data.apply(
-            lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
-            axis=1)
-        
-        # Step 3: Create a horizontal bar chart
-        gcu_static = px.bar(
-            data,
-            x="Duration",  # Horizontal axis
-            y="Product Name",  # Vertical axis
-            color="legend",  # Color by components
-            orientation="h",  # Horizontal bars
-            labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-            # title="Horizontal Bar Chart of Task Durations"
-        )
-
-        gcu_static.update_layout(
-            xaxis_title="Task Duration (minutes)",
-            yaxis_title="Products",
-            legend_title="Components",
-            template="plotly_white"
-        )
-
-        # Step 4: Integrate into Streamlit
-        st.plotly_chart(gcu_static, use_container_width=True,key='gantt_chart_unscheduled')
-
-# =========================================================================================
-
-        # elif selected_visualization == "Product Waiting Time":
-        # Create a bar chart
-        st.markdown("### Product Waiting Time")
-        fig = px.bar(
-            st.session_state.product_waiting_df,
-            x="Product Name",
-            y="Average Days",
-            text="Formatted Time",
-            # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
-            title="Average Product Waiting Time",
-            color="Product Name",
-        )
-
-        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        fig.update_layout(
-            xaxis_title="Product Name",
-            yaxis_title="Waiting Time",
-            template="plotly_white",
-            showlegend=True,
-        )
-
-        # Integrate into Streamlit
-        # st.title("Machine Utilization Visualization")
-        st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
-
-# =========================================================================================
+    # =========================================================================================
 
     with col2:
-        # Ensure scatter plot DataFrame is initialised
+        # Product Components Status
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
             st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
-        st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
+        st.session_state.df_scatter_progress.index = range(1, len(st.session_state.df_scatter_progress) + 1)
 
         # Process the current row for the scatter plot
-        current_row_index = st.session_state.rows_added  # Sync progression with Gantt chart    
+        current_row_index = st.session_state.rows_added  # Sync progression with Gantt chart
         if current_row_index < len(st.session_state.df_scatter_progress):
             # Get the current row to process
             current_row = st.session_state.df_scatter_progress.iloc[current_row_index]
@@ -277,7 +205,7 @@ def visualisation_tab():
                     st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed_In House'
                 elif current_row['End Time'] > current_row['Promised Delivery Date']:
                     st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Late'
-  
+
         # Assign colors for scatter plot
         status_colors = {
             'InProgress_Outsource': 'gray',
@@ -291,7 +219,6 @@ def visualisation_tab():
         # Create scatter plot
         fig = go.Figure()
 
-        # for _, row in st.session_state.df_scatter_progress.iloc[:st.session_state.rows_added].iterrows():
         for _, row in st.session_state.df_scatter_progress.iterrows():
             fig.add_trace(go.Scatter(
                 x=[row['Product Name']],
@@ -314,69 +241,3 @@ def visualisation_tab():
 
         # Display the scatter plot
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
-
-# =========================================================================================
- 
-        # elif selected_visualization == "Machine Utilisation":
-        # Calculate machine utilization
-        st.markdown("### Machine Utilisation")
-        average_utilization = calculate_machine_utilization(st.session_state.dfm)
-
-        # Prepare data for visualization
-        utilization_df = average_utilization.reset_index()
-        utilization_df.columns = ["Machine Number", "Average Utilization"]
-        utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
-
-        # Create a bar chart
-        fig = px.bar(
-            utilization_df,
-            x="Machine Number",
-            y="Average Utilization (%)",
-            text="Average Utilization (%)",
-            labels={"Average Utilization (%)": "Utilization (%)", "Machine Number": "Machine"},
-            # title="Average Daily Machine Utilization",
-            color="Machine Number",
-        )
-
-        fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        fig.update_layout(
-            xaxis_title="Machine",
-            yaxis_title="Utilization (%)",
-            template="plotly_white",
-            showlegend=True,
-        )
-
-        # Integrate into Streamlit
-        # st.title("Machine Utilization Visualization")
-        st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
-
-# =========================================================================================
-    
-        # elif selected_visualization == "Component Waiting Time":
-        # Create a bar chart
-        st.markdown("### Component Waiting Time")
-        fig = px.bar(
-            st.session_state.component_waiting_df,
-            x="Components",
-            y="Average Days",
-            text="Formatted Time",
-            # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
-            title="Average Components Waiting Time",
-            color="Components",
-        )
-
-        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-        fig.update_layout(
-            xaxis_title="Components",
-            yaxis_title="Waiting Time",
-            template="plotly_white",
-            showlegend=True,
-        )
-
-        # Integrate into Streamlit
-        # st.title("Machine Utilization Visualization")
-        st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
-
-# =========================================================================================
-    
-
