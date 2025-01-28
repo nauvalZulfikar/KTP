@@ -46,6 +46,14 @@ def visualisation_tab():
         st.session_state.total_rows = len(st.session_state.dfm) + 1  # Total rows in the DataFrame
     if "dataframe_history" not in st.session_state:
         st.session_state.dataframe_history = []  # List to store the last 4 dataframes
+    if "machine_utilization_history" not in st.session_state:
+        st.session_state.machine_utilization_history = []  # List to store machine utilization dataframes
+    if "component_waiting_history" not in st.session_state:
+        st.session_state.component_waiting_history = []  # List to store component waiting time dataframes
+    if "product_waiting_history" not in st.session_state:
+        st.session_state.product_waiting_history = []  # List to store product waiting time dataframes
+    if "late_df_history" not in st.session_state:
+        st.session_state.late_df_history = []  # List to store late products dataframes
 
     # Layout for buttons
     with st.container():
@@ -103,6 +111,18 @@ def visualisation_tab():
 
                 # Append the new dataframe to the history list
                 st.session_state.dataframe_history.append(new_dataframe)
+
+                # Calculate derived dataframes
+                machine_utilization_df = calculate_machine_utilization(new_dataframe.copy())
+                component_waiting_df = calculate_waiting_time(new_dataframe, group_by_column='Components', date_columns=('Order Processing Date', 'Start Time'))
+                product_waiting_df = calculate_waiting_time(new_dataframe, group_by_column='Product Name', date_columns=('Order Processing Date', 'Start Time'))
+                late_df = late_products(new_dataframe)
+
+                # Append derived dataframes to their history lists
+                st.session_state.machine_utilization_history.append(machine_utilization_df)
+                st.session_state.component_waiting_history.append(component_waiting_df)
+                st.session_state.product_waiting_history.append(product_waiting_df)
+                st.session_state.late_df_history.append(late_df)
 
                 # Ensure only the last 4 dataframes are retained
                 if len(st.session_state.dataframe_history) > 4:
