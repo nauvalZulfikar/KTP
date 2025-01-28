@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 from collections import defaultdict
-from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days
+from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
 # Create Bar Charts
@@ -127,6 +127,10 @@ def visualisation_tab():
                 # Ensure only the last 4 dataframes are retained
                 if len(st.session_state.dataframe_history) > 4:
                     st.session_state.dataframe_history.pop(0)  # Remove the oldest dataframe
+                    st.session_state.machine_utilization_history.pop(0)
+                    st.session_state.component_waiting_history.pop(0)
+                    st.session_state.product_waiting_history.pop(0)
+                    st.session_state.late_df_history.pop(0)
 
                 st.session_state.rows_added = pause_index  # Restart animation from the current index
                 st.info("Rescheduling initiated. Click 'Start' to animate again.")
