@@ -35,13 +35,22 @@ def product_catalogue():
     for title, (current_df_key, history_key) in dataframes.items():
         st.subheader(title)
 
-        # Display the current dataframe if it exists
-        if current_df_key in st.session_state:
-            st.write(st.session_state[current_df_key])
+        # Create columns for the current dataframe and its history
+        num_columns = 4  # Maximum number of columns
+        columns = st.columns(num_columns)
 
-        # Display the history if it exists
+        # Display the current dataframe in the first column
+        if current_df_key in st.session_state:
+            with columns[0]:
+                st.write("**Current**")
+                st.write(st.session_state[current_df_key])
+
+        # Display the history in the remaining columns
         if history_key in st.session_state and st.session_state[history_key]:
-            with st.expander(f"{title} History"):
-                for i, df in enumerate(st.session_state[history_key]):
-                    st.write(f"Version {i + 1}")
-                    st.write(df)
+            for i, df in enumerate(st.session_state[history_key]):
+                if i + 1 < num_columns:  # Ensure we don't exceed the number of columns
+                    with columns[i + 1]:
+                        st.write(f"**Version {i + 1}**")
+                        st.write(df)
+                else:
+                    break  # Stop if we reach the maximum number of columns
