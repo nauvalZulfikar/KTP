@@ -18,9 +18,6 @@ def product_catalogue():
             if col in display_df.columns and pd.api.types.is_datetime64_any_dtype(display_df[col]):
                 display_df[col] = display_df[col].dt.strftime('%Y-%m-%d %H:%M')
 
-        # Display the DataFrame
-        st.write(display_df[display_df['Quantity Required']>0].sort_values(by=['Start Time', 'End Time']))
-
     st.subheader("Production Scheduling Results")
 
     # Define the dataframes and their history to display
