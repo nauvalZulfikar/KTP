@@ -206,6 +206,67 @@ def visualisation_tab():
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
 
+# =========================================================================================
+    
+        # elif selected_visualization == "Gantt Chart (Unscheduled)":        
+        # Step 1: Calculate durations
+        st.markdown("### Gantt Chart (Unscheduled)")
+        data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
+        data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
+        
+        # Step 2: Adjust durations for working hours and days
+        data['Adjusted End Time'] = data.apply(
+            lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
+            axis=1)
+        
+        # Step 3: Create a horizontal bar chart
+        gcu_static = px.bar(
+            data,
+            x="Duration",  # Horizontal axis
+            y="Product Name",  # Vertical axis
+            color="legend",  # Color by components
+            orientation="h",  # Horizontal bars
+            labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+            # title="Horizontal Bar Chart of Task Durations"
+        )
+
+        gcu_static.update_layout(
+            xaxis_title="Task Duration (minutes)",
+            yaxis_title="Products",
+            legend_title="Components",
+            template="plotly_white"
+        )
+
+        # Step 4: Integrate into Streamlit
+        st.plotly_chart(gcu_static, use_container_width=True,key='gantt_chart_unscheduled')
+
+# =========================================================================================
+
+        # elif selected_visualization == "Product Waiting Time":
+        # Create a bar chart
+        st.markdown("### Product Waiting Time")
+        fig = px.bar(
+            st.session_state.product_waiting_df,
+            x="Product Name",
+            y="Average Days",
+            text="Formatted Time",
+            # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
+            title="Average Product Waiting Time",
+            color="Product Name",
+        )
+
+        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        fig.update_layout(
+            xaxis_title="Product Name",
+            yaxis_title="Waiting Time",
+            template="plotly_white",
+            showlegend=True,
+        )
+
+        # Integrate into Streamlit
+        # st.title("Machine Utilization Visualization")
+        st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
+
     # =========================================================================================
 
     with col2:
@@ -265,3 +326,67 @@ def visualisation_tab():
 
         # Display the scatter plot
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+
+# =========================================================================================
+ 
+        # elif selected_visualization == "Machine Utilisation":
+        # Calculate machine utilization
+        st.markdown("### Machine Utilisation")
+        average_utilization = calculate_machine_utilization(st.session_state.dfm)
+
+        # Prepare data for visualization
+        utilization_df = average_utilization.reset_index()
+        utilization_df.columns = ["Machine Number", "Average Utilization"]
+        utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
+
+        # Create a bar chart
+        fig = px.bar(
+            utilization_df,
+            x="Machine Number",
+            y="Average Utilization (%)",
+            text="Average Utilization (%)",
+            labels={"Average Utilization (%)": "Utilization (%)", "Machine Number": "Machine"},
+            # title="Average Daily Machine Utilization",
+            color="Machine Number",
+        )
+
+        fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        fig.update_layout(
+            xaxis_title="Machine",
+            yaxis_title="Utilization (%)",
+            template="plotly_white",
+            showlegend=True,
+        )
+
+        # Integrate into Streamlit
+        # st.title("Machine Utilization Visualization")
+        st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
+
+# =========================================================================================
+    
+        # elif selected_visualization == "Component Waiting Time":
+        # Create a bar chart
+        st.markdown("### Component Waiting Time")
+        fig = px.bar(
+            st.session_state.component_waiting_df,
+            x="Components",
+            y="Average Days",
+            text="Formatted Time",
+            # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
+            title="Average Components Waiting Time",
+            color="Components",
+        )
+
+        # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+        fig.update_layout(
+            xaxis_title="Components",
+            yaxis_title="Waiting Time",
+            template="plotly_white",
+            showlegend=True,
+        )
+
+        # Integrate into Streamlit
+        # st.title("Machine Utilization Visualization")
+        st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
+
+# =========================================================================================
