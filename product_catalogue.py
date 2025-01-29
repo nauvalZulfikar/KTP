@@ -11,12 +11,13 @@ def product_catalogue():
     # Use a temporary DataFrame for display purposes
     if 'dfm' in st.session_state:
         display_df = st.session_state.dfm.drop(columns=['Status', 'wait_time', 'legend','Daily Utilization'], errors='ignore')
-        st.write(display_df[display_df['Quantity Required'] > 0].sort_values(by=['Start Time', 'End Time']))
 
         # Format date columns in `display_df` only for display
         for col in df_list:
             if col in display_df.columns and pd.api.types.is_datetime64_any_dtype(display_df[col]):
                 display_df[col] = display_df[col].dt.strftime('%Y-%m-%d %H:%M')
+                
+        st.write(display_df[display_df['Quantity Required'] > 0].sort_values(by=['Start Time', 'End Time']))
 
     st.subheader("Production Scheduling Results")
 
