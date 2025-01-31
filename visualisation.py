@@ -186,11 +186,11 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
+                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_static = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -211,6 +211,7 @@ def visualisation_tab():
             # Display the progressive Gantt chart during animation
             # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
+                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_animated = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -232,7 +233,6 @@ def visualisation_tab():
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Gantt Chart (Unscheduled)
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -243,6 +243,7 @@ def visualisation_tab():
             axis=1)
         
         # Create a horizontal bar chart
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         gcu_static = px.bar(
             data,
             x="Duration",  # Horizontal axis
