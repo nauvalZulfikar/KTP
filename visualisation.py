@@ -313,10 +313,10 @@ def visualisation_tab():
 
         # Assign colors for scatter plot
         status_colors = {
-            'InProgress_Outsource': '#0084E8',
-            'InProgress_In House': '#004DB2',
-            'Completed_Outsource': 'darkgreen',
-            'Completed_In House': 'olivedrab',
+            'InProgress_Outsource': 'fray',
+            'InProgress_In House': 'dimgray',
+            'Completed_Outsource': '#FB8A12',
+            'Completed_In House': '#FFA515',
             'Late': 'red'
         }
         st.session_state.df_scatter_progress['color'] = st.session_state.df_scatter_progress['status'].map(status_colors)
