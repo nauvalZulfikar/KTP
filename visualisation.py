@@ -8,17 +8,20 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
-# Inject CSS for white borders around each visualization
-st.markdown("""
-    <style>
-        .plot-container {
-            border: 2px solid white;  /* White border */
+def add_custom_css():
+    st.markdown(
+        """
+        <style>
+        .visualization-container {
+            border: 2px solid white;
             padding: 10px;
-            border-radius: 5px;  /* Rounded corners */
+            border-radius: 5px;
             margin-bottom: 20px;
         }
-    </style>
-""", unsafe_allow_html=True)
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -180,11 +183,11 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 fig_static = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -220,12 +223,13 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
-                st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Step 1: Calculate durations
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -236,7 +240,6 @@ def visualisation_tab():
             axis=1)
         
         # Step 3: Create a horizontal bar chart
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         gcu_static = px.bar(
             data,
             x="Duration",  # Horizontal axis
@@ -262,8 +265,8 @@ def visualisation_tab():
 
         # elif selected_visualization == "Product Waiting Time":
         # Create a bar chart
-        st.markdown("### Product Waiting Time")
         st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown("### Product Waiting Time")
         fig = px.bar(
             st.session_state.product_waiting_df,
             x="Product Name",
@@ -291,6 +294,7 @@ def visualisation_tab():
 
     with col2:
         # Product Components Status
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
             st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
@@ -346,11 +350,13 @@ def visualisation_tab():
 
         # Display the scatter plot
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
  
         # elif selected_visualization == "Machine Utilisation":
         # Calculate machine utilization
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.markdown("### Machine Utilisation")
         average_utilization = calculate_machine_utilization(st.session_state.dfm)
 
@@ -381,11 +387,13 @@ def visualisation_tab():
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
         st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
     
         # elif selected_visualization == "Component Waiting Time":
         # Create a bar chart
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.markdown("### Component Waiting Time")
         fig = px.bar(
             st.session_state.component_waiting_df,
@@ -408,5 +416,6 @@ def visualisation_tab():
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
         st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
