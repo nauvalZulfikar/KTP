@@ -7,19 +7,6 @@ import streamlit as st
 from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
-#     )
-
-# # Define a simple CSS style for framing the visualizations
-# frame_css = """
-#     <style>
-#         .plot-container {
-#             border: 2px solid white;  /* White border */
-#             padding: 10px;
-#             border-radius: 5px;  /* Optional: Rounded corners */
-#             margin-bottom: 20px;
-#         }
-#     </style>
-# """
 
 # Inject CSS to frame all visualizations
 st.markdown("""
@@ -32,9 +19,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# # Inject CSS into Streamlit
-# st.markdown(frame_css, unsafe_allow_html=True)
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
