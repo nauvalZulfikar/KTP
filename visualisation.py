@@ -7,20 +7,6 @@ import streamlit as st
 from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
-
-# def add_custom_css():
-#     st.markdown(
-#         """
-#         <style>
-#         .visualization-container {
-#             border: 2px solid white;
-#             padding: 10px;
-#             border-radius: 5px;
-#             margin-bottom: 20px;
-#         }
-#         </style>
-#         """,
-#         unsafe_allow_html=True,
 #     )
 
 # Define a simple CSS style for framing the visualizations
@@ -219,7 +205,9 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
+                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
+                st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
@@ -239,7 +227,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-                st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
+                st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_animated')
                 st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
