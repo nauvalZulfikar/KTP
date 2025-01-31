@@ -183,7 +183,7 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
@@ -207,7 +207,7 @@ def visualisation_tab():
         else:
             # Display the progressive Gantt chart during animation
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_animated = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -229,7 +229,7 @@ def visualisation_tab():
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Step 1: Calculate durations
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -265,7 +265,7 @@ def visualisation_tab():
 
         # elif selected_visualization == "Product Waiting Time":
         # Create a bar chart
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Product Waiting Time")
         fig = px.bar(
             st.session_state.product_waiting_df,
@@ -294,7 +294,7 @@ def visualisation_tab():
 
     with col2:
         # Product Components Status
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
             st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
@@ -356,7 +356,7 @@ def visualisation_tab():
  
         # elif selected_visualization == "Machine Utilisation":
         # Calculate machine utilization
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Machine Utilisation")
         average_utilization = calculate_machine_utilization(st.session_state.dfm)
 
@@ -393,7 +393,7 @@ def visualisation_tab():
     
         # elif selected_visualization == "Component Waiting Time":
         # Create a bar chart
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Component Waiting Time")
         fig = px.bar(
             st.session_state.component_waiting_df,
