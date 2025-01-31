@@ -186,8 +186,8 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
