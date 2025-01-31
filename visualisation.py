@@ -231,18 +231,18 @@ def visualisation_tab():
 # =========================================================================================
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
-        # Step 1: Calculate durations
+        # Gantt Chart (Unscheduled)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
         
-        # Step 2: Adjust durations for working hours and days
+        # Adjust durations for working hours and days
         data['Adjusted End Time'] = data.apply(
             lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
             axis=1)
         
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
-        # Step 3: Create a horizontal bar chart
+        # Create a horizontal bar chart
         gcu_static = px.bar(
             data,
             x="Duration",  # Horizontal axis
@@ -250,7 +250,6 @@ def visualisation_tab():
             color="legend",  # Color by components
             orientation="h",  # Horizontal bars
             labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-            # title="Horizontal Bar Chart of Task Durations"
         )
 
         gcu_static.update_layout(
@@ -260,8 +259,8 @@ def visualisation_tab():
             template="plotly_white"
         )
 
-        # Step 4: Integrate into Streamlit
-        st.plotly_chart(gcu_static, use_container_width=True,key='gantt_chart_unscheduled')
+        # Integrate into Streamlit
+        st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
         st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
