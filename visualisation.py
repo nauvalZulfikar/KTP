@@ -186,11 +186,12 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
+                
+                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_static = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -226,13 +227,12 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
-        st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Step 1: Calculate durations
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -242,6 +242,7 @@ def visualisation_tab():
             lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
             axis=1)
         
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         # Step 3: Create a horizontal bar chart
         gcu_static = px.bar(
             data,
@@ -268,8 +269,8 @@ def visualisation_tab():
 
         # elif selected_visualization == "Product Waiting Time":
         # Create a bar chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Product Waiting Time")
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             st.session_state.product_waiting_df,
             x="Product Name",
@@ -297,7 +298,6 @@ def visualisation_tab():
 
     with col2:
         # Product Components Status
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
             st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
@@ -329,6 +329,7 @@ def visualisation_tab():
         st.session_state.df_scatter_progress['color'] = st.session_state.df_scatter_progress['status'].map(status_colors)
 
         # Create scatter plot
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = go.Figure()
 
         for _, row in st.session_state.df_scatter_progress.iterrows():
@@ -359,7 +360,6 @@ def visualisation_tab():
  
         # elif selected_visualization == "Machine Utilisation":
         # Calculate machine utilization
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Machine Utilisation")
         average_utilization = calculate_machine_utilization(st.session_state.dfm)
 
@@ -369,6 +369,7 @@ def visualisation_tab():
         utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
 
         # Create a bar chart
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             utilization_df,
             x="Machine Number",
@@ -396,8 +397,8 @@ def visualisation_tab():
     
         # elif selected_visualization == "Component Waiting Time":
         # Create a bar chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Component Waiting Time")
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             st.session_state.component_waiting_df,
             x="Components",
