@@ -313,7 +313,7 @@ def visualisation_tab():
 
         # Assign colors for scatter plot
         status_colors = {
-            'InProgress_Outsource': 'fray',
+            'InProgress_Outsource': 'gray',
             'InProgress_In House': 'dimgray',
             'Completed_Outsource': '#FB8A12',
             'Completed_In House': '#FFA515',
