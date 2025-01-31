@@ -186,12 +186,11 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
-                
-                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_static = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -207,11 +206,11 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-                st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
+            st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_animated = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -227,7 +226,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
-                st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
