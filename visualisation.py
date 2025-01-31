@@ -200,11 +200,11 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-                # st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-                # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 fig_animated = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -220,7 +220,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
-                # st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
@@ -236,7 +236,7 @@ def visualisation_tab():
             axis=1)
         
         # Step 3: Create a horizontal bar chart
-        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         gcu_static = px.bar(
             data,
             x="Duration",  # Horizontal axis
@@ -256,14 +256,14 @@ def visualisation_tab():
 
         # Step 4: Integrate into Streamlit
         st.plotly_chart(gcu_static, use_container_width=True,key='gantt_chart_unscheduled')
-        # st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
 
         # elif selected_visualization == "Product Waiting Time":
         # Create a bar chart
         st.markdown("### Product Waiting Time")
-        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         fig = px.bar(
             st.session_state.product_waiting_df,
             x="Product Name",
@@ -285,7 +285,7 @@ def visualisation_tab():
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
         st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
-        # st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
     # =========================================================================================
 
