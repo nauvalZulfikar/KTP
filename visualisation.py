@@ -8,17 +8,17 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
-# Inject CSS for white borders around each visualization
-st.markdown("""
-    <style>
-        .plot-container {
-            border: 2px solid white;  /* White border */
-            padding: 10px;
-            border-radius: 5px;  /* Rounded corners */
-            margin-bottom: 20px;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# # Inject CSS for white borders around each visualization
+# st.markdown("""
+#     <style>
+#         .plot-container {
+#             border: 2px solid white;  /* White border */
+#             padding: 10px;
+#             border-radius: 5px;  /* Rounded corners */
+#             margin-bottom: 20px;
+#         }
+#     </style>
+# """, unsafe_allow_html=True)
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
