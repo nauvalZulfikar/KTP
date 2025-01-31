@@ -8,20 +8,20 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
-# def add_custom_css():
-#     st.markdown(
-#         """
-#         <style>
-#         .visualization-container {
-#             border: 2px solid white;
-#             padding: 10px;
-#             border-radius: 5px;
-#             margin-bottom: 20px;
-#         }
-#         </style>
-#         """,
-#         unsafe_allow_html=True,
-#     )
+def add_custom_css():
+    st.markdown(
+        """
+        <style>
+        .visualization-container {
+            border: 2px solid white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -44,7 +44,7 @@ def create_bar_chart(data, x_col, y_col, color=None):
 
 def visualisation_tab():
     # Add custom CSS for white borders
-    # add_custom_css()
+    add_custom_css()
     
     st.subheader("Visualisation")
 
@@ -186,8 +186,8 @@ def visualisation_tab():
 
     with col1:
         # Gantt Chart
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart")
-        # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
@@ -206,7 +206,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-        # st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
@@ -226,13 +226,13 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-        # st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Gantt Chart (Unscheduled)
-        # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
+        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -258,20 +258,10 @@ def visualisation_tab():
             legend_title="Components",
             template="plotly_white"
         )
-        gcu_static.add_shape(type="rect",
-            xref="paper", yref="paper",
-            x0=-0.06, y0=-0.3, x1=1.06, y1=1.3, 
-            line=dict(
-                #color="RoyalBlue",
-                color="white", #named colors from https://stackoverflow.com/a/72502441/8508004
-                width=2,
-            ),
-        )
-        # gcu_static.show();
 
         # Integrate into Streamlit
         st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
-        # st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
 
