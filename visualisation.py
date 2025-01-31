@@ -225,7 +225,7 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
-                st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
+                st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
         st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
