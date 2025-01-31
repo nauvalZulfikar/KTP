@@ -8,20 +8,35 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
-def add_custom_css():
-    st.markdown(
-        """
-        <style>
-        .visualization-container {
-            border: 2px solid white;
+# def add_custom_css():
+#     st.markdown(
+#         """
+#         <style>
+#         .visualization-container {
+#             border: 2px solid white;
+#             padding: 10px;
+#             border-radius: 5px;
+#             margin-bottom: 20px;
+#         }
+#         </style>
+#         """,
+#         unsafe_allow_html=True,
+#     )
+
+# Define a simple CSS style for framing the visualizations
+frame_css = """
+    <style>
+        .plot-container {
+            border: 2px solid white;  /* White border */
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 5px;  /* Optional: Rounded corners */
             margin-bottom: 20px;
         }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    </style>
+"""
+
+# Inject CSS into Streamlit
+st.markdown(frame_css, unsafe_allow_html=True)
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -44,7 +59,7 @@ def create_bar_chart(data, x_col, y_col, color=None):
 
 def visualisation_tab():
     # Add custom CSS for white borders
-    add_custom_css()
+    # add_custom_css()
     
     st.subheader("Visualisation")
 
@@ -190,7 +205,6 @@ def visualisation_tab():
         if st.session_state.auto_refresh == False:
             # Static Gantt chart displayed immediately when the page loads
             if not st.session_state.auto_refresh:  # Show the static chart if not animating
-                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_static = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -206,12 +220,10 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-                st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
             if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
-                st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
                 fig_animated = px.timeline(
                     st.session_state.dfm_progress,
                     x_start="Start Time",
@@ -226,6 +238,7 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
+                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
                 st.markdown('</div>', unsafe_allow_html=True)
         
@@ -243,7 +256,6 @@ def visualisation_tab():
             axis=1)
         
         # Create a horizontal bar chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         gcu_static = px.bar(
             data,
             x="Duration",  # Horizontal axis
@@ -261,6 +273,7 @@ def visualisation_tab():
         )
 
         # Integrate into Streamlit
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
         st.markdown('</div>', unsafe_allow_html=True)
         
@@ -269,7 +282,6 @@ def visualisation_tab():
         # elif selected_visualization == "Product Waiting Time":
         # Create a bar chart
         st.markdown("### Product Waiting Time")
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             st.session_state.product_waiting_df,
             x="Product Name",
@@ -290,6 +302,7 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
         st.markdown('</div>', unsafe_allow_html=True)
         
@@ -328,7 +341,6 @@ def visualisation_tab():
         st.session_state.df_scatter_progress['color'] = st.session_state.df_scatter_progress['status'].map(status_colors)
 
         # Create scatter plot
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = go.Figure()
 
         for _, row in st.session_state.df_scatter_progress.iterrows():
@@ -352,6 +364,7 @@ def visualisation_tab():
         )
 
         # Display the scatter plot
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -368,7 +381,6 @@ def visualisation_tab():
         utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
 
         # Create a bar chart
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             utilization_df,
             x="Machine Number",
@@ -389,6 +401,7 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -397,7 +410,6 @@ def visualisation_tab():
         # elif selected_visualization == "Component Waiting Time":
         # Create a bar chart
         st.markdown("### Component Waiting Time")
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         fig = px.bar(
             st.session_state.component_waiting_df,
             x="Components",
@@ -418,6 +430,7 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
+        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
         st.markdown('</div>', unsafe_allow_html=True)
 
