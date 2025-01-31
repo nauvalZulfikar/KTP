@@ -43,6 +43,9 @@ def create_bar_chart(data, x_col, y_col, color=None):
     return fig
 
 def visualisation_tab():
+    # Add custom CSS for white borders
+    add_custom_css()
+    
     st.subheader("Visualisation")
 
     # Constants
