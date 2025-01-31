@@ -232,7 +232,7 @@ def visualisation_tab():
     
         # elif selected_visualization == "Gantt Chart (Unscheduled)":        
         # Gantt Chart (Unscheduled)
-        st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         st.markdown("### Gantt Chart (Unscheduled)")
         data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
         data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
@@ -261,7 +261,7 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
 
