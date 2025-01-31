@@ -9,17 +9,29 @@ from scheduler import adjust_to_working_hours_and_days, calculate_machine_utiliz
 import time
 #     )
 
-# Define a simple CSS style for framing the visualizations
-frame_css = """
+# # Define a simple CSS style for framing the visualizations
+# frame_css = """
+#     <style>
+#         .plot-container {
+#             border: 2px solid white;  /* White border */
+#             padding: 10px;
+#             border-radius: 5px;  /* Optional: Rounded corners */
+#             margin-bottom: 20px;
+#         }
+#     </style>
+# """
+
+# Inject CSS to frame all visualizations
+st.markdown("""
     <style>
-        .plot-container {
-            border: 2px solid white;  /* White border */
+        div.stPlotlyChart {
+            border: 2px solid white !important;
             padding: 10px;
-            border-radius: 5px;  /* Optional: Rounded corners */
+            border-radius: 5px;
             margin-bottom: 20px;
         }
     </style>
-"""
+""", unsafe_allow_html=True)
 
 # Inject CSS into Streamlit
 st.markdown(frame_css, unsafe_allow_html=True)
@@ -205,9 +217,9 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+                # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-                st.markdown('</div>', unsafe_allow_html=True)
+                # st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
@@ -226,9 +238,9 @@ def visualisation_tab():
                     xaxis_title="Time",
                     yaxis_title="Products"
                 )
-                st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+                # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_animated')
-                st.markdown('</div>', unsafe_allow_html=True)
+                # st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
@@ -261,9 +273,9 @@ def visualisation_tab():
         )
 
         # Integrate into Streamlit
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
 
@@ -290,9 +302,9 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
         
     # =========================================================================================
 
@@ -352,9 +364,9 @@ def visualisation_tab():
         )
 
         # Display the scatter plot
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='product_component_status')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
  
@@ -389,9 +401,9 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
     
@@ -418,8 +430,8 @@ def visualisation_tab():
 
         # Integrate into Streamlit
         # st.title("Machine Utilization Visualization")
-        st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+        # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='component_waiting_time')
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
 
 # =========================================================================================
