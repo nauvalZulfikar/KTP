@@ -33,8 +33,8 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Inject CSS into Streamlit
-st.markdown(frame_css, unsafe_allow_html=True)
+# # Inject CSS into Streamlit
+# st.markdown(frame_css, unsafe_allow_html=True)
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
