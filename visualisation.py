@@ -206,7 +206,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
-            st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
         else:
             # Display the progressive Gantt chart during animation
             st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
@@ -226,7 +226,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
     
