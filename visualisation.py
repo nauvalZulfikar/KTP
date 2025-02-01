@@ -271,7 +271,7 @@ def visualisation_tab():
             x=[row['Product Name']],
             y=[row['Components']],
             mode='markers+text',
-            marker=dict(size=20, color=row['color'], symbol='square'),
+            marker=dict(size=20, color=row['color'], symbol=marker_symbol),
             text=row['Machine Number'],  # Display machine info
             textposition='top center',
             name=row['status'],  # Controls legend label
