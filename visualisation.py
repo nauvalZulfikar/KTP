@@ -231,70 +231,6 @@ def visualisation_tab():
             # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
             st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
             st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
-    
-# =========================================================================================
-
-    # elif selected_visualization == "Gantt Chart (Unscheduled)":        
-    # Gantt Chart (Unscheduled)
-    st.markdown("### Gantt Chart (Unscheduled)")
-    data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
-    data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
-    
-    # Adjust durations for working hours and days
-    data['Adjusted End Time'] = data.apply(
-        lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
-        axis=1)
-    
-    # Create a horizontal bar chart
-    gcu_static = px.bar(
-        data,
-        x="Duration",  # Horizontal axis
-        y="Product Name",  # Vertical axis
-        color="legend",  # Color by components
-        orientation="h",  # Horizontal bars
-        labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
-    )
-
-    gcu_static.update_layout(
-        xaxis_title="Task Duration (minutes)",
-        yaxis_title="Products",
-        legend_title="Components",
-        template="plotly_white"
-    )
-
-    # Integrate into Streamlit
-    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-    st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
-    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
-    
-# =========================================================================================
-
-    # elif selected_visualization == "Product Waiting Time":
-    # Create a bar chart
-    st.markdown("### Product Waiting Time")
-    fig = px.bar(
-        st.session_state.product_waiting_df,
-        x="Product Name",
-        y="Average Days",
-        text="Formatted Time",
-        # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
-        title="Average Product Waiting Time",
-        color="Product Name",
-    )
-
-    # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
-    fig.update_layout(
-        xaxis_title="Product Name",
-        yaxis_title="Waiting Time",
-        template="plotly_white",
-        showlegend=True,
-    )
-
-    # Integrate into Streamlit
-    # st.title("Machine Utilization Visualization")
-    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
-    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
 
     # =========================================================================================
 
@@ -356,6 +292,41 @@ def visualisation_tab():
     # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True, key='product_component_status')
     st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
+    
+# =========================================================================================
+
+    # elif selected_visualization == "Gantt Chart (Unscheduled)":        
+    # Gantt Chart (Unscheduled)
+    st.markdown("### Gantt Chart (Unscheduled)")
+    data = st.session_state.dfm.copy()  # Ensure the original DataFrame is not modified
+    data['Duration'] = data['Quantity Required'] / 1000 * data['Run Time (min/1000)']
+    
+    # Adjust durations for working hours and days
+    data['Adjusted End Time'] = data.apply(
+        lambda row: adjust_to_working_hours_and_days(row['Order Processing Date'], row['Duration']),
+        axis=1)
+    
+    # Create a horizontal bar chart
+    gcu_static = px.bar(
+        data,
+        x="Duration",  # Horizontal axis
+        y="Product Name",  # Vertical axis
+        color="legend",  # Color by components
+        orientation="h",  # Horizontal bars
+        labels={"Duration": "Task Duration (minutes)", "Product Name": "Product", "Components": "Component"},
+    )
+
+    gcu_static.update_layout(
+        xaxis_title="Task Duration (minutes)",
+        yaxis_title="Products",
+        legend_title="Components",
+        template="plotly_white"
+    )
+
+    # Integrate into Streamlit
+    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+    st.plotly_chart(gcu_static, use_container_width=True, key='gantt_chart_unscheduled')
+    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
 
 # =========================================================================================
 
@@ -392,6 +363,35 @@ def visualisation_tab():
     # st.title("Machine Utilization Visualization")
     # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True, key='machine_utilisation')
+    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
+    
+# =========================================================================================
+
+    # elif selected_visualization == "Product Waiting Time":
+    # Create a bar chart
+    st.markdown("### Product Waiting Time")
+    fig = px.bar(
+        st.session_state.product_waiting_df,
+        x="Product Name",
+        y="Average Days",
+        text="Formatted Time",
+        # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
+        title="Average Product Waiting Time",
+        color="Product Name",
+    )
+
+    # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig.update_layout(
+        xaxis_title="Product Name",
+        yaxis_title="Waiting Time",
+        template="plotly_white",
+        showlegend=True,
+    )
+
+    # Integrate into Streamlit
+    # st.title("Machine Utilization Visualization")
+    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
     st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
 
 # =========================================================================================
