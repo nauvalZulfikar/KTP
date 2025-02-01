@@ -299,15 +299,10 @@ def visualisation_tab():
         # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
         st.plotly_chart(fig, use_container_width=True, key='product_waiting_time')
         st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
-        
+
     # =========================================================================================
 
     with col2:
-        vertical_divider()  # This renders the vertical white line
-
-    # =========================================================================================
-
-    with col3:
         # Product Components Status
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
