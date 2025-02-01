@@ -207,12 +207,10 @@ def visualisation_tab():
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
-            # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
             st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
             st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
     else:
         # Display the progressive Gantt chart during animation
-        # st.markdown('<div class="visualization-container">', unsafe_allow_html=True)
         if st.session_state.auto_refresh or st.session_state.rows_added < st.session_state.total_rows:
             fig_animated = px.timeline(
                 st.session_state.dfm_progress,
@@ -238,10 +236,10 @@ def visualisation_tab():
     st.markdown("### Product Components Status")
     if "df_scatter_progress" not in st.session_state:
         st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
-    st.session_state.df_scatter_progress.index = range(1, len(st.session_state.df_scatter_progress) + 1)
+    # st.session_state.df_scatter_progress.index = range(1, len(st.session_state.df_scatter_progress) + 1)
 
     # Process the current row for the scatter plot
-    current_row_index = st.session_state.rows_added + 1  # Sync progression with Gantt chart
+    current_row_index = st.session_state.rows_added #+ 1  # Sync progression with Gantt chart
     if current_row_index < len(st.session_state.df_scatter_progress):
         # Get the current row to process
         current_row = st.session_state.df_scatter_progress.reset_index(drop=True).iloc[current_row_index]
