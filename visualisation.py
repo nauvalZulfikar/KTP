@@ -249,18 +249,16 @@ def visualisation_tab():
         # Update status for the current row based on scatter plot's logic
         if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
             if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed_Outsource'
+                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed'
             elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed_In House'
+                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed'
             else:#if current_row['End Time'] > current_row['Promised Delivery Date']:
                 st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Late'
 
     # Assign colors for scatter plot
     status_colors = {
-        'InProgress_Outsource': 'gray',
-        'InProgress_In House': 'dimgray',
-        'Completed_Outsource': '#FB8A12',
-        'Completed_In House': '#FFA515',
+        'InProgress': 'gray',
+        'Completed': 'green',
         'Late': 'red'
     }
     st.session_state.df_scatter_progress['color'] = st.session_state.df_scatter_progress['status'].map(status_colors)
@@ -269,6 +267,8 @@ def visualisation_tab():
     fig = go.Figure()
 
     for _, row in st.session_state.df_scatter_progress.iterrows():
+        marker_symbol = 'circle' if row['Process Type'] == 'Outsource' else 'square'
+
         fig.add_trace(go.Scatter(
             x=[row['Product Name']],
             y=[row['Components']],
