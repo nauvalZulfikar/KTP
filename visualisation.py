@@ -8,7 +8,26 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
+# Function to create a vertical divider
+def vertical_divider():
+    st.markdown(
+        """ 
+        <style>
+            .divider {
+                display: inline-block;
+                width: 1px;
+                background-color: white;
+                height: 100%;
+                margin: 0 10px;
+            }
+        </style>
+        <div class="divider"></div>
+        """, unsafe_allow_html=True
+    )
 
+# Function to create a horizontal divider
+def horizontal_divider():
+    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
 
 # Create Bar Charts
 def create_bar_chart(data, x_col, y_col, color=None):
@@ -167,7 +186,8 @@ def visualisation_tab():
         st.session_state.auto_refresh = False
         st.success("Animation complete! Reload the page to reset.")
 
-    col1, col2 = st.columns(2)
+    # Layout with white lines between columns
+    col1, col2 = st.columns([1, 0.05, 1])  # Adding space for the divider
 
     # =========================================================================================
 
@@ -283,6 +303,11 @@ def visualisation_tab():
     # =========================================================================================
 
     with col2:
+    vertical_divider()  # This renders the vertical white line
+
+    # =========================================================================================
+
+    with col3:
         # Product Components Status
         st.markdown("### Product Components Status")
         if "df_scatter_progress" not in st.session_state:
