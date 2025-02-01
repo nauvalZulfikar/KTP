@@ -248,9 +248,7 @@ def visualisation_tab():
 
         # Update status for the current row based on scatter plot's logic
         if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
-            if current_row['Process Type'] == 'Outsource' and current_row['End Time'] < current_row['Promised Delivery Date']:
-                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed'
-            elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
+            if current_row['End Time'] < current_row['Promised Delivery Date']:
                 st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed'
             else:#if current_row['End Time'] > current_row['Promised Delivery Date']:
                 st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Late'
