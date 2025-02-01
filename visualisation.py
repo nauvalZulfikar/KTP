@@ -236,15 +236,15 @@ def visualisation_tab():
     st.markdown("### Product Components Status")
     if "df_scatter_progress" not in st.session_state:
         st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
-    st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
+    # st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
 
     conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
-    st.session_state.df_scatter_progress = pd.concat([conc_row, st.session_state.df_scatter_progress], ignore_index=True)
+    st.session_state.df_scatter_progress = pd.concat([conc_row, st.session_state.df_scatter_progress], ignore_index=True).reset_index(drop=True)
 
     st.write(st.session_state.df_scatter_progress)
     
     # Process the current row for the scatter plot
-    current_row_index = st.session_state.rows_added #+ 1  # Sync progression with Gantt chart
+    current_row_index = st.session_state.rows_added - 1  # Sync progression with Gantt chart
     if current_row_index < len(st.session_state.df_scatter_progress):
         # Get the current row to process
         current_row = st.session_state.df_scatter_progress.reset_index(drop=True).iloc[current_row_index]
