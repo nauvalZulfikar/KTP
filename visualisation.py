@@ -244,7 +244,7 @@ def visualisation_tab():
     current_row_index = st.session_state.rows_added + 1  # Sync progression with Gantt chart
     if current_row_index < len(st.session_state.df_scatter_progress):
         # Get the current row to process
-        current_row = st.session_state.df_scatter_progress.iloc[current_row_index]
+        current_row = st.session_state.df_scatter_progress.reset_index(drop=True).iloc[current_row_index]
 
         # Update status for the current row based on scatter plot's logic
         if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
