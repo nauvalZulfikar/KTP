@@ -255,7 +255,7 @@ def visualisation_tab():
 
     # Assign colors for scatter plot
     status_colors = {
-        'InProgress': 'gray',
+        'InProgress': 'orange',
         'Completed': 'green',
         'Late': 'red'
     }
