@@ -236,7 +236,7 @@ def visualisation_tab():
     st.markdown("### Product Components Status")
     if "df_scatter_progress" not in st.session_state:
         st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
-    st.session_state.df_scatter_progress.index(range(1,len(st.session_state.df_scatter_progress)+1))
+    st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
 
     st.write(st.session_state.df_scatter_progress)
     
