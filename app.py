@@ -20,9 +20,7 @@ df['Order Processing Date'] = pd.to_datetime(df['Order Processing Date'])
 df['Promised Delivery Date'] = pd.to_datetime(df['Promised Delivery Date'])
 df['Start Time'] = pd.NaT  # Initialize as empty datetime
 df['End Time'] = pd.NaT  # Initialize as empty datetime
-df['status'] = ''  # Initialize the Status column
-df.loc[df['Process Type'] == 'In House', 'status'] = 'InProgress_In House'
-df.loc[df['Process Type'] == 'Outsource','status'] = 'InProgress_Outsource'
+df['status'] = 'InProgress'  # Initialize the Status column
 df = df.sort_values(by=['Promised Delivery Date',
                         'Product Name',
                         'Components']).reset_index(drop=True)
