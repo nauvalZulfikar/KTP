@@ -223,7 +223,7 @@ def visualisation_tab():
                     yaxis_title="Products"
                 )
                 # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-                st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_animated')
+                st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
                 # st.markdown('</div>', unsafe_allow_html=True)
         
 # =========================================================================================
