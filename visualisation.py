@@ -303,7 +303,7 @@ def visualisation_tab():
     # =========================================================================================
 
     with col2:
-    vertical_divider()  # This renders the vertical white line
+        vertical_divider()  # This renders the vertical white line
 
     # =========================================================================================
 
