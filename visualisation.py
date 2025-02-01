@@ -241,7 +241,7 @@ def visualisation_tab():
     # conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
     # st.session_state.df_scatter_progress = pd.concat([conc_row, st.session_state.df_scatter_progress], ignore_index=True).reset_index(drop=True)
 
-    # st.write(st.session_state.df_scatter_progress)
+    st.write(st.session_state.df_scatter_progress)
     
     # Process the current row for the scatter plot
     current_row_index = st.session_state.rows_added - 1  # Sync progression with Gantt chart
