@@ -187,7 +187,7 @@ def visualisation_tab():
         st.success("Animation complete! Reload the page to reset.")
 
     # Layout with white lines between columns
-    col1, col2 = st.columns([1, 0.05, 1])  # Adding space for the divider
+    col1, col2, col3 = st.columns([1, 0.5, 1, 0.5, 1])  # Adding space for the divider
 
     # =========================================================================================
 
