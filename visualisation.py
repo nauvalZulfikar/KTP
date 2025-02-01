@@ -238,7 +238,7 @@ def visualisation_tab():
         st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
     st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
 
-    empty_row = pd.DataFrame([{col: None for col in st.session_state.df_scatter_progress.columns}])
+    conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
     st.session_state.df_scatter_progress = pd.concat([empty_row, st.session_state.df_scatter_progress], ignore_index=True)
     
     # Process the current row for the scatter plot
