@@ -310,7 +310,7 @@ def visualisation_tab():
         st.session_state.df_scatter_progress.index = range(1, len(st.session_state.df_scatter_progress) + 1)
 
         # Process the current row for the scatter plot
-        current_row_index = st.session_state.rows_added  # Sync progression with Gantt chart
+        current_row_index = st.session_state.rows_added + 1  # Sync progression with Gantt chart
         if current_row_index < len(st.session_state.df_scatter_progress):
             # Get the current row to process
             current_row = st.session_state.df_scatter_progress.iloc[current_row_index]
@@ -321,7 +321,7 @@ def visualisation_tab():
                     st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed_Outsource'
                 elif current_row['Process Type'] == 'In House' and current_row['End Time'] < current_row['Promised Delivery Date']:
                     st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed_In House'
-                elif current_row['End Time'] > current_row['Promised Delivery Date']:
+                else:#if current_row['End Time'] > current_row['Promised Delivery Date']:
                     st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Late'
 
         # Assign colors for scatter plot
