@@ -433,7 +433,7 @@ def visualisation_tab():
         st.session_state.late_df,
         values="late",
         names="status",
-        text="late",
+        # text="late",
         # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
         title="Number of Late Products",
         color="status",
