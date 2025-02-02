@@ -425,3 +425,30 @@ def visualisation_tab():
     st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
 
 # =========================================================================================
+
+    # elif selected_visualization == "Component Waiting Time":
+    # Create a bar chart
+    st.markdown("### Late Products")
+    fig = px.pie(
+        st.session_state.late_df,
+        values="late",
+        names="status",
+        text="late",
+        # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
+        title="Number of Late Products",
+        color="status",
+    )
+
+    # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    fig.update_layout(
+        xaxis_title="status",
+        yaxis_title="late",
+        template="plotly_white",
+        showlegend=True,
+    )
+
+    # Integrate into Streamlit
+    # st.title("Machine Utilization Visualization")
+    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
+    st.plotly_chart(fig, use_container_width=True, key='late_products')
+    st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
