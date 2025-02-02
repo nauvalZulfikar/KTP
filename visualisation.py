@@ -436,7 +436,7 @@ def visualisation_tab():
         # text="late",
         # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
         title="Number of Late Products",
-        color="status",
+        color="count",
     )
 
     # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
