@@ -439,6 +439,9 @@ def visualisation_tab():
         color="count",
     )
 
+    # Update traces to show normal numbers instead of percentage
+    fig.update_traces(textinfo="value+label")
+
     # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
     fig.update_layout(
         xaxis_title="count",
@@ -447,8 +450,5 @@ def visualisation_tab():
         showlegend=True,
     )
 
-    # Integrate into Streamlit
-    # st.title("Machine Utilization Visualization")
-    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
     st.plotly_chart(fig, use_container_width=True, key='late_products')
     st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
