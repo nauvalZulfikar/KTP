@@ -607,6 +607,6 @@ def calculate_waiting_time(df, group_by_column, date_columns):
 def late_products(df):
     late = df.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
     late['late'] = ['late' if late['End Time'][i] > late['Promised Delivery Date'][i] else 'on time' for i in range(len(late))]
-    late_df = late.groupby('late',as_index=False)['late'].count()
+    late_df = late.groupby('late')['late'].count().reset_index(name='count')
 
     return late_df
