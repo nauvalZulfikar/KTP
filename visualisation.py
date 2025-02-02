@@ -431,8 +431,8 @@ def visualisation_tab():
     st.markdown("### Late Products")
     fig = px.pie(
         st.session_state.late_df,
-        values="late",
-        names="status",
+        values="count",
+        names="late",
         # text="late",
         # labels={"Average Days": "Utilization (%)", "Machine Number": "Machine"},
         title="Number of Late Products",
@@ -441,7 +441,7 @@ def visualisation_tab():
 
     # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
     fig.update_layout(
-        xaxis_title="status",
+        xaxis_title="count",
         yaxis_title="late",
         template="plotly_white",
         showlegend=True,
