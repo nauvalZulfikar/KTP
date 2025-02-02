@@ -439,13 +439,15 @@ def visualisation_tab():
         color="count",
     )
 
-    # Update traces to show normal numbers instead of percentage
-    fig.update_traces(textinfo="value+label")
+    # Update trace to show both percentage and actual number
+    fig.update_traces(
+        textinfo="label+percent+value",  # Show category name, percentage, and absolute value
+        texttemplate="%{percent:.1%} (%{value})",  # Format: Label: Value (Percentage)
+        textposition="inside",  # Position labels inside the slices
+    )
 
-    # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
+    # Update layout
     fig.update_layout(
-        xaxis_title="count",
-        yaxis_title="late",
         template="plotly_white",
         showlegend=True,
     )
