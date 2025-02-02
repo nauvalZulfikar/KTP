@@ -47,6 +47,7 @@ product_waiting_df = calculate_waiting_time(
         date_columns=('Order Processing Date', 'Start Time'))
 
 late_df = late_products(dfm)
+late_df.reset_index(inplace=True)
 
 def initialise_state():
   if "df" not in st.session_state:
