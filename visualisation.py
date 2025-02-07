@@ -239,64 +239,82 @@ def visualisation_tab():
 
     # Product Components Status
     st.markdown("### Product Components Status")
-    if "df_scatter_progress" not in st.session_state:
-        st.session_state.df_scatter_progress = st.session_state.dfm.copy()#.reset_index(drop=True)  # Independent copy for scatter plot
-    # st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
+    # Ensure scatter plot uses the latest dfm_progress data
+    df_scatter_progress = st.session_state.dfm_progress.copy()
 
-    # conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
-    # st.session_state.df_scatter_progress = pd.concat([conc_row, st.session_state.df_scatter_progress], ignore_index=True).reset_index(drop=True)
+    # ✅ Function to Generate Scatter Plot
+    def generate_scatter_plot(data, key_name):
+        fig = go.Figure()
+        
+        for i in range(len(data)):
+            row = data.iloc[i]
+            marker_symbol = 'circle' if row['Process Type'] == 'Outsource' else 'square'
 
-    # st.write(st.session_state.df_scatter_progress)
-    
-    # Process the current row for the scatter plot
-    current_row_index = st.session_state.rows_added - 1  # Sync progression with Gantt chart
-    if current_row_index < len(st.session_state.df_scatter_progress):
-        # Get the current row to process
-        current_row = st.session_state.df_scatter_progress.reset_index(drop=True).iloc[current_row_index]
+            fig.add_trace(go.Scatter(
+                x=[row['Product Name']],
+                y=[row['Components']],
+                mode='markers+text',
+                marker=dict(size=20, color=row['color'], symbol=marker_symbol),
+                text=row['Machine Number'],
+                textposition='top center',
+                name=row['status'],
+                legendgroup=row['status'],
+                showlegend=not fig.data or row['status'] not in [trace.name for trace in fig.data]
+            ))
 
-        # Update status for the current row based on scatter plot's logic
-        if pd.notna(current_row['End Time']) and pd.notna(current_row['Promised Delivery Date']):
-            if current_row['End Time'] < current_row['Promised Delivery Date']:
-                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Completed'
-            else:#if current_row['End Time'] > current_row['Promised Delivery Date']:
-                st.session_state.df_scatter_progress.at[current_row_index, 'status'] = 'Late'
+        fig.update_layout(
+            xaxis=dict(title="Product Name"),
+            yaxis=dict(title="Components"),
+            legend_title="Status and Process Type",
+            template="plotly_white"
+        )
 
-    # Assign colors for scatter plot
+        st.plotly_chart(fig, use_container_width=True, key=key_name)
+
+    # ✅ Step 1: Assign Colors Based on Status
     status_colors = {
         'InProgress': 'orange',
         'Completed': 'green',
         'Late': 'red'
     }
-    st.session_state.df_scatter_progress['color'] = st.session_state.df_scatter_progress['status'].map(status_colors)
 
-    # Create scatter plot
-    fig = go.Figure()
+    # ✅ Step 2: If Animation is Running, Update Status Dynamically
+    if st.session_state.auto_refresh:
+        st.subheader("Animated Product Component Status")
 
-    for _, row in st.session_state.df_scatter_progress.iterrows():
-        marker_symbol = 'circle' if row['Process Type'] == 'Outsource' else 'square'
+        for i in range(len(df_scatter_progress)):
+            row = df_scatter_progress.iloc[i]
 
-        fig.add_trace(go.Scatter(
-            x=[row['Product Name']],
-            y=[row['Components']],
-            mode='markers+text',
-            marker=dict(size=20, color=row['color'], symbol=marker_symbol),
-            text=row['Machine Number'],  # Display machine info
-            textposition='top center',
-            name=row['status'],  # Controls legend label
-            legendgroup=row['status'],  # Groups traces with the same status
-            showlegend=not fig.data or row['status'] not in [trace.name for trace in fig.data]  # Show legend once per status
-        ))
+            if pd.notna(row['End Time']) and pd.notna(row['Promised Delivery Date']):
+                if row['End Time'] < row['Promised Delivery Date']:
+                    df_scatter_progress.at[i, 'status'] = 'Completed'
+                else:
+                    df_scatter_progress.at[i, 'status'] = 'Late'
+            else:
+                df_scatter_progress.at[i, 'status'] = 'InProgress'
 
-    fig.update_layout(
-        xaxis=dict(title="Product Name"),
-        yaxis=dict(title="Components"),
-        legend_title="Status and Process Type",
-        template="plotly_white"
-    )
+        df_scatter_progress['color'] = df_scatter_progress['status'].map(status_colors)
 
-    # Display the scatter plot
-    # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True, key='product_component_status')
+        # ✅ Store the latest computed status for later use
+        st.session_state.last_static_status = df_scatter_progress.copy()
+
+        # ✅ Display Animated Scatter Plot
+        generate_scatter_plot(df_scatter_progress, key_name="product_component_status_animated")
+
+    # ✅ Step 3: If Animation Stops, Keep Last Updated Status Instead of Resetting
+    else:
+        st.subheader("Static Product Component Status")
+
+        if "last_static_status" in st.session_state:
+            df_scatter_progress = st.session_state.last_static_status  # Keep last updated statuses
+        else:
+            df_scatter_progress["status"] = "InProgress"  # Fallback for first load
+
+        df_scatter_progress['color'] = df_scatter_progress['status'].map(status_colors)
+
+        # ✅ Display Static Scatter Plot (With Last Animation Status)
+        generate_scatter_plot(df_scatter_progress, key_name="product_component_status_static")
+
     st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
     
 # =========================================================================================
