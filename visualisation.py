@@ -240,7 +240,7 @@ def visualisation_tab():
     # Product Components Status
     st.markdown("### Product Components Status")
     if "df_scatter_progress" not in st.session_state:
-        st.session_state.df_scatter_progress = st.session_state.dfm_progress.copy()#.reset_index(drop=True)  # Independent copy for scatter plot
+        st.session_state.df_scatter_progress = st.session_state.dfm.copy()#.reset_index(drop=True)  # Independent copy for scatter plot
     # st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
 
     # conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
@@ -338,20 +338,26 @@ def visualisation_tab():
 
     # elif selected_visualization == "Machine Utilisation":
     # Calculate machine utilization
+    # st.write(pd.DataFrame(st.session_state.machine_utilization_df).reset_index().columns)
     st.markdown("### Machine Utilisation")
     average_utilization = calculate_machine_utilization(st.session_state.dfm)
+    # average_utilization = st.session_state.machine_utilization_df.copy()
 
-    # Prepare data for visualization
+    # # # Prepare data for visualization
     utilization_df = average_utilization.reset_index()
     utilization_df.columns = ["Machine Number", "Average Utilization"]
+    utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
     utilization_df["Average Utilization (%)"] = utilization_df["Average Utilization"] * 100
 
     # Create a bar chart
     fig = px.bar(
         utilization_df,
+        # st.session_state.machine_utilization_df,
         x="Machine Number",
         y="Average Utilization (%)",
+        # y = 'Daily Utilization',
         text="Average Utilization (%)",
+        # text = 'Daily Utilization',
         labels={"Average Utilization (%)": "Utilization (%)", "Machine Number": "Machine"},
         # title="Average Daily Machine Utilization",
         color="Machine Number",
@@ -377,7 +383,8 @@ def visualisation_tab():
     # Create a bar chart
     st.markdown("### Product Waiting Time")
     fig = px.bar(
-        st.session_state.product_waiting_df,
+        # st.session_state.product_waiting_df,
+        calculate_waiting_time(st.session_state.dfm, group_by_column='Product Name', date_columns=('Order Processing Date', 'Start Time')),
         x="Product Name",
         y="Average Days",
         text="Formatted Time",
@@ -406,7 +413,8 @@ def visualisation_tab():
     # Create a bar chart
     st.markdown("### Component Waiting Time")
     fig = px.bar(
-        st.session_state.component_waiting_df,
+        # st.session_state.component_waiting_df,
+        calculate_waiting_time(st.session_state.dfm, group_by_column='Components', date_columns=('Order Processing Date', 'Start Time')),
         x="Components",
         y="Average Days",
         text="Formatted Time",
@@ -435,7 +443,8 @@ def visualisation_tab():
     # Create a bar chart
     st.markdown("### Late Products")
     fig = px.pie(
-        st.session_state.late_df,
+        # st.session_state.late_df,
+        late_products(st.session_state.dfm),
         values="count",
         names="late",
         # text="late",
