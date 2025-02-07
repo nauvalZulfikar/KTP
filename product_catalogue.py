@@ -17,7 +17,7 @@ def product_catalogue():
         if col in display_df.columns and pd.api.types.is_datetime64_any_dtype(display_df[col]):
             display_df[col] = display_df[col].dt.strftime('%Y-%m-%d %H:%M')
             
-    st.write(display_df.sort_values(by=['Start Time', 'End Time']).reset_index())
+    st.write(display_df.sort_values(by=['Start Time', 'End Time']).reset_index(drop=True))
 
     st.subheader("Production Scheduling Results")
 
