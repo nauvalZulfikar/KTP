@@ -58,18 +58,12 @@ def visualisation_tab():
     WORK_START = 9
 
     # Initialize session state for progressive visualization
-    if "dfm_progress" not in st.session_state:
-        st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
-    if "df_progress" not in st.session_state:
-        st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
     if "auto_refresh" not in st.session_state:
         st.session_state.auto_refresh = False  # Auto-refresh toggle
     if "rows_added" not in st.session_state:
         st.session_state.rows_added = len(st.session_state.dfm) + 1  # Start with all rows added
     if "total_rows" not in st.session_state:
         st.session_state.total_rows = len(st.session_state.dfm) + 1  # Total rows in the DataFrame
-    if "dataframe_history" not in st.session_state:
-        st.session_state.dataframe_history = []  # List to store the last 4 dataframes
     if "machine_utilization_history" not in st.session_state:
         st.session_state.machine_utilization_history = []  # List to store machine utilization dataframes
     if "component_waiting_history" not in st.session_state:
@@ -132,9 +126,12 @@ def visualisation_tab():
                     by=['Start Time', 'End Time', 'Promised Delivery Date'])
                 # Combine both parts
                 new_dataframe = pd.concat([dfm1, dfm2], ignore_index=True)
+                new_dataframe = new_dataframe[new_dataframe['Quantity Required']>=1]
 
                 # Append the new dataframe to the history list
+                st.session_state.dfm = new_dataframe.reset_index(drop=True).copy()
                 st.session_state.dataframe_history.append(new_dataframe)
+                #
 
                 # Calculate derived dataframes
                 machine_utilization_df = calculate_machine_utilization(new_dataframe.copy())
@@ -170,6 +167,14 @@ def visualisation_tab():
                 st.success("Progress reset successfully.")
 
         st.write(f'{st.session_state.rows_added + 1}th step')
+    
+    if "dfm_progress" not in st.session_state:
+        # st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
+        st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
+    if "df_progress" not in st.session_state:
+        st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
+    if "dataframe_history" not in st.session_state:
+        st.session_state.dataframe_history = []  # List to store the last 4 dataframes
 
     # Progressive animation
     if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
@@ -187,7 +192,7 @@ def visualisation_tab():
         st.success("Animation complete! Reload the page to reset.")
 
     # =========================================================================================
-
+    # st.write(st.session_state.dfm)
     # Gantt Chart
     st.markdown("### Gantt Chart")
     if st.session_state.auto_refresh == False:
@@ -235,7 +240,7 @@ def visualisation_tab():
     # Product Components Status
     st.markdown("### Product Components Status")
     if "df_scatter_progress" not in st.session_state:
-        st.session_state.df_scatter_progress = st.session_state.dfm.copy().reset_index(drop=True)  # Independent copy for scatter plot
+        st.session_state.df_scatter_progress = st.session_state.dfm_progress.copy()#.reset_index(drop=True)  # Independent copy for scatter plot
     # st.session_state.df_scatter_progress.index = range(1,len(st.session_state.df_scatter_progress)+1)
 
     # conc_row = st.session_state.df_scatter_progress.iloc[0].to_frame().T
