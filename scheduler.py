@@ -536,11 +536,16 @@ def calculate_machine_utilization(df):
 
     # Expand the daily utilization into a separate DataFrame
     daily_utilization_expanded = df.explode("Daily Utilization").reset_index()
+    
+    try:
+        # Extract the date and production minutes
+        daily_utilization_expanded[["Production Date", "Production Minutes"]] = daily_utilization_expanded[
+            "Daily Utilization"
+        ].apply(pd.Series)
+    except:
+        daily_utilization_expanded["Production Date"] = 0
+        daily_utilization_expanded["Production Minutes"] = 0
 
-    # Extract the date and production minutes
-    daily_utilization_expanded[["Production Date", "Production Minutes"]] = daily_utilization_expanded[
-        "Daily Utilization"
-    ].apply(pd.Series)
 
     # Group by machine and date, summing up production minutes for each machine per day
     daily_machine_utilization = daily_utilization_expanded[
@@ -558,52 +563,82 @@ def calculate_machine_utilization(df):
     return average_daily_utilization_per_machine
 
 def calculate_waiting_time(df, group_by_column, date_columns):
-    start_col, end_col = date_columns
+    try:
+        start_col, end_col = date_columns
 
-    # Calculate business hours split for each row
-    def business_hours_split(start_time, end_time):
-        total_hours = timedelta()
-        current = start_time
+        # ✅ Return empty DataFrame early if df is empty
+        if df.empty or start_col not in df.columns or end_col not in df.columns:
+            print(f"⚠️ Warning: DataFrame is empty or missing columns {date_columns}")
+            return pd.DataFrame(columns=[group_by_column, "Average Days", "Formatted Time"])
 
-        while current.date() <= end_time.date():
-            if current.weekday() < 5:  # Skip weekends
-                day_start = max(current, current.replace(hour=9, minute=0, second=0))
-                day_end = min(end_time, current.replace(hour=17, minute=0, second=0))
-                if day_start < day_end:
-                    total_hours += (day_end - day_start)
-            current += timedelta(days=1)
-            current = current.replace(hour=9, minute=0, second=0)
+        # ✅ Function to calculate waiting time in business hours
+        def business_hours_split(start_time, end_time):
+            try:
+                total_hours = timedelta()
+                current = start_time
 
-        return total_hours
+                while current.date() <= end_time.date():
+                    if current.weekday() < 5:  # Skip weekends
+                        day_start = max(current, current.replace(hour=9, minute=0, second=0))
+                        day_end = min(end_time, current.replace(hour=17, minute=0, second=0))
+                        if day_start < day_end:
+                            total_hours += (day_end - day_start)
+                    current += timedelta(days=1)
+                    current = current.replace(hour=9, minute=0, second=0)
 
-    # Apply the business hours calculation
-    df['wait_time'] = df.apply(
-        lambda row: business_hours_split(row[start_col], row[end_col]),
-        axis=1
-    )
+                return total_hours
+            except Exception as e:
+                print(f"⚠️ Error in business_hours_split: {e}")
+                return timedelta(0)
 
-    # Group and calculate the average waiting time
-    wait_time_grouped = df.groupby(group_by_column)['wait_time'].mean()
+        # ✅ Apply business hour calculation safely
+        df["wait_time"] = df.apply(
+            lambda row: business_hours_split(row[start_col], row[end_col]) if pd.notna(row[start_col]) and pd.notna(row[end_col]) else timedelta(0),
+            axis=1
+        )
 
-    # Format the results
-    formatted_results = []
-    for group_value, avg_time in wait_time_grouped.items():
-        total_seconds = avg_time.total_seconds()
-        avg_days = total_seconds // (24 * 3600)
-        remaining_seconds = total_seconds % (24 * 3600)
-        avg_hours = remaining_seconds // 3600
-        avg_decimal_days = total_seconds / (24 * 3600)
+        # ✅ Ensure group_by_column exists
+        if group_by_column not in df.columns:
+            print(f"⚠️ Warning: Column '{group_by_column}' not found in DataFrame.")
+            return pd.DataFrame(columns=[group_by_column, "Average Days", "Formatted Time"])
 
-        formatted_results.append({
-            group_by_column: group_value,
-            "Average Days": round(avg_decimal_days, 2),
-            "Formatted Time": f"{int(avg_days)} days {int(avg_hours)} hours"
-        })
+        # ✅ Group and calculate the average waiting time
+        wait_time_grouped = df.groupby(group_by_column)["wait_time"].mean()
 
-    # Convert to DataFrame for better display
-    formatted_df = pd.DataFrame(formatted_results)
-    return formatted_df
-  
+        # ✅ Handle empty group result
+        if wait_time_grouped.empty:
+            print(f"⚠️ Warning: No valid data found for '{group_by_column}'")
+            return pd.DataFrame(columns=[group_by_column, "Average Days", "Formatted Time"])
+
+        # ✅ Format the results
+        formatted_results = []
+        for group_value, avg_time in wait_time_grouped.items():
+            total_seconds = avg_time.total_seconds()
+            avg_days = total_seconds // (24 * 3600)
+            remaining_seconds = total_seconds % (24 * 3600)
+            avg_hours = remaining_seconds // 3600
+            avg_decimal_days = total_seconds / (24 * 3600)
+
+            formatted_results.append({
+                group_by_column: group_value,
+                "Average Days": round(avg_decimal_days, 2),
+                "Formatted Time": f"{int(avg_days)} days {int(avg_hours)} hours"
+            })
+
+        # ✅ Convert to DataFrame
+        formatted_df = pd.DataFrame(formatted_results)
+
+        # ✅ Ensure output is not empty before returning
+        if formatted_df.empty:
+            print(f"⚠️ Warning: Final DataFrame is empty for '{group_by_column}'")
+            return pd.DataFrame(columns=[group_by_column, "Average Days", "Formatted Time"])
+
+        return formatted_df
+
+    except Exception as e:
+        print(f"⚠️ Critical Error in calculate_waiting_time: {e}")
+        return pd.DataFrame(columns=[group_by_column, "Average Days", "Formatted Time"])
+
 def late_products(df):
     late = df.sort_values(by=['Product Name','Components']).groupby('Product Name',as_index=False).last()
     late['late'] = ['late' if late['End Time'][i] > late['Promised Delivery Date'][i] else 'on time' for i in range(len(late))]
