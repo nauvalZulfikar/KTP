@@ -150,8 +150,8 @@ def visualisation_tab():
 
                 # Append the new dataframe to the history list
                 st.session_state.dfm = new_dataframe.reset_index(drop=True).copy()
+                st.session_state.total_rows = len(st.session_state.dfm) + 1
                 st.session_state.dataframe_history.append(new_dataframe)
-                #
 
                 # Calculate derived dataframes
                 machine_utilization_df = calculate_machine_utilization(new_dataframe.copy())
@@ -201,9 +201,9 @@ def visualisation_tab():
         st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
     if "dataframe_history" not in st.session_state:
         st.session_state.dataframe_history = []  # List to store the last 4 dataframes
-
+    
     # Progressive animation
-    if st.session_state.auto_refresh and st.session_state.rows_added < st.session_state.total_rows:
+    if st.session_state.auto_refresh and st.session_state.rows_added <= st.session_state.total_rows:
         st_autorefresh(interval=2000, limit=None, key="autorefresh")  # Refresh every second
         # Add the next row to the progress DataFrame
         st.session_state.dfm_progress = pd.concat(
