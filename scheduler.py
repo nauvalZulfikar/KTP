@@ -175,14 +175,13 @@ def schedule_production_with_days(data):
                 # If the task does not fit, split it into smaller pieces
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
-
-                # Update the task with the producible quantity
-                data.at[i, 'Quantity Required'] = int(producible_qty)
+                to_be_produced = min(producible_qty,data['Quantity Required'][i])
 
                 # If there’s remaining work, create a new task for it
-                if producible_qty > 0:
-                    remaining_qty = data['Quantity Required'][i] - producible_qty
+                if to_be_produced > 0:
                     remaining_task = data.iloc[i].copy()
+                    remaining_qty = data['Quantity Required'][i] - to_be_produced
+                    data.at[i, 'Quantity Required'] = int(to_be_produced)
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
                     remaining_task['End Time'] = None
@@ -348,21 +347,17 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
                 # If the task does not fit, split it into smaller pieces
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
-
-                # Update the task with the producible quantity
-                data.at[i, 'Quantity Required'] = int(producible_qty)
+                to_be_produced = min(producible_qty,data['Quantity Required'][i])
 
                 # If there’s remaining work, create a new task for it
-                if producible_qty > 0:
-                    remaining_qty = data['Quantity Required'][i] - producible_qty
+                if to_be_produced > 0:
                     remaining_task = data.iloc[i].copy()
+                    remaining_qty = data['Quantity Required'][i] - to_be_produced
+                    data.at[i, 'Quantity Required'] = int(to_be_produced)
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
                     remaining_task['End Time'] = None
-
-                    # Append the new task to the DataFrame
-                    next_index = data.index[-1] + 1  # Determine the next available index
-                    data.loc[next_index] = remaining_task  # Add the new task
+                    data.loc[len(data)] = remaining_task  # Add the new task to the dataset
 
                 # Schedule the producible part of the task in this gap
                 gap_start_time = adjusted_gap_start
