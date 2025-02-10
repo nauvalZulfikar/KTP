@@ -119,6 +119,26 @@ def visualisation_tab():
                 dfm2['Start Time'] = pd.NaT
                 dfm2['End Time'] = pd.NaT
 
+                dfm2 = dfm2.groupby('UniqueID',as_index=False).agg({
+                    'Sr. No':'first',
+                    'Product Name':'first',
+                    'Order Processing Date':'first',
+                    'Promised Delivery Date':'first',
+                    'Quantity Required':"sum",
+                    'Components':'first',
+                    'Operation':'first',
+                    'Process Type':'first',
+                    'Machine Number':'first',
+                    'Run Time (min/1000)':'first',
+                    'Cycle Time (seconds)':'first',
+                    'Setup time (seconds)':'first',
+                    'Start Time':'first',
+                    'End Time':'first',
+                    'status':'first',
+                    # 'Status':'first',
+                    'legend':'first'
+                    })
+
                 # Reschedule using the existing state
                 dfm2 = reschedule_production_with_days(dfm2, st.session_state.machine_last_end,
                                                       st.session_state.machine_schedule, dfm1)
@@ -210,7 +230,8 @@ def visualisation_tab():
                 x_end="End Time",
                 y="Product Name",
                 color="legend",  # Use Components for color differentiation
-                labels={"Components": "Component", "Machine Number": "Machine"}
+                labels={"Components": "Component", "Machine Number": "Machine"},
+                hover_data=["Machine Number"]
             )
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_static.update_layout(
@@ -229,7 +250,8 @@ def visualisation_tab():
                 x_end="End Time",
                 y="Product Name",
                 color="legend",  # Use Components for color differentiation
-                labels={"Components": "Component", "Machine Number": "Machine"}
+                labels={"Components": "Component", "Machine Number": "Machine"},
+                hover_data=["Machine Number"]
             )
             fig_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_animated.update_layout(
