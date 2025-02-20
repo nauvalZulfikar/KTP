@@ -69,8 +69,8 @@ def product_list_change():
                     'Setup time (seconds)': int(add_setup),
                 })
                 
-                st.session_state.df = pd.concat([st.session_state.df,pd.DataFrame(new_row)])
-                st.session_state.dfm = pd.concat([st.session_state.dfm,pd.DataFrame(new_row)])  
+                st.session_state.df = pd.concat([st.session_state.df,new_row])
+                st.session_state.dfm = pd.concat([st.session_state.dfm,new_row])  
                 # prod_chg = pd.concat([prod_chg,pd.DataFrame(new_row)])  
                 st.success(f"Product '{add_prod}' added successfully.")
 
