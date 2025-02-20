@@ -6,7 +6,7 @@ def product_list_change():
 
     st.title("Product List Management")
 
-    st.dataframe(prod_chg)
+    st.dataframe(st.session_state.dfm)
     
     # Add Tabs Below
     tabs = st.tabs([
