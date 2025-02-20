@@ -65,6 +65,7 @@ def product_list_change():
                     'Run Time (min/1000)': int(add_run),
                     'Cycle Time (seconds)': float(add_cycle),
                     'Setup time (seconds)': int(add_setup),
+                    'legend': next_comp
                 })
                 
                 st.session_state.df = pd.concat([st.session_state.df,new_row])
