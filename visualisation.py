@@ -195,7 +195,6 @@ def visualisation_tab():
         st.write(f'{st.session_state.rows_added + 1}th step')
     
     if "dfm_progress" not in st.session_state:
-        # st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
         st.session_state.dfm_progress = st.session_state.dfm.copy()  # Initially show the full DataFrame
     if "df_progress" not in st.session_state:
         st.session_state.df_progress = st.session_state.df.copy()  # Initially show the full DataFrame
@@ -221,6 +220,7 @@ def visualisation_tab():
 
     # Gantt Chart
     st.markdown("### Gantt Chart")
+    st.dataframe(st.session_state.dfm_progress)
     if st.session_state.auto_refresh == False:
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
