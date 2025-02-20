@@ -5,8 +5,6 @@ def product_list_change():
     prod_chg = st.session_state.dfm.copy()
 
     st.title("Product List Management")
-
-    st.dataframe(st.session_state.dfm)
     
     # Add Tabs Below
     tabs = st.tabs([
@@ -73,6 +71,8 @@ def product_list_change():
                 st.session_state.dfm = pd.concat([st.session_state.dfm,new_row])  
                 # prod_chg = pd.concat([prod_chg,pd.DataFrame(new_row)])  
                 st.success(f"Product '{add_prod}' added successfully.")
+                
+            st.dataframe(st.session_state.dfm)
 
             with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
                 st.session_state.df.to_excel(writer, sheet_name='P', index=False)
@@ -91,6 +91,8 @@ def product_list_change():
                 st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Product Name']!=del_prod] 
                 # prod_chg = pd.concat([prod_chg,pd.DataFrame(new_row)])   
                 st.warning(f"Product with ID '{del_prod}' deleted successfully.")
+                
+            st.dataframe(st.session_state.dfm)
 
             with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
                 st.session_state.df.to_excel(writer, sheet_name='P', index=False)
@@ -109,6 +111,8 @@ def product_list_change():
                 st.session_state.dfm.loc[st.session_state.dfm['Product Name']==chg_prod,'Promised Delivery Date'] = chg_prom
                 # prod_chg.loc[prod_chg['Product Name']==chg_prod,'Promised Delivery Date'] = chg_prom
                 st.info(f"Product {chg_prod}'s Product Delivery date had been changed to {chg_prom}")
+                
+            st.dataframe(st.session_state.dfm)
 
             with pd.ExcelWriter('Product Details_v1.xlsx', engine='openpyxl') as writer:
                 st.session_state.df.to_excel(writer, sheet_name='P', index=False)
