@@ -220,7 +220,7 @@ def visualisation_tab():
 
     # Gantt Chart
     st.markdown("### Gantt Chart")
-    st.write(st.session_state.dfm_progress)
+    
     if st.session_state.auto_refresh == False:
         # Static Gantt chart displayed immediately when the page loads
         if not st.session_state.auto_refresh:  # Show the static chart if not animating
@@ -267,8 +267,8 @@ def visualisation_tab():
 
     # Product Components Status
     st.markdown("### Product Components Status")
+    
     # Ensure scatter plot uses the latest dfm_progress data
-    st.write(st.session_state.dfm_progress)
     df_scatter_progress = st.session_state.dfm_progress.copy()
 
     # ✅ Function to Generate Scatter Plot
