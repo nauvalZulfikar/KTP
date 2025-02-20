@@ -268,6 +268,7 @@ def visualisation_tab():
     # Product Components Status
     st.markdown("### Product Components Status")
     # Ensure scatter plot uses the latest dfm_progress data
+    st.write(st.session_state.dfm_progress)
     df_scatter_progress = st.session_state.dfm_progress.copy()
 
     # ✅ Function to Generate Scatter Plot
