@@ -83,13 +83,16 @@ def product_list_change():
                 st.session_state.late_df.to_excel(writer, sheet_name='Late Products')
 
         with tabs[1]:
-            del_prod = st.text_input("Delete Product Name:")
-            prod_chg = prod_chg[prod_chg['Product Name']!=del_prod]
+            del_products = st.session_state.dfm['Product Name'].unique()
+            del_selected_product = st.selectbox(
+                'Select product name:',
+                del_products
+            )
 
             if st.button("Delete"):
-                st.session_state.df = st.session_state.df[st.session_state.df['Product Name']!=del_prod].reset_index(drop=True)
-                st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Product Name']!=del_prod].reset_index(drop=True)
-                st.warning(f"Product with ID '{del_prod}' deleted successfully.")
+                st.session_state.df = st.session_state.df[st.session_state.df['Product Name']!=del_selected_product].reset_index(drop=True)
+                st.session_state.dfm = st.session_state.dfm[st.session_state.dfm['Product Name']!=del_selected_product].reset_index(drop=True)
+                st.warning(f"Product with ID '{del_selected_product}' deleted successfully.")
                 
             st.dataframe(st.session_state.dfm)
 
