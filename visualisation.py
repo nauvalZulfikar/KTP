@@ -8,6 +8,8 @@ from collections import defaultdict
 from scheduler import adjust_to_working_hours_and_days, calculate_machine_utilization, adjust_end_time_and_start_time, schedule_production_with_days, reschedule_production_with_days, calculate_waiting_time, late_products
 import time
 
+bold_font = dict(family="Arial Black, Arial, sans-serif", size=16, color="black")
+
 # Function to create a vertical divider
 def vertical_divider():
     st.markdown(
@@ -41,6 +43,8 @@ def create_bar_chart(data, x_col, y_col, color=None):
     )
     fig.update_traces(texttemplate="%{text:.2f} days", textposition="outside")
     fig.update_layout(
+        font=bold_font,
+        legend=dict(font=bold_font),
         xaxis_title="Category",
         yaxis_title="Average Waiting Time (Days)",
         template="plotly_white",
@@ -235,6 +239,8 @@ def visualisation_tab():
             )
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_static.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
@@ -255,6 +261,8 @@ def visualisation_tab():
             )
             fig_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_animated.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
@@ -292,6 +300,8 @@ def visualisation_tab():
             ))
 
         fig.update_layout(
+            font=bold_font,
+            legend=dict(font=bold_font),
             xaxis=dict(title="Product Name"),
             yaxis=dict(title="Components"),
             legend_title="Status and Process Type",
@@ -370,6 +380,8 @@ def visualisation_tab():
     )
 
     gcu_static.update_layout(
+        font=bold_font,
+        legend=dict(font=bold_font),
         xaxis_title="Task Duration (minutes)",
         yaxis_title="Products",
         legend_title="Components",
@@ -406,6 +418,8 @@ def visualisation_tab():
 
             mu_static.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             mu_static.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Machine",
                 yaxis_title="Utilization (%)",
                 template="plotly_white",
@@ -429,6 +443,8 @@ def visualisation_tab():
 
             mu_animated.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             mu_animated.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Machine",
                 yaxis_title="Utilization (%)",
                 template="plotly_white",
@@ -460,6 +476,8 @@ def visualisation_tab():
 
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             pw_static.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Product Name",
                 yaxis_title="Waiting Time",
                 template="plotly_white",
@@ -484,6 +502,8 @@ def visualisation_tab():
 
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             pw_animated.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Product Name",
                 yaxis_title="Waiting Time",
                 template="plotly_white",
@@ -514,6 +534,8 @@ def visualisation_tab():
 
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             cw_static.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Components",
                 yaxis_title="Waiting Time",
                 template="plotly_white",
@@ -537,6 +559,8 @@ def visualisation_tab():
 
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             cw_animated.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 xaxis_title="Components",
                 yaxis_title="Waiting Time",
                 template="plotly_white",
@@ -576,6 +600,8 @@ def visualisation_tab():
 
             # Update layout
             lp_static.update_layout(
+                font=bold_font,
+                legend=dict(font=bold_font),
                 template="plotly_white",
                 showlegend=True,
             )
@@ -605,6 +631,8 @@ def visualisation_tab():
 
         # Update layout
         lp_animated.update_layout(
+            font=bold_font,
+            legend=dict(font=bold_font),
             template="plotly_white",
             showlegend=True,
         )
