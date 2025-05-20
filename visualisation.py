@@ -263,7 +263,6 @@ def visualisation_tab():
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                legend_title="Component",
                 xaxis_title="Time",
                 yaxis_title="Products"
             )
