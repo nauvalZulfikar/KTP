@@ -46,16 +46,16 @@ def create_bar_chart(data, x_col, y_col, color=None):
         font=bold_font,
         legend=dict(font=bold_font),              
         xaxis=dict(
+            title="Category",
             titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
+            title="Average Waiting Time (Days)",
             titlefont=bold_font,
             tickfont=bold_font
         ),
         legend_title="Component",
-        xaxis_title="Category",
-        yaxis_title="Average Waiting Time (Days)",
         template="plotly_white",
         showlegend=bool(color),
     )
@@ -251,16 +251,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),              
                 xaxis=dict(
+                    title='Time',
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    yaxis_title='Products',
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
-                legend_title="Component",
-                xaxis_title="Time",
-                yaxis_title="Products"
+                legend_title="Component"
             )
             st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
             st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
@@ -281,16 +281,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),                
                 xaxis=dict(
+                    title='Time',
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title='Products',
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
-                legend_title="Component",
-                xaxis_title="Time",
-                yaxis_title="Products"
+                legend_title="Component"
             )
             # st.markdown('<div class="plot-container">', unsafe_allow_html=True)
             st.plotly_chart(fig_animated, use_container_width=True, key='gantt_chart_animated')
@@ -414,15 +414,15 @@ def visualisation_tab():
         font=bold_font,
         legend=dict(font=bold_font),               
         xaxis=dict(
+            title="Task Duration (minutes)",
             titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
+            title="Products",
             titlefont=bold_font,
             tickfont=bold_font
         ),
-        xaxis_title="Task Duration (minutes)",
-        yaxis_title="Products",
         legend_title="Components",
         template="plotly_white"
     )
@@ -460,16 +460,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),                  
                 xaxis=dict(
+                    title="Machine",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Utilization (%)",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Machine",
-                yaxis_title="Utilization (%)",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -494,16 +494,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
+                    title="Machine",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Utilization (%)",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Machine",
-                yaxis_title="Utilization (%)",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -536,16 +536,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),                
                 xaxis=dict(
+                    title="Product Name",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Waiting Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Product Name",
-                yaxis_title="Waiting Time",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -571,16 +571,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),                
                 xaxis=dict(
+                    title="Product Name",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Waiting Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Product Name",
-                yaxis_title="Waiting Time",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -612,16 +612,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
+                    title="Components",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Waiting Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Components",
-                yaxis_title="Waiting Time",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -646,16 +646,16 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
+                    title="Components",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
+                    title="Waiting Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
-                xaxis_title="Components",
-                yaxis_title="Waiting Time",
                 template="plotly_white",
                 showlegend=True,
             )
@@ -725,20 +725,12 @@ def visualisation_tab():
 
         # Update layout
         lp_animated.update_layout(
-            font=bold_font,
-            legend=dict(font=bold_font),                
-            xaxis=dict(
-                titlefont=bold_font,
-                tickfont=bold_font
-            ),
-            yaxis=dict(
-                titlefont=bold_font,
-                tickfont=bold_font
-            ),
-            legend_title="Component",
-            template="plotly_white",
-            showlegend=True,
-        )
+                font=bold_font,
+                legend=dict(font=bold_font),
+                legend_title="Component",
+                template="plotly_white",
+                showlegend=True,
+            )
 
         st.plotly_chart(lp_animated, use_container_width=True, key='late_products_animated')
         st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
