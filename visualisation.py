@@ -694,15 +694,7 @@ def visualisation_tab():
             # Update layout
             lp_static.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),               
-                xaxis=dict(
-                    titlefont=bold_font,
-                    tickfont=bold_font
-                ),
-                yaxis=dict(
-                    titlefont=bold_font,
-                    tickfont=bold_font
-                ),
+                legend=dict(font=bold_font),
                 legend_title="Component",
                 template="plotly_white",
                 showlegend=True,
