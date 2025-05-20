@@ -248,20 +248,20 @@ def visualisation_tab():
             )
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_static.update_layout(
-                font=bold_font,
-                legend=dict(font=bold_font),              
-                xaxis=dict(
-                    title='Time',
-                    # titlefont=bold_font,
-                    tickfont=bold_font
-                ),
-                yaxis=dict(
-                    yaxis_title='Products',
-                    # titlefont=bold_font,
-                    tickfont=bold_font
-                ),
-                legend_title="Component"
-            )
+            font=bold_font,
+            legend=dict(font=bold_font),
+            legend_title="Component",
+            xaxis=dict(
+                title=dict(text="Time", font=bold_font),
+                tickfont=bold_font
+            ),
+            yaxis=dict(
+                title=dict(text="Products", font=bold_font),
+                tickfont=bold_font
+            ),
+            template="plotly_white",
+            showlegend=True
+        )
             st.plotly_chart(fig_static, use_container_width=True, key='gantt_chart_static')
             st.markdown('<hr style="border:1px solid white">', unsafe_allow_html=True)
     else:
