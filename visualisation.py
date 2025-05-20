@@ -44,14 +44,12 @@ def create_bar_chart(data, x_col, y_col, color=None):
     fig.update_traces(texttemplate="%{text:.2f} days", textposition="outside")
     fig.update_layout(
         font=bold_font,
-        legend=dict(font=bold_font),
+        legend=dict(font=bold_font),              
         xaxis=dict(
-            title="Time",
             titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
-            title="Products",
             titlefont=bold_font,
             tickfont=bold_font
         ),
@@ -251,14 +249,12 @@ def visualisation_tab():
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_static.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),
+                legend=dict(font=bold_font),              
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -283,14 +279,12 @@ def visualisation_tab():
             fig_animated.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_animated.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),               
+                legend=dict(font=bold_font),                
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -332,20 +326,15 @@ def visualisation_tab():
 
         fig.update_layout(
             font=bold_font,
-            legend=dict(font=bold_font),               
+            legend=dict(font=bold_font),                 
             xaxis=dict(
-                title="Time",
                 titlefont=bold_font,
                 tickfont=bold_font
             ),
             yaxis=dict(
-                title="Products",
                 titlefont=bold_font,
                 tickfont=bold_font
             ),
-            legend_title="Component",
-            xaxis=dict(title="Product Name"),
-            yaxis=dict(title="Components"),
             legend_title="Status and Process Type",
             template="plotly_white"
         )
@@ -425,16 +414,13 @@ def visualisation_tab():
         font=bold_font,
         legend=dict(font=bold_font),               
         xaxis=dict(
-            title="Time",
             titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
-            title="Products",
             titlefont=bold_font,
             tickfont=bold_font
         ),
-        legend_title="Component",
         xaxis_title="Task Duration (minutes)",
         yaxis_title="Products",
         legend_title="Components",
@@ -472,14 +458,12 @@ def visualisation_tab():
             mu_static.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             mu_static.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),               
+                legend=dict(font=bold_font),                  
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -510,12 +494,10 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -552,14 +534,12 @@ def visualisation_tab():
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             pw_static.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),               
+                legend=dict(font=bold_font),                
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -589,14 +569,12 @@ def visualisation_tab():
             # fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
             pw_animated.update_layout(
                 font=bold_font,
-                legend=dict(font=bold_font),               
+                legend=dict(font=bold_font),                
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -634,12 +612,10 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -670,12 +646,10 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -722,12 +696,10 @@ def visualisation_tab():
                 font=bold_font,
                 legend=dict(font=bold_font),               
                 xaxis=dict(
-                    title="Time",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
-                    title="Products",
                     titlefont=bold_font,
                     tickfont=bold_font
                 ),
@@ -762,14 +734,12 @@ def visualisation_tab():
         # Update layout
         lp_animated.update_layout(
             font=bold_font,
-            legend=dict(font=bold_font),               
+            legend=dict(font=bold_font),                
             xaxis=dict(
-                title="Time",
                 titlefont=bold_font,
                 tickfont=bold_font
             ),
             yaxis=dict(
-                title="Products",
                 titlefont=bold_font,
                 tickfont=bold_font
             ),
