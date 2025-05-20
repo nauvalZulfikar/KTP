@@ -248,17 +248,17 @@ def visualisation_tab():
             )
             fig_static.update_yaxes(categoryorder="total ascending")  # Sort tasks
             fig_static.update_layout(
-            font=bold_font,
-            legend=dict(font=bold_font),
-            legend_title="Component",
-            xaxis=dict(
-                title=dict(text="Time", font=bold_font),
-                tickfont=bold_font
-            ),
-            yaxis=dict(
-                title=dict(text="Products", font=bold_font),
-                tickfont=bold_font
-            ),
+                font=bold_font,
+                legend=dict(font=bold_font),
+                legend_title="Component",
+                xaxis=dict(
+                    title=dict(text="Time", font=bold_font),
+                    tickfont=bold_font
+                ),
+                yaxis=dict(
+                    title=dict(text="Products", font=bold_font),
+                    tickfont=bold_font
+                ),
             template="plotly_white",
             showlegend=True
         )
