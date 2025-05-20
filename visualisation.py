@@ -47,12 +47,12 @@ def create_bar_chart(data, x_col, y_col, color=None):
         legend=dict(font=bold_font),              
         xaxis=dict(
             title="Category",
-            titlefont=bold_font,
+            # titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
             title="Average Waiting Time (Days)",
-            titlefont=bold_font,
+            # titlefont=bold_font,
             tickfont=bold_font
         ),
         legend_title="Component",
@@ -252,12 +252,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),              
                 xaxis=dict(
                     title='Time',
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     yaxis_title='Products',
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component"
@@ -282,12 +282,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),                
                 xaxis=dict(
                     title='Time',
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title='Products',
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component"
@@ -328,11 +328,11 @@ def visualisation_tab():
             font=bold_font,
             legend=dict(font=bold_font),                 
             xaxis=dict(
-                titlefont=bold_font,
+                # titlefont=bold_font,
                 tickfont=bold_font
             ),
             yaxis=dict(
-                titlefont=bold_font,
+                # titlefont=bold_font,
                 tickfont=bold_font
             ),
             legend_title="Status and Process Type",
@@ -415,12 +415,12 @@ def visualisation_tab():
         legend=dict(font=bold_font),               
         xaxis=dict(
             title="Task Duration (minutes)",
-            titlefont=bold_font,
+            # titlefont=bold_font,
             tickfont=bold_font
         ),
         yaxis=dict(
             title="Products",
-            titlefont=bold_font,
+            # titlefont=bold_font,
             tickfont=bold_font
         ),
         legend_title="Components",
@@ -461,12 +461,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),                  
                 xaxis=dict(
                     title="Machine",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Utilization (%)",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
@@ -495,12 +495,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),               
                 xaxis=dict(
                     title="Machine",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Utilization (%)",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
@@ -537,12 +537,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),                
                 xaxis=dict(
                     title="Product Name",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Waiting Time",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
@@ -572,12 +572,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),                
                 xaxis=dict(
                     title="Product Name",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Waiting Time",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
@@ -613,12 +613,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),               
                 xaxis=dict(
                     title="Components",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Waiting Time",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
@@ -647,12 +647,12 @@ def visualisation_tab():
                 legend=dict(font=bold_font),               
                 xaxis=dict(
                     title="Components",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 yaxis=dict(
                     title="Waiting Time",
-                    titlefont=bold_font,
+                    # titlefont=bold_font,
                     tickfont=bold_font
                 ),
                 legend_title="Component",
