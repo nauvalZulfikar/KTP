@@ -107,7 +107,7 @@ def visualisation_tab():
                         st.session_state.machine_last_end = defaultdict(
                             lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
                         # Extract machine state for rows up to `st.session_state.rows_added`
-                        for _, row in st.session_state._progress.iloc[:st.session_state.rows_added].iterrows():
+                        for _, row in st.session_state.dfm_progress.iloc[:st.session_state.rows_added].iterrows():
                             st.session_state.machine_schedule[row['Machine Number']].append(
                                 (row['Start Time'], row['End Time'], row['UniqueID']))
                             st.session_state.machine_last_end[row['Machine Number']] = max(
