@@ -176,11 +176,11 @@ def schedule_production_with_days(data):
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
                 to_be_produced = min(producible_qty,data['Quantity Required'][i])
+                remaining_task = data.iloc[i].copy()
+                remaining_qty = data['Quantity Required'][i] - to_be_produced
 
                 # If there’s remaining work, create a new task for it
-                if to_be_produced > 0:
-                    remaining_task = data.iloc[i].copy()
-                    remaining_qty = data['Quantity Required'][i] - to_be_produced
+                if remaining_qty > 0:
                     data.at[i, 'Quantity Required'] = int(to_be_produced)
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
@@ -226,6 +226,9 @@ def schedule_production_with_days(data):
         has_empty_rows = data['Start Time'].isna().any() or data['End Time'].isna().any()
 
     data['Quantity Required'] = data['Quantity Required'].apply(lambda x: round(x))
+
+    # data = data[data['Quantity Required']>0]
+    # data.reset_index(inplace=True,drop=True)
 
     # Return the completed schedule
     return data
@@ -348,11 +351,11 @@ def reschedule_production_with_days(data, machine_last_end, machine_schedule, pr
                 available_minutes = (gap_end - adjusted_gap_start).total_seconds() / 60
                 producible_qty = (available_minutes / run_time_minutes) * data['Quantity Required'][i]
                 to_be_produced = min(producible_qty,data['Quantity Required'][i])
+                remaining_task = data.iloc[i].copy()
+                remaining_qty = data['Quantity Required'][i] - to_be_produced
 
                 # If there’s remaining work, create a new task for it
-                if to_be_produced > 0:
-                    remaining_task = data.iloc[i].copy()
-                    remaining_qty = data['Quantity Required'][i] - to_be_produced
+                if remaining_qty > 0:
                     data.at[i, 'Quantity Required'] = int(to_be_produced)
                     remaining_task['Quantity Required'] = remaining_qty
                     remaining_task['Start Time'] = None
