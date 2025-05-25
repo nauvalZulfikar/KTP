@@ -86,7 +86,6 @@ def visualisation_tab():
     if "late_df_history" not in st.session_state:
         st.session_state.late_df_history = []  # List to store late products dataframes
 
-    # Layout for buttons
     with st.container():
         col1, spacer1, col2, spacer2, col3, spacer3, col4 = st.columns([1, 0.2, 1, 0.2, 1, 0.2, 1])
 
@@ -97,28 +96,27 @@ def visualisation_tab():
                         # Initialize the progress DataFrame
                         st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
 
+                        st.session_state.machine_schedule = defaultdict(list)
                         for machine in st.session_state.df['Machine Number'].unique():
                             st.session_state.machine_schedule[machine].append(
                                 (st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
                                  st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
                                  None))
-                        
+
                         st.session_state.machine_last_end = defaultdict(
                             lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
-                        
-                        # Extract machine state for rows up to `st.session_state.rows_added`
+                        # Extract machine state for rows up to st.session_state.rows_added
                         for _, row in st.session_state.dfm.iloc[:st.session_state.rows_added].iterrows():
                             st.session_state.machine_schedule[row['Machine Number']].append(
                                 (row['Start Time'], row['End Time'], row['UniqueID']))
                             st.session_state.machine_last_end[row['Machine Number']] = max(
                                 st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
-                            st.write(st.session_state.machine_last_end)
+
                     st.session_state.auto_refresh = True  # Enable auto-refresh
         with col2:
             if st.button("Pause"):
                 st.session_state.auto_refresh = False
                 st.session_state.rows_added -= 1
-                st.session_state.machine_schedule = defaultdict(list)
                 st.info("Animation paused.")
         with col3:
             if st.button("Reschedule"):
@@ -160,7 +158,7 @@ def visualisation_tab():
                     by=['Start Time', 'End Time', 'Promised Delivery Date'])
                 # Combine both parts
                 new_dataframe = pd.concat([dfm1, dfm2], ignore_index=True)
-                # new_dataframe = new_dataframe[new_dataframe['Quantity  Required']>=1]
+                new_dataframe = new_dataframe[new_dataframe['Quantity Required']>=1]
 
                 # Append the new dataframe to the history list
                 st.session_state.dfm = new_dataframe.reset_index(drop=True).copy()
