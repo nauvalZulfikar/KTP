@@ -106,7 +106,7 @@ def visualisation_tab():
                                 (row['Start Time'], row['End Time'], row['UniqueID']))
                             st.session_state.machine_last_end[row['Machine Number']] = max(
                                 st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
-                            print(st.session_state.machine_last_end)
+                            st.write(st.session_state.machine_last_end)
                     st.session_state.auto_refresh = True  # Enable auto-refresh
         with col2:
             if st.button("Pause"):
