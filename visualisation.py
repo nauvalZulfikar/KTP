@@ -107,7 +107,7 @@ def visualisation_tab():
                         st.session_state.machine_last_end = defaultdict(
                             lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
                         # Extract machine state for rows up to `st.session_state.rows_added`
-                        for _, row in st.session_state.dfm.iloc[:st.session_state.rows_added].iterrows():
+                        for _, row in st.session_state._progress.iloc[:st.session_state.rows_added].iterrows():
                             st.session_state.machine_schedule[row['Machine Number']].append(
                                 (row['Start Time'], row['End Time'], row['UniqueID']))
                             st.session_state.machine_last_end[row['Machine Number']] = max(
@@ -163,18 +163,6 @@ def visualisation_tab():
 
                 # Append the new dataframe to the history list
                 st.session_state.dfm = new_dataframe.reset_index(drop=True).copy()
-                # Rebuild machine state based on rescheduled portion (i.e., up to pause_index)
-                st.session_state.machine_schedule = defaultdict(list)
-                st.session_state.machine_last_end = defaultdict(
-                    lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0)
-                )
-                
-                for _, row in st.session_state.dfm.iloc[:pause_index].iterrows():
-                    machine = row['Machine Number']
-                    st.session_state.machine_schedule[machine].append((row['Start Time'], row['End Time'], row['UniqueID']))
-                    st.session_state.machine_last_end[machine] = max(
-                        st.session_state.machine_last_end[machine], row['End Time']
-                    )
                 st.session_state.total_rows = len(st.session_state.dfm) + 1
                 st.session_state.dataframe_history.append(new_dataframe)
 
