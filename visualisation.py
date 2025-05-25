@@ -95,8 +95,18 @@ def visualisation_tab():
                 if not st.session_state.auto_refresh:  # If not already animating
                     if st.session_state.rows_added == 0:  # If starting fresh
                         # Initialize the progress DataFrame
-                        st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns)
-
+                        st.session_state.dfm_progress = pd.DataFrame(columns=st.session_state.dfm.columns
+                                                                     
+                        st.session_state.machine_last_end = defaultdict(
+                            lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
+                        
+                        # Extract machine state for rows up to `st.session_state.rows_added`
+                        for _, row in st.session_state.dfm.iloc[:st.session_state.rows_added].iterrows():
+                            st.session_state.machine_schedule[row['Machine Number']].append(
+                                (row['Start Time'], row['End Time'], row['UniqueID']))
+                            st.session_state.machine_last_end[row['Machine Number']] = max(
+                                st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
+                            print(st.session_state.machine_last_end)
                     st.session_state.auto_refresh = True  # Enable auto-refresh
         with col2:
             if st.button("Pause"):
@@ -109,16 +119,7 @@ def visualisation_tab():
                         (st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
                          st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0),
                          None))
-
-                st.session_state.machine_last_end = defaultdict(
-                    lambda: st.session_state.df['Order Processing Date'].min().replace(hour=9, minute=0))
-                # Extract machine state for rows up to `st.session_state.rows_added`
-                for _, row in st.session_state.dfm.iloc[:st.session_state.rows_added].iterrows():
-                    st.session_state.machine_schedule[row['Machine Number']].append(
-                        (row['Start Time'], row['End Time'], row['UniqueID']))
-                    st.session_state.machine_last_end[row['Machine Number']] = max(
-                        st.session_state.machine_last_end[row['Machine Number']], row['End Time'])
-                    
+                   
                 st.info("Animation paused.")
         with col3:
             if st.button("Reschedule"):
