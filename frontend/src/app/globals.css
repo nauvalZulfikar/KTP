@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure native <option> popups have readable colors across OSes / themes. */
+select option {
+  color: #18181b;
+  background-color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  select option {
+    color: #f4f4f5;
+    background-color: #27272a;
+  }
+}
+
+/* frappe-gantt: its defaults render bars in white. Override so they're visible. */
+.gantt-container {
+  --g-bar-color: #3b82f6;     /* blue-500 */
+  --g-bar-border: #1d4ed8;    /* blue-700 */
+  --g-progress-color: #60a5fa; /* blue-400 */
+  --g-text-light: #ffffff;
+}
+.gantt .bar-wrapper .bar {
+  stroke-width: 1;
+}
+.gantt .bar-wrapper.bar-outsource .bar {
+  fill: #f97316 !important;   /* orange-500 */
+  stroke: #c2410c !important; /* orange-700 */
+}
+.gantt .bar-wrapper.bar-outsource .bar-progress {
+  fill: #fb923c !important;   /* orange-400 */
+}
+.gantt .bar-wrapper.bar-inhouse .bar-label {
+  fill: #ffffff !important;
+}
+.gantt .bar-wrapper.bar-outsource .bar-label {
+  fill: #ffffff !important;
+}

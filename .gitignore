@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.db
+*.db-journal
+dist/
+build/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+.turbo/
+next-env.d.ts
+*.tsbuildinfo
+
+# Generated artefacts
+frontend/openapi.json
+
+# Env / secrets
+.env
+.env.local
+.env.production
+.env.agent
+.agent.yaml
+legacy/ktp credential.json
+legacy/.env.agent
+legacy/.agent.yaml
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Legacy pycache
+legacy/__pycache__/

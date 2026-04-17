@@ -1,0 +1,7 @@
+pandas
+matplotlib
+streamlit
+plotly
+streamlit-autorefresh
+openpyxl
+st-gsheets-connection
