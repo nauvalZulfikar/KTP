@@ -43,12 +43,12 @@ type Bar = {
 };
 
 /**
- * FCFS schedule without job splitting.
+ * Strictly serialised schedule without job splitting.
  *   - component dependency preserved (C2 waits for C1 in the same product)
- *   - machine sequencing preserved for real machines (one job at a time)
- *   - OutSrc stays parallel (infinite capacity), matching the real scheduler
- *   - no gap-splitting: a job that could theoretically slide into a gap just
- *     waits until the machine is fully free, as one continuous block
+ *   - ALL in-house machines share a single global "last end" — only one
+ *     in-house machine runs at any given moment across the whole plant
+ *   - OutSrc stays parallel (infinite-capacity vendor — not a plant machine)
+ *   - no gap-splitting: every component is one continuous block
  */
 function computeNoSplitBars(tasks: TaskRead[]): Bar[] {
   const sorted = [...tasks].sort((a, b) => {
@@ -59,7 +59,7 @@ function computeNoSplitBars(tasks: TaskRead[]): Bar[] {
     return a.component.localeCompare(b.component);
   });
 
-  const machineLastEnd = new Map<string, number>();
+  let globalInHouseEnd = 0;
   const productLastEnd = new Map<string, number>();
   const bars: Bar[] = [];
 
@@ -67,8 +67,9 @@ function computeNoSplitBars(tasks: TaskRead[]): Bar[] {
     const orderMs = new Date(t.order_processing_date).getTime();
     const prevComp = productLastEnd.get(t.product_name) ?? 0;
     const isOut = t.machine_number === "OutSrc";
-    const mEnd = isOut ? 0 : machineLastEnd.get(t.machine_number) ?? 0;
-    const startMs = Math.max(orderMs, prevComp, mEnd);
+    const startMs = isOut
+      ? Math.max(orderMs, prevComp)
+      : Math.max(orderMs, prevComp, globalInHouseEnd);
     const durationMin = (t.quantity_required * t.run_time_per_1000) / 1000;
     const durationMs = (durationMin / BUSINESS_MIN_PER_DAY) * MS_PER_DAY;
     const endMs = startMs + durationMs;
@@ -83,7 +84,7 @@ function computeNoSplitBars(tasks: TaskRead[]): Bar[] {
       outsource: isOut,
       lane: 0,
     });
-    if (!isOut) machineLastEnd.set(t.machine_number, endMs);
+    if (!isOut) globalInHouseEnd = endMs;
     productLastEnd.set(t.product_name, endMs);
   }
 
@@ -172,8 +173,8 @@ export function CriticalPathChart() {
         <h3 className="text-sm font-medium">
           No Machine Sequencing and Job Splitting (MSJS){" "}
           <span className="text-xs text-zinc-500">
-            (original Excel — component order preserved, one job at a time per machine, each
-            component is a single continuous bar with no gap-filling splits)
+            (original Excel — only one in-house machine runs at a time across the whole plant;
+            OutSrc stays parallel as a vendor; each component is a single continuous bar)
           </span>
         </h3>
       </div>

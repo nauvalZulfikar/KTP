@@ -35,7 +35,7 @@ function computeNoMsjs(tasks: TaskRead[]): NoMsjsBar[] {
     if (a.product_name !== b.product_name) return a.product_name.localeCompare(b.product_name);
     return a.component.localeCompare(b.component);
   });
-  const machineLastEnd = new Map<string, number>();
+  let globalInHouseEnd = 0;
   const productLastEnd = new Map<string, number>();
   const out: NoMsjsBar[] = [];
   for (const t of sorted) {
@@ -43,8 +43,9 @@ function computeNoMsjs(tasks: TaskRead[]): NoMsjsBar[] {
     const promisedMs = new Date(t.promised_delivery_date).getTime();
     const prev = productLastEnd.get(t.product_name) ?? 0;
     const isOut = t.machine_number === "OutSrc";
-    const mEnd = isOut ? 0 : machineLastEnd.get(t.machine_number) ?? 0;
-    const startMs = Math.max(orderMs, prev, mEnd);
+    const startMs = isOut
+      ? Math.max(orderMs, prev)
+      : Math.max(orderMs, prev, globalInHouseEnd);
     const durationMin = (t.quantity_required * t.run_time_per_1000) / 1000;
     const endMs = startMs + (durationMin / BUSINESS_MIN_PER_DAY) * MS_PER_DAY;
     out.push({
@@ -58,7 +59,7 @@ function computeNoMsjs(tasks: TaskRead[]): NoMsjsBar[] {
       promisedMs,
       orderMs,
     });
-    if (!isOut) machineLastEnd.set(t.machine_number, endMs);
+    if (!isOut) globalInHouseEnd = endMs;
     productLastEnd.set(t.product_name, endMs);
   }
   return out;
