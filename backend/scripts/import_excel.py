@@ -58,13 +58,27 @@ def load_dataframe(path: Path, sheet: str = "P") -> pd.DataFrame:
     return df
 
 
+def _is_blank(value: Any) -> bool:
+    """Treat NaN, None, empty strings, and whitespace-only strings as missing."""
+    if value is None:
+        return True
+    try:
+        if pd.isna(value):
+            return True
+    except (TypeError, ValueError):
+        pass
+    if isinstance(value, str) and value.strip() == "":
+        return True
+    return False
+
+
 def row_to_taskrow(row: "pd.Series[Any]") -> TaskRow:
     data: dict[str, Any] = {}
     for excel_col, attr in _COLUMN_MAP.items():
         if excel_col not in row.index:
             continue
         value = row[excel_col]
-        data[attr] = None if pd.isna(value) else value
+        data[attr] = None if _is_blank(value) else value
 
     data["unique_id"] = int(data["unique_id"])
     data["quantity_required"] = int(data["quantity_required"])
