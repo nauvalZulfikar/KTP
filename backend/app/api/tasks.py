@@ -19,7 +19,7 @@ def list_tasks(session: Session = Depends(get_session)) -> list[TaskRow]:
 def list_original_tasks() -> list[TaskRead]:
     """Read the source Excel workbook fresh and return task rows as-originally-defined.
     Independent of any Randomise / Modify / Products edits that have hit the DB."""
-    df = load_dataframe(settings.excel_path, "P")
+    df = load_dataframe(settings.excel_path, "As-Is")
     out: list[TaskRead] = []
     for _, row in df.iterrows():
         tr = row_to_taskrow(row)

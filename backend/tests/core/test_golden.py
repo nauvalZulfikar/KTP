@@ -51,7 +51,7 @@ def excel_input():
     pd = pytest.importorskip("pandas")
     if not EXCEL_PATH.exists():
         pytest.skip(f"missing Excel fixture at {EXCEL_PATH}")
-    df = pd.read_excel(EXCEL_PATH, sheet_name="P")
+    df = pd.read_excel(EXCEL_PATH, sheet_name="As-Is")
     df["Order Processing Date"] = pd.to_datetime(df["Order Processing Date"])
     df["Promised Delivery Date"] = pd.to_datetime(df["Promised Delivery Date"])
     df["Start Time"] = pd.NaT

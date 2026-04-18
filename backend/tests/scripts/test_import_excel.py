@@ -72,9 +72,9 @@ def test_row_to_taskrow_handles_null_status() -> None:
 
 def test_load_dataframe_rejects_missing_columns(tmp_path: Path) -> None:
     bad = tmp_path / "bad.xlsx"
-    pd.DataFrame([{"UniqueID": 1}]).to_excel(bad, sheet_name="P", index=False)
+    pd.DataFrame([{"UniqueID": 1}]).to_excel(bad, sheet_name="As-Is", index=False)
     with pytest.raises(ValueError, match="Missing required columns"):
-        load_dataframe(bad, "P")
+        load_dataframe(bad, "As-Is")
 
 
 def test_import_dataframe_inserts_all_rows(session: Session) -> None:
@@ -99,7 +99,7 @@ def test_import_dataframe_wipes_on_reimport(session: Session) -> None:
 
 @pytest.mark.skipif(not EXCEL_PATH.exists(), reason=f"missing fixture {EXCEL_PATH}")
 def test_import_real_excel_round_trip(session: Session) -> None:
-    df = load_dataframe(EXCEL_PATH, "P")
+    df = load_dataframe(EXCEL_PATH, "As-Is")
     deleted, inserted = import_dataframe(df, session)
     assert deleted == 0
     assert inserted == len(df)

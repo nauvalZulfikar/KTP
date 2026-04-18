@@ -1,10 +1,13 @@
-"""Import the legacy 'P' sheet from Product Details_v1.xlsx into the SQLite TaskRow table.
+"""Import a sheet from Product Details_v1.xlsx into the SQLite TaskRow table.
 
 Wipes existing rows and reinserts, so the workbook stays the source of truth.
+The default sheet is 'As-Is' (current scheduling scenario). Other common sheet
+names: 'Non-Preemptive', 'What-If 1'…'What-If 5'.
+
 Run from the backend directory:
 
     python -m scripts.import_excel
-    python -m scripts.import_excel --path "../Product Details_v1.xlsx" --sheet P
+    python -m scripts.import_excel --path "../Product Details_v1.xlsx" --sheet "What-If 1"
 """
 
 from __future__ import annotations
@@ -50,11 +53,13 @@ REQUIRED_COLUMNS: frozenset[str] = frozenset({
 })
 
 
-def load_dataframe(path: Path, sheet: str = "P") -> pd.DataFrame:
+def load_dataframe(path: Path, sheet: str = "As-Is") -> pd.DataFrame:
     df = pd.read_excel(path, sheet_name=sheet)
     missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:
         raise ValueError(f"Missing required columns in {path}: {sorted(missing)}")
+    # Drop trailing/empty rows where the primary key is blank.
+    df = df[df["UniqueID"].notna()].reset_index(drop=True)
     return df
 
 
@@ -106,7 +111,7 @@ def import_dataframe(df: pd.DataFrame, session: Session) -> tuple[int, int]:
     return deleted, len(df)
 
 
-def import_excel(path: Path, sheet: str = "P") -> tuple[int, int]:
+def import_excel(path: Path, sheet: str = "As-Is") -> tuple[int, int]:
     df = load_dataframe(path, sheet)
     init_db()
     with Session(engine) as session:
@@ -121,7 +126,7 @@ def main() -> None:
         default=settings.excel_path,
         help=f"Excel workbook path (default: {settings.excel_path})",
     )
-    parser.add_argument("--sheet", default="P", help="Sheet name (default: P)")
+    parser.add_argument("--sheet", default="As-Is", help="Sheet name (default: As-Is)")
     args = parser.parse_args()
 
     deleted, inserted = import_excel(args.path, args.sheet)
