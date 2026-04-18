@@ -1,11 +1,17 @@
 import ExcelJS from "exceljs";
 import { api } from "./api";
-import { renderGroupedBarPng } from "./excel-chart";
+import { renderGroupedBarPng, renderGanttPng } from "./excel-chart";
 import type { MetricsRead, ScheduleRunDetail, ScheduleRunRead, TaskRead } from "./types";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const BUSINESS_MIN_PER_DAY = 480;
-const HISTORY_COUNT = 4;
+const ORIGINAL_HEADERS = [
+  "UniqueID", "Sr. No", "Product Name",
+  "Order Processing Date", "Promised Delivery Date",
+  "Quantity Required", "Components", "Operation", "Process Type",
+  "Machine Number", "Run Time (min/1000)",
+  "Cycle Time (seconds)", "Setup time (seconds)",
+];
 
 const SERIES_PALETTE = [
   "#3b82f6", // no MSJS
@@ -157,9 +163,9 @@ export async function exportToExcel(): Promise<void> {
     api.listTasks(),
     api.listRuns(),
   ]);
-  const recentRuns = runs.slice(0, HISTORY_COUNT);
+  // Fetch ALL runs, not just recent
   const bundles: RunBundle[] = await Promise.all(
-    recentRuns.map(async (r) => {
+    runs.map(async (r) => {
       const [detail, metrics] = await Promise.all([api.getRun(r.id), api.getRunMetrics(r.id)]);
       return { run: r, detail, metrics };
     })
@@ -169,77 +175,132 @@ export async function exportToExcel(): Promise<void> {
   wb.created = new Date();
 
   // =================================================================
-  // Sheet 1 — No MSJS
+  // Sheet 1 — Original Scheduling (matches original Excel columns + Start/End)
   // =================================================================
   const noMsjsBars = computeNoMsjs(originalTasks);
-  const sheetNo = wb.addWorksheet("No MSJS");
-  setHeaderRow(sheetNo, [
-    "Task ID", "Product", "Component", "Machine",
-    "Quantity", "Run/1000 (min)", "Duration (min)",
-    "Order Date", "Promised Date", "Start", "End",
-  ]);
+  const sheetNo = wb.addWorksheet("Non-Preemptive");
+  setHeaderRow(sheetNo, [...ORIGINAL_HEADERS, "Start Time", "End Time"]);
   const taskById = new Map<number, TaskRead>();
   for (const t of originalTasks) taskById.set(t.id, t);
-  for (const b of noMsjsBars) {
-    const t = taskById.get(b.taskId);
+  // Build a map from task id to computed start/end
+  const noMsjsByTaskId = new Map<number, NoMsjsBar>();
+  for (const b of noMsjsBars) noMsjsByTaskId.set(b.taskId, b);
+  // Sort by UniqueID to match original ordering
+  const sortedOriginal = [...originalTasks].sort((a, b) => a.unique_id - b.unique_id);
+  for (const t of sortedOriginal) {
+    const bar = noMsjsByTaskId.get(t.id);
     sheetNo.addRow([
-      b.taskId,
-      b.product,
-      b.component,
-      b.machine,
-      t?.quantity_required ?? "",
-      t?.run_time_per_1000 ?? "",
-      b.durationMin.toFixed(1),
-      iso(b.orderMs),
-      iso(b.promisedMs),
-      iso(b.startMs),
-      iso(b.endMs),
+      t.unique_id,
+      t.sr_no ?? "",
+      t.product_name,
+      iso(new Date(t.order_processing_date).getTime()),
+      iso(new Date(t.promised_delivery_date).getTime()),
+      t.quantity_required,
+      t.component,
+      t.operation ?? "",
+      t.process_type ?? "",
+      t.machine_number,
+      t.run_time_per_1000,
+      t.cycle_time_seconds ?? "",
+      t.setup_time_seconds ?? "",
+      bar ? iso(bar.startMs) : "",
+      bar ? iso(bar.endMs) : "",
     ]);
   }
-  sheetNo.columns.forEach((c) => (c.width = 16));
+  sheetNo.columns.forEach((c) => (c.width = 20));
+
+  // Gantt chart for Non-Preemptive
+  const noMsjsGanttPng = await renderGanttPng({
+    title: "Non-Preemptive — Gantt Chart",
+    bars: noMsjsBars.map((b) => ({
+      product: b.product,
+      component: b.component,
+      machine: b.machine,
+      startMs: b.startMs,
+      endMs: b.endMs,
+      outsource: b.machine === "OutSrc",
+    })),
+  });
+  const noMsjsImgId = wb.addImage({ buffer: noMsjsGanttPng, extension: "png" });
+  const noMsjsImgRow = sheetNo.rowCount + 2;
+  sheetNo.addImage(noMsjsImgId, {
+    tl: { col: 0, row: noMsjsImgRow },
+    ext: { width: 1100, height: 500 },
+  });
 
   // =================================================================
-  // Sheet 2 — With MSJS (latest run)
+  // What-if sheets — one per run
   // =================================================================
-  const sheetWith = wb.addWorksheet("With MSJS");
-  if (bundles.length > 0) {
-    const latest = bundles[0];
-    const dbTaskById = new Map<number, TaskRead>();
-    for (const t of dbTasks) dbTaskById.set(t.id, t);
-    sheetWith.addRow([
-      `Latest scheduled run #${latest.run.id} (${iso(new Date(latest.run.created_at).getTime())})`,
+  const dbTaskById = new Map<number, TaskRead>();
+  for (const t of dbTasks) dbTaskById.set(t.id, t);
+  for (let i = 0; i < bundles.length; i++) {
+    const bundle = bundles[i];
+    const sheetName = i === 0 ? "As-Is" : `What-If ${i}`;
+    const sheet = wb.addWorksheet(sheetName);
+    sheet.addRow([
+      `Run #${bundle.run.id} (${iso(new Date(bundle.run.created_at).getTime())})${bundle.run.notes ? ` — ${bundle.run.notes}` : ""}`,
     ]);
-    sheetWith.getRow(1).font = { bold: true };
-    sheetWith.addRow([]);
-    setHeaderRow(sheetWith, [
-      "Assignment ID", "Task ID", "Product", "Component", "Machine",
-      "Split #", "Quantity", "Start", "End",
+    sheet.getRow(1).font = { bold: true };
+    sheet.addRow([]);
+    setHeaderRow(sheet, [
+      ...ORIGINAL_HEADERS, "Split #", "Assigned Qty", "Start Time", "End Time",
     ]);
-    const sorted = [...latest.detail.assignments].sort((a, b) =>
+    const sorted = [...bundle.detail.assignments].sort((a, b) =>
       a.start_time.localeCompare(b.start_time)
     );
     for (const a of sorted) {
       const t = dbTaskById.get(a.task_id);
-      sheetWith.addRow([
-        a.id,
-        a.task_id,
+      sheet.addRow([
+        t?.unique_id ?? "",
+        t?.sr_no ?? "",
         t?.product_name ?? "",
+        t ? iso(new Date(t.order_processing_date).getTime()) : "",
+        t ? iso(new Date(t.promised_delivery_date).getTime()) : "",
+        t?.quantity_required ?? "",
         t?.component ?? "",
+        t?.operation ?? "",
+        t?.process_type ?? "",
         t?.machine_number ?? "",
+        t?.run_time_per_1000 ?? "",
+        t?.cycle_time_seconds ?? "",
+        t?.setup_time_seconds ?? "",
         a.split_index,
         a.assigned_quantity,
         iso(new Date(a.start_time).getTime()),
         iso(new Date(a.end_time).getTime()),
       ]);
     }
-  } else {
-    sheetWith.addRow(["No runs yet. Click 'Run scheduler' first."]);
+    sheet.columns.forEach((c) => (c.width = 20));
+
+    // Gantt chart for this run
+    const runGanttBars = sorted.map((a) => {
+      const t = dbTaskById.get(a.task_id);
+      return {
+        product: t?.product_name ?? "\u2014",
+        component: t?.component ?? "\u2014",
+        machine: t?.machine_number ?? "\u2014",
+        startMs: new Date(a.start_time).getTime(),
+        endMs: new Date(a.end_time).getTime(),
+        outsource: (t?.machine_number ?? "") === "OutSrc",
+      };
+    });
+    const runGanttPng = await renderGanttPng({
+      title: `${sheetName} — Gantt Chart`,
+      bars: runGanttBars,
+    });
+    const runImgId = wb.addImage({ buffer: runGanttPng, extension: "png" });
+    const runImgRow = sheet.rowCount + 2;
+    sheet.addImage(runImgId, {
+      tl: { col: 0, row: runImgRow },
+      ext: { width: 1100, height: 500 },
+    });
   }
-  sheetWith.columns.forEach((c) => (c.width = 18));
 
   // =================================================================
-  // Metric sheets (table + chart). Columns: key | No MSJS | Run N ... Run N-3
+  // Metric sheets (table + chart). Columns: key | Original | Run N ... Run N-3
+  // Uses up to 4 most recent runs for comparison
   // =================================================================
+  const metricBundles = bundles.slice(0, 4);
   const noMsjsMetrics = computeNoMsjsMetrics(noMsjsBars);
 
   type MetricDef = {
@@ -299,17 +360,17 @@ export async function exportToExcel(): Promise<void> {
     // Collect all keys across No MSJS and each run
     const keySet = new Set<string>();
     for (const k of Object.keys(def.noMsjs)) keySet.add(k);
-    for (const b of bundles) for (const k of Object.keys(def.perRun(b.metrics))) keySet.add(k);
+    for (const b of metricBundles) for (const k of Object.keys(def.perRun(b.metrics))) keySet.add(k);
     const keys = Array.from(keySet).sort();
 
-    const runHeaders = bundles.map((b, i) => (i === 0 ? `Run #${b.run.id} (current)` : `Run #${b.run.id}`));
-    setHeaderRow(sheet, [def.keyLabel, "No MSJS", ...runHeaders]);
+    const runHeaders = metricBundles.map((b, i) => (i === 0 ? `As-Is` : `What-If ${i}`));
+    setHeaderRow(sheet, [def.keyLabel, "Non-Preemptive", ...runHeaders]);
 
     for (const k of keys) {
       const row: (string | number)[] = [k];
       const noVal = def.noMsjs[k];
       row.push(noVal == null ? "" : def.format(noVal));
-      for (const b of bundles) {
+      for (const b of metricBundles) {
         const v = def.perRun(b.metrics)[k];
         row.push(v == null ? "" : def.format(v));
       }
@@ -320,12 +381,12 @@ export async function exportToExcel(): Promise<void> {
     // Build chart data
     const seriesList = [
       {
-        name: "No MSJS",
+        name: "Non-Preemptive",
         color: SERIES_PALETTE[0],
         values: keys.map((k) => def.noMsjs[k] ?? null),
       },
-      ...bundles.map((b, i) => ({
-        name: i === 0 ? `Run #${b.run.id} (current)` : `Run #${b.run.id}`,
+      ...metricBundles.map((b, i) => ({
+        name: i === 0 ? `As-Is` : `What-If ${i}`,
         color: SERIES_PALETTE[(i + 1) % SERIES_PALETTE.length],
         values: keys.map((k) => def.perRun(b.metrics)[k] ?? null),
       })),

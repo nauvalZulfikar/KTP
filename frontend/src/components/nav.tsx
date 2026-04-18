@@ -9,7 +9,6 @@ export function Nav() {
           <Link href="/" className="hover:text-zinc-900 dark:hover:text-zinc-100">Dashboard</Link>
           <Link href="/tasks" className="hover:text-zinc-900 dark:hover:text-zinc-100">Tasks</Link>
           <Link href="/catalogue" className="hover:text-zinc-900 dark:hover:text-zinc-100">Catalogue</Link>
-          <Link href="/runs" className="hover:text-zinc-900 dark:hover:text-zinc-100">Runs</Link>
         </div>
       </div>
     </nav>
