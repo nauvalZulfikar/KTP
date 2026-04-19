@@ -1,16 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { DiffStatus } from "@/lib/scenario-diff";
 import type { ScheduledAssignmentRead, TaskRead } from "@/lib/types";
 
 type Props = {
   assignments: ScheduledAssignmentRead[];
   tasks: TaskRead[];
+  diffStatusMap?: Map<number, DiffStatus>;
 };
 
 type Bar = {
   key: string;
   assignmentId: number;
+  taskId: number;
   product: string;
   component: string;
   machine: string;
@@ -19,6 +22,14 @@ type Bar = {
   endMs: number;
   outsource: boolean;
   lane: number;
+};
+
+const DIFF_OUTLINE: Record<DiffStatus, string | null> = {
+  same: null,
+  moved: "3px solid #f59e0b",
+  "machine-changed": "3px solid #ef4444",
+  added: "3px solid #10b981",
+  removed: "3px dashed #f43f5e",
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -79,7 +90,7 @@ function clamp(v: number, lo: number, hi: number): number {
   return Math.min(hi, Math.max(lo, v));
 }
 
-export default function GanttView({ assignments, tasks }: Props) {
+export default function GanttView({ assignments, tasks, diffStatusMap }: Props) {
   const [zoom, setZoom] = useState(1);
 
   const taskById = useMemo(() => {
@@ -100,6 +111,7 @@ export default function GanttView({ assignments, tasks }: Props) {
       return {
         key: `a-${a.id}`,
         assignmentId: a.id,
+        taskId: a.task_id,
         product,
         component,
         machine,
@@ -263,6 +275,8 @@ export default function GanttView({ assignments, tasks }: Props) {
                     const width = Math.max(0.3, pct(b.endMs) - left);
                     const slotTop = LANE_PAD_PX + b.lane * SLOT_HEIGHT_PX;
                     const color = componentColor(b.component);
+                    const diffStatus = diffStatusMap?.get(b.taskId);
+                    const diffBorder = diffStatus ? DIFF_OUTLINE[diffStatus] : null;
                     const barStyle: React.CSSProperties = {
                       left: `${left}%`,
                       width: `${width}%`,
@@ -270,7 +284,8 @@ export default function GanttView({ assignments, tasks }: Props) {
                       top: slotTop,
                       height: BAR_HEIGHT_PX,
                       backgroundColor: color,
-                      border: "1.5px solid rgba(0,0,0,0.2)",
+                      border: diffBorder ?? "1.5px solid rgba(0,0,0,0.2)",
+                      boxShadow: diffBorder ? "0 0 0 1px rgba(0,0,0,0.15)" : undefined,
                     };
                     if (b.outsource) {
                       barStyle.backgroundImage =

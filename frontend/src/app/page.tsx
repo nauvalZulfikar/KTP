@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
 import GanttView from "@/components/gantt-view";
+import { ScenarioCompare } from "@/components/scenario-compare";
 import { MetricsTiles } from "@/components/metrics-tiles";
 import { ComponentStatusChart } from "@/components/charts/component-status-chart";
 import { LateProductsChart } from "@/components/charts/late-products-chart";
@@ -42,9 +43,20 @@ export default function DashboardPage() {
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const activeScenario = selectedScenario ?? scenarios[0] ?? null;
 
+  // Compare mode state
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareScenario, setCompareScenario] = useState<string | null>(null);
+
   // Fetch the selected scenario data
   const scenarioData = useSWR<ScenarioData>(
     activeScenario ? `/scenarios/${encodeURIComponent(activeScenario)}` : null,
+    fetcher
+  );
+
+  const compareData = useSWR<ScenarioData>(
+    compareMode && compareScenario
+      ? `/scenarios/${encodeURIComponent(compareScenario)}`
+      : null,
     fetcher
   );
 
@@ -100,6 +112,47 @@ export default function DashboardPage() {
     return computeNonPreemptiveMetrics(scenarioTasks);
   }, [scenarioTasks, scenarioAssignments]);
 
+  const compareTasks: TaskRead[] = useMemo(() => {
+    if (!compareData.data) return [];
+    return compareData.data.tasks.map((t) => ({
+      id: t.unique_id,
+      unique_id: t.unique_id,
+      sr_no: t.sr_no,
+      product_name: t.product_name,
+      order_processing_date: t.order_processing_date,
+      promised_delivery_date: t.promised_delivery_date,
+      quantity_required: t.quantity_required,
+      component: t.component,
+      operation: t.operation,
+      process_type: t.process_type,
+      machine_number: t.machine_number,
+      run_time_per_1000: t.run_time_per_1000,
+      cycle_time_seconds: t.cycle_time_seconds,
+      setup_time_seconds: t.setup_time_seconds,
+      status: t.status ?? "InProgress",
+    }));
+  }, [compareData.data]);
+
+  const compareAssignments: ScheduledAssignmentRead[] = useMemo(() => {
+    if (!compareData.data) return [];
+    const st = compareData.data.tasks;
+    const hasSchedule = st.some((t) => t.start_time);
+    if (hasSchedule) {
+      return st
+        .filter((t) => t.start_time && t.end_time)
+        .map((t, i) => ({
+          id: i + 1,
+          run_id: 0,
+          task_id: t.unique_id,
+          split_index: 0,
+          assigned_quantity: t.quantity_required,
+          start_time: typeof t.start_time === "string" ? t.start_time : new Date(t.start_time!).toISOString(),
+          end_time: typeof t.end_time === "string" ? t.end_time : new Date(t.end_time!).toISOString(),
+        }));
+    }
+    return computeNonPreemptiveAssignments(compareTasks);
+  }, [compareData.data, compareTasks]);
+
   // Animation
   const total = scenarioAssignments.length;
   const [visibleCount, setVisibleCount] = useState(0);
@@ -145,6 +198,12 @@ export default function DashboardPage() {
 
   const visible = scenarioAssignments.slice(0, visibleCount);
   const showGantt = scenarios.length > 0;
+  const compareReady =
+    compareMode &&
+    compareScenario !== null &&
+    compareScenario !== activeScenario &&
+    compareTasks.length > 0 &&
+    scenarioTasks.length > 0;
 
   return (
     <div className="space-y-6">
@@ -224,80 +283,158 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="text-lg font-medium">Gantt</h2>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-500 tabular-nums mr-2">
-                {visibleCount} / {total}
-              </span>
               <button
                 type="button"
                 onClick={() => {
-                  if (visibleCount >= total) setVisibleCount(0);
-                  setPlaying(true);
+                  setCompareMode((v) => {
+                    const next = !v;
+                    if (next && !compareScenario) {
+                      const firstOther = scenarios.find((s) => s !== activeScenario) ?? null;
+                      setCompareScenario(firstOther);
+                    }
+                    return next;
+                  });
                 }}
-                disabled={playing}
-                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+                className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                  compareMode
+                    ? "bg-violet-600 text-white border-violet-600 dark:bg-violet-500 dark:border-violet-500"
+                    : "border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                }`}
               >
-                Play
+                {compareMode ? "Exit compare" : "Compare"}
               </button>
-              <button
-                type="button"
-                onClick={() => setPlaying(false)}
-                disabled={!playing}
-                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
-              >
-                Pause
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPlaying(false);
-                  setVisibleCount(total);
-                }}
-                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                Show all
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setVisibleCount(0);
-                  setPlaying(false);
-                }}
-                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                Clear
-              </button>
+              {!compareMode && (
+                <>
+                  <span className="text-xs text-zinc-500 tabular-nums mr-2">
+                    {visibleCount} / {total}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (visibleCount >= total) setVisibleCount(0);
+                      setPlaying(true);
+                    }}
+                    disabled={playing}
+                    className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+                  >
+                    Play
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPlaying(false)}
+                    disabled={!playing}
+                    className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+                  >
+                    Pause
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlaying(false);
+                      setVisibleCount(total);
+                    }}
+                    className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Show all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVisibleCount(0);
+                      setPlaying(false);
+                    }}
+                    className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Clear
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
-          {scenarioTasks.length > 0 && (
-            <GanttView assignments={visible} tasks={scenarioTasks} />
-          )}
-
-          {/* Scenario selector buttons */}
-          <div className="flex flex-wrap gap-2 pt-2">
-            {scenarios.map((name) => {
-              const isActive = activeScenario === name;
-              return (
-                <button
-                  key={name}
-                  type="button"
-                  onClick={() => {
+          {compareMode ? (
+            <>
+              {compareReady && activeScenario && compareScenario ? (
+                <ScenarioCompare
+                  baseline={{
+                    name: activeScenario,
+                    tasks: scenarioTasks,
+                    assignments: scenarioAssignments,
+                  }}
+                  candidate={{
+                    name: compareScenario,
+                    tasks: compareTasks,
+                    assignments: compareAssignments,
+                  }}
+                />
+              ) : (
+                <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 p-6 text-center text-sm text-zinc-500">
+                  {compareData.isLoading
+                    ? "Loading comparison scenario…"
+                    : "Pick a second scenario below to compare."}
+                </div>
+              )}
+              <div className="space-y-2 pt-2">
+                <div className="text-xs font-medium text-sky-600 dark:text-sky-400">
+                  A · Baseline
+                </div>
+                <ScenarioButtons
+                  scenarios={scenarios}
+                  active={activeScenario}
+                  disabled={compareScenario}
+                  activeClass="bg-sky-600 text-white border-sky-600 dark:bg-sky-500 dark:border-sky-500"
+                  onSelect={(name) => {
                     setSelectedScenario(name);
                     setPlaying(false);
                     setVisibleCount(0);
                     setAnimatedScenario(null);
                   }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
-                    isActive
-                      ? "bg-sky-600 text-white border-sky-600 dark:bg-sky-500 dark:border-sky-500"
-                      : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  }`}
-                >
-                  {name}
-                </button>
-              );
-            })}
-          </div>
+                />
+                <div className="text-xs font-medium text-violet-600 dark:text-violet-400 pt-2">
+                  B · Compare against
+                </div>
+                <ScenarioButtons
+                  scenarios={scenarios}
+                  active={compareScenario}
+                  disabled={activeScenario}
+                  activeClass="bg-violet-600 text-white border-violet-600 dark:bg-violet-500 dark:border-violet-500"
+                  onSelect={(name) => setCompareScenario(name)}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {scenarioTasks.length > 0 && (
+                <GanttView assignments={visible} tasks={scenarioTasks} />
+              )}
+
+              {/* Scenario selector buttons */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {scenarios.map((name) => {
+                  const isActive = activeScenario === name;
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => {
+                        setSelectedScenario(name);
+                        setPlaying(false);
+                        setVisibleCount(0);
+                        setAnimatedScenario(null);
+                      }}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                        isActive
+                          ? "bg-sky-600 text-white border-sky-600 dark:bg-sky-500 dark:border-sky-500"
+                          : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      }`}
+                    >
+                      {name}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </section>
       )}
 
@@ -330,6 +467,44 @@ export default function DashboardPage() {
           <UnscheduledDurationChart tasks={tasks.data} />
         </section>
       )}
+    </div>
+  );
+}
+
+function ScenarioButtons({
+  scenarios,
+  active,
+  disabled,
+  activeClass,
+  onSelect,
+}: {
+  scenarios: string[];
+  active: string | null;
+  disabled: string | null;
+  activeClass: string;
+  onSelect: (name: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {scenarios.map((name) => {
+        const isActive = active === name;
+        const isDisabled = disabled === name;
+        return (
+          <button
+            key={name}
+            type="button"
+            disabled={isDisabled}
+            onClick={() => onSelect(name)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+              isActive
+                ? activeClass
+                : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            } ${isDisabled ? "opacity-30 cursor-not-allowed" : ""}`}
+          >
+            {name}
+          </button>
+        );
+      })}
     </div>
   );
 }

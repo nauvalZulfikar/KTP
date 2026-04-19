@@ -19,6 +19,24 @@ router = APIRouter(prefix="/scenarios", tags=["scenarios"])
 SKIP_SHEETS = {"Machine Util", "Product WT", "Component WT", "Late Orders"}
 
 
+def _safe_float(value: Any) -> float | None:
+    if not pd.notna(value):
+        return None
+    if isinstance(value, str) and not value.strip():
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _safe_str(value: Any) -> str | None:
+    if not pd.notna(value):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
 class ScenarioTask(BaseModel):
     unique_id: int
     sr_no: int | None = None
@@ -61,12 +79,15 @@ def _read_scenario_sheet(sheet_name: str) -> list[ScenarioTask]:
         data["promised_delivery_date"] = pd.Timestamp(row["Promised Delivery Date"]).to_pydatetime()
         data["quantity_required"] = int(row["Quantity Required"])
         data["component"] = str(row["Components"])
-        data["operation"] = str(row["Operation"]) if pd.notna(row.get("Operation")) else None
-        data["process_type"] = str(row["Process Type"]) if pd.notna(row.get("Process Type")) else None
+        data["operation"] = _safe_str(row.get("Operation"))
+        data["process_type"] = _safe_str(row.get("Process Type"))
         data["machine_number"] = str(row["Machine Number"])
-        data["run_time_per_1000"] = float(row["Run Time (min/1000)"])
-        data["cycle_time_seconds"] = float(row["Cycle Time (seconds)"]) if pd.notna(row.get("Cycle Time (seconds)")) else None
-        data["setup_time_seconds"] = float(row["Setup time (seconds)"]) if pd.notna(row.get("Setup time (seconds)")) else None
+        run_time = _safe_float(row.get("Run Time (min/1000)"))
+        if run_time is None:
+            continue
+        data["run_time_per_1000"] = run_time
+        data["cycle_time_seconds"] = _safe_float(row.get("Cycle Time (seconds)"))
+        data["setup_time_seconds"] = _safe_float(row.get("Setup time (seconds)"))
         if "Start Time" in df.columns and pd.notna(row.get("Start Time")):
             data["start_time"] = pd.Timestamp(row["Start Time"]).to_pydatetime()
         if "End Time" in df.columns and pd.notna(row.get("End Time")):
