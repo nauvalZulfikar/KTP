@@ -53,8 +53,26 @@ REQUIRED_COLUMNS: frozenset[str] = frozenset({
 })
 
 
-def load_dataframe(path: Path, sheet: str = "As-Is") -> pd.DataFrame:
-    df = pd.read_excel(path, sheet_name=sheet)
+SHEET_CANDIDATES = ["P", "Non-Preempitive", "Non-Preemptive", "As-Is"]
+
+
+def load_dataframe(path: Path, sheet: str | None = None) -> pd.DataFrame:
+    if sheet is not None:
+        df = pd.read_excel(path, sheet_name=sheet)
+    else:
+        # Try common sheet names, fall back to first sheet
+        import openpyxl
+        wb = openpyxl.load_workbook(path, read_only=True)
+        names = wb.sheetnames
+        wb.close()
+        target = None
+        for candidate in SHEET_CANDIDATES:
+            if candidate in names:
+                target = candidate
+                break
+        if target is None:
+            target = names[0]
+        df = pd.read_excel(path, sheet_name=target)
     missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:
         raise ValueError(f"Missing required columns in {path}: {sorted(missing)}")
@@ -111,7 +129,7 @@ def import_dataframe(df: pd.DataFrame, session: Session) -> tuple[int, int]:
     return deleted, len(df)
 
 
-def import_excel(path: Path, sheet: str = "As-Is") -> tuple[int, int]:
+def import_excel(path: Path, sheet: str | None = None) -> tuple[int, int]:
     df = load_dataframe(path, sheet)
     init_db()
     with Session(engine) as session:
@@ -126,12 +144,12 @@ def main() -> None:
         default=settings.excel_path,
         help=f"Excel workbook path (default: {settings.excel_path})",
     )
-    parser.add_argument("--sheet", default="As-Is", help="Sheet name (default: As-Is)")
+    parser.add_argument("--sheet", default=None, help="Sheet name (auto-detect if omitted)")
     args = parser.parse_args()
 
     deleted, inserted = import_excel(args.path, args.sheet)
     print(f"Deleted {deleted} existing row(s).")
-    print(f"Inserted {inserted} row(s) from {args.path} [sheet={args.sheet}].")
+    print(f"Inserted {inserted} row(s) from {args.path}.")
 
 
 if __name__ == "__main__":

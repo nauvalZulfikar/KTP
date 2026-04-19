@@ -16,74 +16,109 @@ import { ModifyPanel } from "@/components/panels/modify-panel";
 import { ProductsPanel } from "@/components/panels/products-panel";
 import { api, fetcher } from "@/lib/api";
 import { computeNonPreemptiveMetrics, computeNonPreemptiveAssignments } from "@/lib/non-preemptive";
-import type { MetricsRead, ScheduleRunDetail, ScheduleRunRead, TaskRead } from "@/lib/types";
+import type { ScheduledAssignmentRead, ScheduleRunRead, TaskRead } from "@/lib/types";
 
 const TICK_MS = 400;
 
-type GanttMode = "non-preemptive" | number; // number = run ID
+type ScenarioTask = TaskRead & {
+  start_time?: string | null;
+  end_time?: string | null;
+};
+
+type ScenarioData = {
+  name: string;
+  tasks: ScenarioTask[];
+};
 
 export default function DashboardPage() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const runs = useSWR<ScheduleRunRead[]>("/runs", fetcher);
-  const allRuns = runs.data ?? [];
+  // Fetch scenario list from Excel sheets
+  const scenarioList = useSWR<string[]>("/scenarios", fetcher);
+  const scenarios = scenarioList.data ?? [];
 
-  // Gantt mode: "non-preemptive" or a run ID
-  const [ganttMode, setGanttMode] = useState<GanttMode | null>(null);
+  // Selected scenario (default to first one, typically "Non-Preempitive")
+  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const activeScenario = selectedScenario ?? scenarios[0] ?? null;
 
-  // Default to first run (As-Is) when available
-  const effectiveMode: GanttMode = ganttMode ?? allRuns[0]?.id ?? "non-preemptive";
-  const activeRunId = typeof effectiveMode === "number" ? effectiveMode : null;
-
-  const runDetail = useSWR<ScheduleRunDetail>(
-    activeRunId !== null ? `/runs/${activeRunId}` : null,
+  // Fetch the selected scenario data
+  const scenarioData = useSWR<ScenarioData>(
+    activeScenario ? `/scenarios/${encodeURIComponent(activeScenario)}` : null,
     fetcher
   );
-  const metrics = useSWR<MetricsRead>(
-    activeRunId !== null ? `/runs/${activeRunId}/metrics` : null,
-    fetcher
-  );
+
   const tasks = useSWR<TaskRead[]>("/tasks", fetcher);
-  const originalTasks = useSWR<TaskRead[]>("/tasks/original", fetcher);
+  const runs = useSWR<ScheduleRunRead[]>("/runs", fetcher);
 
-  // Non-preemptive computed data
-  const npMetrics = useMemo(
-    () => (originalTasks.data ? computeNonPreemptiveMetrics(originalTasks.data) : null),
-    [originalTasks.data]
-  );
-  const npAssignments = useMemo(
-    () => (originalTasks.data ? computeNonPreemptiveAssignments(originalTasks.data) : []),
-    [originalTasks.data]
-  );
+  // Convert scenario tasks to TaskRead[] and ScheduledAssignmentRead[]
+  const scenarioTasks: TaskRead[] = useMemo(() => {
+    if (!scenarioData.data) return [];
+    return scenarioData.data.tasks.map((t) => ({
+      id: t.unique_id,
+      unique_id: t.unique_id,
+      sr_no: t.sr_no,
+      product_name: t.product_name,
+      order_processing_date: t.order_processing_date,
+      promised_delivery_date: t.promised_delivery_date,
+      quantity_required: t.quantity_required,
+      component: t.component,
+      operation: t.operation,
+      process_type: t.process_type,
+      machine_number: t.machine_number,
+      run_time_per_1000: t.run_time_per_1000,
+      cycle_time_seconds: t.cycle_time_seconds,
+      setup_time_seconds: t.setup_time_seconds,
+      status: t.status ?? "InProgress",
+    }));
+  }, [scenarioData.data]);
 
-  const sortedAssignments = useMemo(
-    () =>
-      [...(runDetail.data?.assignments ?? [])].sort((a, b) =>
-        a.start_time.localeCompare(b.start_time)
-      ),
-    [runDetail.data]
-  );
-  const total = sortedAssignments.length;
+  const scenarioAssignments: ScheduledAssignmentRead[] = useMemo(() => {
+    if (!scenarioData.data) return [];
+    const st = scenarioData.data.tasks;
+    // If tasks have start_time/end_time from Excel, use those directly
+    const hasSchedule = st.some((t) => t.start_time);
+    if (hasSchedule) {
+      return st
+        .filter((t) => t.start_time && t.end_time)
+        .map((t, i) => ({
+          id: i + 1,
+          run_id: 0,
+          task_id: t.unique_id,
+          split_index: 0,
+          assigned_quantity: t.quantity_required,
+          start_time: typeof t.start_time === "string" ? t.start_time : new Date(t.start_time!).toISOString(),
+          end_time: typeof t.end_time === "string" ? t.end_time : new Date(t.end_time!).toISOString(),
+        }));
+    }
+    // Otherwise compute non-preemptive schedule
+    return computeNonPreemptiveAssignments(scenarioTasks);
+  }, [scenarioData.data, scenarioTasks]);
 
+  const scenarioMetrics = useMemo(() => {
+    if (scenarioTasks.length === 0 || scenarioAssignments.length === 0) return null;
+    return computeNonPreemptiveMetrics(scenarioTasks);
+  }, [scenarioTasks, scenarioAssignments]);
+
+  // Animation
+  const total = scenarioAssignments.length;
   const [visibleCount, setVisibleCount] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [animatedRunId, setAnimatedRunId] = useState<number | null>(null);
+  const [animatedScenario, setAnimatedScenario] = useState<string | null>(null);
 
   const [modifyOpen, setModifyOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
 
   useEffect(() => {
-    if (ganttMode === "non-preemptive") return;
-    if (!runDetail.data || total === 0) return;
-    if (runDetail.data.id !== animatedRunId) {
-      setAnimatedRunId(runDetail.data.id);
+    if (total === 0) return;
+    if (activeScenario !== animatedScenario) {
+      setAnimatedScenario(activeScenario);
       setVisibleCount(0);
       setPlaying(true);
     } else if (visibleCount === 0 && !playing) {
       setVisibleCount(total);
     }
-  }, [runDetail.data, animatedRunId, total, visibleCount, playing, ganttMode]);
+  }, [activeScenario, animatedScenario, total, visibleCount, playing]);
 
   useEffect(() => {
     if (!playing) return;
@@ -108,37 +143,19 @@ export default function DashboardPage() {
     }
   }
 
-  function runLabel(index: number): string {
-    return index === 0 ? "As-Is" : `What-If ${index}`;
-  }
-
-  const visible = sortedAssignments.slice(0, visibleCount);
-  const isNonPreemptive = effectiveMode === "non-preemptive";
-  const activeRunIndex = !isNonPreemptive ? allRuns.findIndex((r) => r.id === activeRunId) : -1;
-
-  // Subtitle
-  let subtitle = "No runs yet \u2014 run the scheduler to get started.";
-  if (isNonPreemptive) {
-    subtitle = "Showing Non-Preemptive (original scheduling)";
-  } else if (activeRunId !== null && activeRunIndex >= 0) {
-    subtitle = `Showing ${runLabel(activeRunIndex)} (run #${activeRunId})`;
-  }
-
-  // Show the Gantt section if we're in non-preemptive mode OR we have run data
-  const showGantt = (isNonPreemptive && originalTasks.data) || (runDetail.data && tasks.data && total > 0);
-
-  // Active metrics for whichever mode
-  const activeMetrics = isNonPreemptive ? npMetrics : metrics.data;
-  // Active assignments + tasks for charts
-  const activeAssignments = isNonPreemptive ? npAssignments : runDetail.data?.assignments ?? [];
-  const activeTasks = isNonPreemptive ? (originalTasks.data ?? []) : (tasks.data ?? []);
+  const visible = scenarioAssignments.slice(0, visibleCount);
+  const showGantt = scenarios.length > 0;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-zinc-500">{subtitle}</p>
+          <p className="text-sm text-zinc-500">
+            {activeScenario
+              ? `Showing: ${activeScenario}`
+              : "Loading scenarios\u2026"}
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button
@@ -200,94 +217,75 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {activeMetrics && <MetricsTiles metrics={activeMetrics} />}
+      {scenarioMetrics && <MetricsTiles metrics={scenarioMetrics} />}
 
       {showGantt && (
         <section className="space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="text-lg font-medium">Gantt</h2>
-            {!isNonPreemptive && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-500 tabular-nums mr-2">
-                  {visibleCount} / {total}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (visibleCount >= total) setVisibleCount(0);
-                    setPlaying(true);
-                  }}
-                  disabled={playing}
-                  className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
-                >
-                  Play
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPlaying(false)}
-                  disabled={!playing}
-                  className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
-                >
-                  Pause
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPlaying(false);
-                    setVisibleCount(total);
-                  }}
-                  className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Show all
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVisibleCount(0);
-                    setPlaying(false);
-                  }}
-                  className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  Clear
-                </button>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-500 tabular-nums mr-2">
+                {visibleCount} / {total}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (visibleCount >= total) setVisibleCount(0);
+                  setPlaying(true);
+                }}
+                disabled={playing}
+                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+              >
+                Play
+              </button>
+              <button
+                type="button"
+                onClick={() => setPlaying(false)}
+                disabled={!playing}
+                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40"
+              >
+                Pause
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlaying(false);
+                  setVisibleCount(total);
+                }}
+                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                Show all
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setVisibleCount(0);
+                  setPlaying(false);
+                }}
+                className="px-3 py-1.5 rounded-md text-xs border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
-          {/* Gantt chart: either Non-Preemptive or a specific run */}
-          {isNonPreemptive ? (
-            originalTasks.data && <GanttView assignments={npAssignments} tasks={originalTasks.data} />
-          ) : (
-            tasks.data && <GanttView assignments={visible} tasks={tasks.data} />
+          {scenarioTasks.length > 0 && (
+            <GanttView assignments={visible} tasks={scenarioTasks} />
           )}
 
           {/* Scenario selector buttons */}
           <div className="flex flex-wrap gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => {
-                setGanttMode("non-preemptive");
-                setPlaying(false);
-              }}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
-                isNonPreemptive
-                  ? "bg-sky-600 text-white border-sky-600 dark:bg-sky-500 dark:border-sky-500"
-                  : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              }`}
-            >
-              Non-Preemptive
-            </button>
-            {allRuns.map((r, i) => {
-              const isActive = effectiveMode === r.id;
+            {scenarios.map((name) => {
+              const isActive = activeScenario === name;
               return (
                 <button
-                  key={r.id}
+                  key={name}
                   type="button"
                   onClick={() => {
-                    setGanttMode(r.id);
+                    setSelectedScenario(name);
                     setPlaying(false);
                     setVisibleCount(0);
-                    setAnimatedRunId(null);
+                    setAnimatedScenario(null);
                   }}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
                     isActive
@@ -295,7 +293,7 @@ export default function DashboardPage() {
                       : "border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   }`}
                 >
-                  {runLabel(i)}
+                  {name}
                 </button>
               );
             })}
@@ -303,25 +301,25 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {activeAssignments.length > 0 && activeTasks.length > 0 && (
+      {scenarioAssignments.length > 0 && scenarioTasks.length > 0 && (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <ComponentStatusChart assignments={activeAssignments} tasks={activeTasks} />
-          {activeMetrics && <LateProductsChart data={activeMetrics.late_counts} />}
+          <ComponentStatusChart assignments={scenarioAssignments} tasks={scenarioTasks} />
+          {scenarioMetrics && <LateProductsChart data={scenarioMetrics.late_counts} />}
         </section>
       )}
 
-      {activeMetrics && (
+      {scenarioMetrics && (
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <MachineUtilChart data={activeMetrics.machine_utilization} />
+          <MachineUtilChart data={scenarioMetrics.machine_utilization} />
           <WaitingTimeChart
             title="Product Waiting Time"
             xLabel="Product"
-            data={activeMetrics.product_waiting_days}
+            data={scenarioMetrics.product_waiting_days}
           />
           <WaitingTimeChart
             title="Component Waiting Time"
             xLabel="Component"
-            data={activeMetrics.component_waiting_days}
+            data={scenarioMetrics.component_waiting_days}
             palette={["#8b5cf6", "#06b6d4", "#84cc16", "#ec4899", "#6366f1", "#f97316"]}
           />
         </section>

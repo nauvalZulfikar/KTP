@@ -61,6 +61,16 @@ def get_run_metrics(run_id: int, session: Session = Depends(get_session)) -> Met
     return compute_metrics(session, run_id)
 
 
+@router.delete("/runs/{run_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_run(run_id: int, session: Session = Depends(get_session)) -> None:
+    run = session.get(ScheduleRun, run_id)
+    if run is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Run not found")
+    session.execute(delete(ScheduledAssignment).where(ScheduledAssignment.run_id == run_id))
+    session.delete(run)
+    session.commit()
+
+
 @router.delete("/runs", status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_runs(session: Session = Depends(get_session)) -> None:
     """Wipe every ScheduleRun + ScheduledAssignment. Task master data is left intact.

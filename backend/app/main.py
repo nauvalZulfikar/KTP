@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import models  # noqa: F401 — registers SQLModel tables with metadata
+from .api.scenarios import router as scenarios_router
 from .api.schedule import router as schedule_router
 from .api.tasks import router as tasks_router
 from .db import init_db
@@ -28,6 +29,7 @@ app.add_middleware(
 
 app.include_router(tasks_router)
 app.include_router(schedule_router)
+app.include_router(scenarios_router)
 
 
 @app.get("/health")

@@ -43,5 +43,6 @@ export const api = {
   listRuns: () => request<ScheduleRunRead[]>("/runs"),
   getRun: (id: number) => request<ScheduleRunDetail>(`/runs/${id}`),
   getRunMetrics: (id: number) => request<MetricsRead>(`/runs/${id}/metrics`),
+  deleteRun: (id: number) => request<void>(`/runs/${id}`, { method: "DELETE" }),
   deleteAllRuns: () => request<void>("/runs", { method: "DELETE" }),
 };
